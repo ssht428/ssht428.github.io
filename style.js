@@ -5,6 +5,7 @@ function format_content(raw)
     var in_code = false;
     var replace_map = [[/&/g, "&amp;"], [/</g, "&lt;"], [/>/g, "&gt;"],
         [/#RED/g, "<font color='red'>"], [/#-RED/g, "</font>"],
+        [/#STRONG/g, "<strong>"], [/#-STRONG/g, "</strong>"],
         [/#HREF/g, "<a href="], [/#-HREF1/g, ">"], [/#-HREF2/g, "</a>"],
         [/#TABLE/g, "<table>"], [/#-TABLE/g, "</table>"],
         [/#TBODY/g, "<tbody>"], [/#-TBODY/g, "</tbody>"],
@@ -37,7 +38,10 @@ function format_content(raw)
             if(item.length == 0)
                 continue;
             if(item.endsWith(".png") || item.endsWith(".jpg"))
+            {
                 formated += "<p><img src = '" + item + "'></p>";
+                
+            }
             else if(item == "+++code")
             {
                 formated += "<pre>";
@@ -59,7 +63,7 @@ window.onload = function()
 {
     var title = document.getElementById("title").innerText;
     var content = document.getElementById("content").innerText;
-    var footer = "周语馨 from 南京大学 to 英特尔亚太研发有限公司<br>504849766@qq.com";
+    var footer = "孙悟空 from 吉林大学自动化 @ 山东灵智机器人有限公司  ssht428@163.com";
     document.write('                                                                                \
         <html>                                                                                      \
             <head>                                                                                  \
