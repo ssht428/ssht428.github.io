@@ -1,0 +1,362 @@
+MAIN
+'First check error when robot not run
+If start=0 Then
+    While M_Err
+        M_Out(0) = M_Err
+    WEnd
+    Servo On
+    ' Initialize robot and start warmup movement under robot is in standstill state
+    CallP "OFFINIT"
+    Dly 5
+    CallP "CYCLEMOVE"
+    Dly 5
+    Servo Off
+EndIf
+'End of program
+End
+************************************************************************************************
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''' Move display on cirbuit board   ''''''''''''''''''''''''
+' Default put display modules on L1/L2/L3/R1/R2, only leave R3 not occupied
+' Movement sequence: L3->R3;L2->L3;L1->L2;R1->L1;R2->R1;R3->R2
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''' Initial general output of CR751D and pnematics/cylinders
+M_Out(4) = 0         ' release gripper
+M_Out(5) = 0         ' release Right pnematic
+M_Out(6) = 0         ' release Left pnematic
+M_Out(7) = 0         ' release Work pnematic
+M_Out(8) = 0         ' release Position pnematic
+Accel 100,100          ' start low speed cycle movement
+Ovrd 100
+'JOvrd 100
+'Spd 100
+'MvTune 4        ' high precision mode movement
+'pdCur = P_Curr
+'Mov P_Curr,-20
+Mov pdHome
+Prec On
+'''''''' Start display movement
+''' Move L3 module to R3
+Mvs pdL3H
+Mvs pdL3L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable,unit=s
+Mvs pdL3H
+Mvs pdR3H
+Mvs pdR3
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdR3H
+''' Move L2 module to L3
+Mvs pdL2H
+Mvs pdL2L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable,unit=s
+Mvs pdL2H
+Mvs pdL3H
+Mvs pdL3
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdL3H
+''' Move L1 module to L2
+Mvs pdL1H
+Mvs pdL1L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable
+Mvs pdL1H
+Mvs pdL2H
+Mvs pdL2
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdL2H
+''' Move R1 module to L1
+Mvs pdR1H
+Mvs pdR1L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable
+Mvs pdR1H
+Mvs pdL1H
+Mvs pdL1
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdL1H
+''' Move R2 module to R1
+Mvs pdR2H
+Mvs pdR2L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable
+Mvs pdR2H
+Mvs pdR1H
+Mvs pdR1
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdR1H
+''' Move R3 module to R2
+Mvs pdR3H
+Mvs pdR3L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable
+Mvs pdR3H
+Mvs pdR2H
+Mvs pdR2
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdR2H
+'''''''''''  start position place
+''' Move L3 module to WL
+Mvs pdL3H
+'Mvs pdL3L
+'M_Out(4)=1          ' Grip display module
+'Dly 0.1             ' wait air gripper stable
+'Mvs pdL3H
+End
+pdHome	550.000	0.000	370.000	0.000	0.000	0.000			4	0
+pdL1	267.105	-330.900	279.100	0.000	0.000	44.268			4	0
+pdL1H	267.105	-330.900	295.000	0.000	0.000	44.268			4	0
+pdL1L	267.105	-330.900	276.100	0.000	0.000	44.268			4	0
+pdL2	347.105	-330.900	279.600	0.000	0.000	44.268			4	0
+pdL2H	347.105	-330.900	295.000	0.000	0.000	44.268			4	0
+pdL2L	347.105	-330.900	276.600	0.000	0.000	44.268			4	0
+pdL3	427.105	-330.900	279.600	0.000	0.000	44.268			4	0
+pdL3H	427.105	-330.900	295.000	0.000	0.000	44.268			4	0
+pdL3L	427.105	-330.900	276.600	0.000	0.000	44.268			4	0
+pdR1	267.105	-240.900	278.100	0.000	0.000	44.268			4	0
+pdR1H	267.105	-240.900	295.000	0.000	0.000	44.268			4	0
+pdR1L	267.105	-240.900	275.100	0.000	0.000	44.268			4	0
+pdR2	347.105	-240.900	278.100	0.000	0.000	44.268			4	0
+pdR2H	347.105	-240.900	295.000	0.000	0.000	44.268			4	0
+pdR2L	347.105	-240.900	275.100	0.000	0.000	44.268			4	0
+pdR3	427.105	-240.900	278.600	0.000	0.000	44.268			4	0
+pdR3H	427.105	-240.900	295.000	0.000	0.000	44.268			4	0
+pdR3L	427.105	-240.900	275.600	0.000	0.000	44.268			4	0
+pdWRL	297.564	238.435	231.772	0.000	0.000	134.268			4	0
+*********************************************************************************************************
+  'Initialize robot and start warmup movement under robot is in standstill state
+    Accel 10,10
+    Ovrd 10
+    Mov p0Home
+    Dly 1
+    Mov p1J1Max
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p2J1Min
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p3J2Max
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p4J2Min
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p5J3Max
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p6J3Min
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p7J4Max
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p8J4Min
+    Dly 1
+    Mov p0Home
+p0Home	550.000	0.000	370.000	0.000	0.000	0.000			4	0
+p1J1Max	-541.644	95.507	370.000	0.000	0.000	170.000			4	0
+p2J1Min	-541.644	-95.506	370.000	0.000	0.000	-170.000			1	0
+p3J2Max	140.691	129.055	370.000	0.000	0.000	145.000			4	0
+p4J2Min	140.691	-129.055	370.000	0.000	0.000	-145.000			0	0
+p5J3Max	550.000	0.000	370.000	0.000	0.000	0.000			4	0
+p6J3Min	550.000	0.000	225.000	0.000	0.000	0.000			4	0
+p7J4Max	550.000	0.000	370.000	0.000	0.000	-0.001			4	4096
+p8J4Min	550.000	0.000	370.000	0.000	0.000	0.001			4	61440
+***************************************************************************************************************
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''' Move display on cirbuit board   ''''''''''''''''''''''''
+' Default put display modules on L1/L2/L3/R1/R2, only leave R3 not occupied
+' Movement sequence: L3->R3;L2->L3;L1->L2;R1->L1;R2->R1;R3->R2
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''' Initial general output of CR751D and pnematics/cylinders
+M_Out(4) = 0         ' release gripper
+M_Out(5) = 0         ' release Right pnematic
+M_Out(6) = 0         ' release Left pnematic
+M_Out(7) = 0         ' release Work pnematic
+M_Out(8) = 0         ' release Position pnematic
+Accel 100,100          ' start low speed cycle movement
+Mov pdHome
+Prec On
+MaxSpeed=0
+*CONTROL
+If MaxSpeed<100 Then
+    MaxSpeed=MaxSpeed+10
+    Ovrd MaxSpeed
+    GoTo *SEQUENCE
+Else
+    iCycle=iCycle+1
+    If iCycle<10 Then
+        MaxSpeed=100
+        Ovrd MaxSpeed
+        GoTo *SEQUENCE
+    Else
+        MaxSpeed=10
+        GoTo *CONTROL
+        'Ovrd MaxSpeed
+        ' Here should add move up before Homing
+        'Mvs pdHome
+        'End
+    EndIf
+EndIf
+*SEQUENCE
+    'Ovrd 100
+    'JOvrd 100
+    'Spd 100
+    'MvTune 4        ' high precision mode movement
+    'pdCur = P_Curr
+    'Mov P_Curr,-20
+    '''''''' Start display movement
+    ''' Move L3 module to R3
+    Mvs pdL3H
+    Mvs pdL3L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable,unit=s
+    Mvs pdL3H
+    Mvs pdR3H
+    Mvs pdR3
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdR3H
+    ''' Move L2 module to L3
+    Mvs pdL2H
+    Mvs pdL2L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable,unit=s
+    Mvs pdL2H
+    Mvs pdL3H
+    Mvs pdL3
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdL3H
+    ''' Move L1 module to L2
+    Mvs pdL1H
+    Mvs pdL1L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable
+    Mvs pdL1H
+    Mvs pdL2H
+    Mvs pdL2
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdL2H
+    ''' Move R1 module to L1
+    Mvs pdR1H
+    Mvs pdR1L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable
+    Mvs pdR1H
+    Mvs pdL1H
+    Mvs pdL1
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdL1H
+    ''' Move R2 module to R1
+    Mvs pdR2H
+    Mvs pdR2L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable
+    Mvs pdR2H
+    Mvs pdR1H
+    Mvs pdR1
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdR1H
+    ''' Move R3 module to R2
+    Mvs pdR3H
+    Mvs pdR3L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable
+    Mvs pdR3H
+    Mvs pdR2H
+    Mvs pdR2
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdR2H
+    GoTo *CONTROL
+Mvs pdHome
+End
+pdHome	550.000	0.000	370.000	0.000	0.000	0.000			4	0
+pdL1	267.105	-330.900	279.100	0.000	0.000	44.268			4	0
+pdL1H	267.105	-330.900	295.000	0.000	0.000	44.268			4	0
+pdL1L	267.105	-330.900	276.100	0.000	0.000	44.268			4	0
+pdL2	347.105	-330.900	279.600	0.000	0.000	44.268			4	0
+pdL2H	347.105	-330.900	295.000	0.000	0.000	44.268			4	0
+pdL2L	347.105	-330.900	276.600	0.000	0.000	44.268			4	0
+pdL3	427.105	-330.900	279.600	0.000	0.000	44.268			4	0
+pdL3H	427.105	-330.900	295.000	0.000	0.000	44.268			4	0
+pdL3L	427.105	-330.900	276.600	0.000	0.000	44.268			4	0
+pdR1	267.105	-240.900	278.100	0.000	0.000	44.268			4	0
+pdR1H	267.105	-240.900	295.000	0.000	0.000	44.268			4	0
+pdR1L	267.105	-240.900	275.100	0.000	0.000	44.268			4	0
+pdR2	347.105	-240.900	278.100	0.000	0.000	44.268			4	0
+pdR2H	347.105	-240.900	295.000	0.000	0.000	44.268			4	0
+pdR2L	347.105	-240.900	275.100	0.000	0.000	44.268			4	0
+pdR3	427.105	-240.900	278.600	0.000	0.000	44.268			4	0
+pdR3H	427.105	-240.900	295.000	0.000	0.000	44.268			4	0
+pdR3L	427.105	-240.900	275.600	0.000	0.000	44.268			4	0
+pdWRL	297.564	238.435	231.772	0.000	0.000	134.268			4	0
+************************************************************************************************************
+' Standard cycle movement is (Distance=300mm,Height=25mm)
+    Accel 100,100          ' start high speed cycle movement
+For MaxSpeed=10 To 100 Step 10
+    Ovrd MaxSpeed
+    'JOvrd MaxSpeed
+    'Spd MaxSpeed
+    Mvs p0DwLf      ' Down-Left
+    Mvs p1UpLf      ' Up-Left
+    Mvs p2UpRt      ' Up-Right
+    Mvs p3DwRt      ' Down-Right
+    Mvs p2UpRt      ' Up-Right
+    Mvs p1UpLf      ' Up-Left
+    Mvs p0DwLf      ' Down-Left
+Next
+    Accel 100,100          ' start high speed cycle movement
+    Ovrd 100
+    'JOvrd 100
+    'Spd 100
+    'MvTune 2        ' high speed mode movement
+For i=0 To 10
+    Mvs p0DwLf      ' Down-Left
+    Mvs p1UpLf      ' Up-Left
+    Mvs p2UpRt      ' Up-Right
+    Mvs p3DwRt      ' Down-Right
+    Mvs p2UpRt      ' Up-Right
+    Mvs p1UpLf      ' Up-Left
+    Mvs p0DwLf      ' Down-Left
+Next
+For MaxSpeed=100 To 10 Step -10
+    Ovrd MaxSpeed
+    'JOvrd MaxSpeed
+    'Spd MaxSpeed
+    Mvs p0DwLf      ' Down-Left
+    Mvs p1UpLf      ' Up-Left
+    Mvs p2UpRt      ' Up-Right
+    Mvs p3DwRt      ' Down-Right
+    Mvs p2UpRt      ' Up-Right
+    Mvs p1UpLf      ' Up-Left
+    Mvs p0DwLf      ' Down-Left
+Next
+'MvTune 1    ' standard mode movement
+Ovrd 10
+JOvrd 10
+Spd 10
+Mov p0Home
+p0DwLf	435.000	150.000	335.000	0.000	0.000	0.000			4	0
+p0Home	550.000	0.000	370.000	0.000	0.000	0.000			4	0
+p1UpLf	435.000	150.000	360.000	0.000	0.000	0.000			4	0
+p2UpRt	435.000	-150.000	360.000	0.000	0.000	0.000			4	0
+p3DwRt	435.000	-150.000	335.000	0.000	0.000	0.000			4	0
