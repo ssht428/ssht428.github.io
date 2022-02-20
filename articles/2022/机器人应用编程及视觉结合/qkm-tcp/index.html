@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>李群机器人AH-5020-054S TCP通信(带断开重连功能)</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">李群机器人AH-5020-054S TCP通信(带断开重连功能)</h1>
+                            </header>
+                            <div class="entry-content">
+<p>
+搞不懂李群机器人官网下载东西还要注册并且还要人工审核，是怕我偷你“高科技”吗....还有很多例程没有，必须联系他们公司才能要到。(估计他们也是找美国Precise Automation公司要的，毕竟无论控制器还是软件都是别人的，他们只是做了个本体)。
+<br> 官方例程我就不上传了，如有需要可以找李群公司要。
+<br> 这个TCP断线重连是在官方的TCP server基础上进行修改的，增加了一个单独的thread进行监控当前tcp连接，如果tcp客户端断开导致error，则thread中关闭tcp server，然后重新打开listen端口，等待client连接。
+<br> 要实现这样断线重连的功能，一般需要thread功能支持，不受当前执行程序的影响，以便在出错后重新启动。
+<br> 代码文件： <a href="PickPlaceNetwork_20210525.zip"> TCP断线重连 </a>
+<pre>
+<br> 简单代码参考如下：     
+          #Region Property
+          Private mServerEp As IPEndPoint	' 定义一个IP端点
+	Private mTcpListen As TcpListener	' 定义监听对象	
+	Private mSocket As Socket
+          Private mClientState As Integer = 0     ' 0=not initialize,1=connection,2=disconnect	
+	Private SendThread As Thread		' 定义一个线程
+	Private ReceiveThread As Thread
+          ......
+          #End Region
+
+          Public Sub Init()
+          mServerEp = New IPEndPoint("", 1100)              ' 创建IP端点对象,端口号用户可自行设置
+	mTcpListen = New TcpListener(mServerEp)	          ' 创建监听器对象
+	SendThread = New Thread("sSendThread")	          ' 创建发送线程
+	ReceiveThread = New Thread("sReceiveThread")	' 创建接收线程
+	MotionThread = New Thread("sMotionThread")
+          .....         
+          End Sub
+
+          Public Sub sReceiveThread
+             .......
+          Catch ex
+	    Console.WriteLine("Network.sReceiveThread" & " " & CStr(ex.ErrorCode) & " " & ex.Message)	' 打印异常错误代码与信息
+	    If(ex.ErrorCode = -1703) Then	' No connection
+	       mClientState = 2
+	    End If 
+          End Sub     
+
+          Public Sub MAIN
+          Dim ex As New Exception  ' 定义一个异常处理类型，用来捕捉异常信息	
+	Dim i As Integer = 0
+	
+	Try
+          While(True)
+                    If(mClientState = 0) Then
+                        mTcpListen.Start()  ' 开始监听连接请求
+                        While Not mTcpListen.Pending()	' 没有连接请求，线程睡眠1s
+                            Thread.Sleep(1000)
+                        End While
+                        Console.Writeline("Connection request...")	' 打印"Connection request..."
+                        mSocket = mTcpListen.AcceptSocket()           ' 获取套接字
+                        mTcpListen.Stop()                          	' 停止监听连接请求
+                        mClientState = 1
+                        SendThread.Start			' 启动发送线程
+                        ReceiveThread.Start			' 启动接收线程
+                        MotionThread.Start			
+                    ElseIf(mClientState = 1) Then                     
+                        ' Just normal running state
+                    ElseIf(mClientState = 2) Then
+                        SendThread.Abort
+                        ReceiveThread.Abort
+                        MotionThread.Abort
+                        mClientState = 0
+                    End If
+                    
+                    Thread.Sleep(1000)
+          End While
+          
+          Catch ex
+                    Console.WriteLine("Network.MAIN" & " " & CStr(ex.ErrorCode) & " " & ex.Message)	' 打印异常错误代码与信息
+                    Thread.Sleep(5000)
+          End Try         
+          
+          End Sub  
+</pre>
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ 山东灵智机器人有限公司  ssht428@163.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
