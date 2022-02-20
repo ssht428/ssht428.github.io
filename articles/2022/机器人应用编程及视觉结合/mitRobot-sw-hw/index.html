@@ -1,0 +1,362 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>三菱机器人MITSUBISHI SCARA 软硬件介绍</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">三菱机器人MITSUBISHI SCARA 软硬件介绍</h1>
+                            </header>
+                            <div class="entry-content">
+<p>
+这个机器人是收的二手的，买回来时外壳有点破碎，控制器上缺少部分接头，其中有个连接示教器的接口，但是因为这个二手的缺少示教器，故需要在示教器接口接个“虚拟插头2D-DP1”，后来在咸鱼上买了个才能使用了。还有一些CNUSER和扩展IO处的接头。。。
+机器人是三菱MITSUBISHI RH-3FH, 控制器是CR751D，安装了两个IO扩展模块2D-TZ368共64个点。
+<p><img src="mitRobot-RH-3FH-hardware.jpg" width="390px" height="520px"></p>
+因为没有示教器，只能采用电脑端编程，用的是RT Toolbox3,下载的是mini版，那个pro版要收费，pro版还可以加载机器人实际的solidworks 3D模型。程序可以在软件中仿真运行后再下载到控制器中，当然有时候仿真可行，实际有的点无法到达。
+虚拟插头可以自己买个接头，规格是TB interface: Width(21mm) * Height(3mm),18+19=37pin,pin_pin=1mm.，然后短接其中的pin111-pin222,pin333-pin444,具体图片如下：
+<p><img src="mitRobot-2D-DP1.png" width="540px" height="284px"></p>
+关于编程，先上程序：
+<a href="SimulationOriginProgram.txt">SimulationOriginProgram</a> 
+<pre> 
+MAIN
+'First check error when robot not run
+If start=0 Then
+    While M_Err
+        M_Out(0) = M_Err
+    WEnd
+    Servo On
+    ' Initialize robot and start warmup movement under robot is in standstill state
+    CallP "OFFINIT"
+    Dly 5
+    CallP "CYCLEMOVE"
+    Dly 5
+    Servo Off
+EndIf
+'End of program
+End
+************************************************************************************************
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''' Move display on cirbuit board   ''''''''''''''''''''''''
+' Default put display modules on L1/L2/L3/R1/R2, only leave R3 not occupied
+' Movement sequence: L3->R3;L2->L3;L1->L2;R1->L1;R2->R1;R3->R2
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''' Initial general output of CR751D and pnematics/cylinders
+M_Out(4) = 0         ' release gripper
+M_Out(5) = 0         ' release Right pnematic
+M_Out(6) = 0         ' release Left pnematic
+M_Out(7) = 0         ' release Work pnematic
+M_Out(8) = 0         ' release Position pnematic
+Accel 100,100          ' start low speed cycle movement
+Ovrd 100
+'JOvrd 100
+'Spd 100
+'MvTune 4        ' high precision mode movement
+'pdCur = P_Curr
+'Mov P_Curr,-20
+Mov pdHome
+Prec On
+'''''''' Start display movement
+''' Move L3 module to R3
+Mvs pdL3H
+Mvs pdL3L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable,unit=s
+Mvs pdL3H
+Mvs pdR3H
+Mvs pdR3
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdR3H
+''' Move L2 module to L3
+Mvs pdL2H
+Mvs pdL2L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable,unit=s
+Mvs pdL2H
+Mvs pdL3H
+Mvs pdL3
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdL3H
+''' Move L1 module to L2
+Mvs pdL1H
+Mvs pdL1L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable
+Mvs pdL1H
+Mvs pdL2H
+Mvs pdL2
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdL2H
+''' Move R1 module to L1
+Mvs pdR1H
+Mvs pdR1L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable
+Mvs pdR1H
+Mvs pdL1H
+Mvs pdL1
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdL1H
+''' Move R2 module to R1
+Mvs pdR2H
+Mvs pdR2L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable
+Mvs pdR2H
+Mvs pdR1H
+Mvs pdR1
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdR1H
+''' Move R3 module to R2
+Mvs pdR3H
+Mvs pdR3L
+M_Out(4)=1          ' Grip display module
+Dly 0.05             ' wait air gripper stable
+Mvs pdR3H
+Mvs pdR2H
+Mvs pdR2
+M_Out(4)=0          ' place display module
+Dly 0.01
+Mvs pdR2H
+'''''''''''  start position place
+''' Move L3 module to WL
+Mvs pdL3H
+'Mvs pdL3L
+'M_Out(4)=1          ' Grip display module
+'Dly 0.1             ' wait air gripper stable
+'Mvs pdL3H
+End
+/**** 以下为点位值表   ****/
+...............
+*********************************************************************************************************
+  'Initialize robot and start warmup movement under robot is in standstill state
+    Accel 10,10
+    Ovrd 10
+    Mov p0Home
+    Dly 1
+    Mov p1J1Max
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p2J1Min
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p3J2Max
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p4J2Min
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p5J3Max
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p6J3Min
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p7J4Max
+    Dly 1
+    Mov p0Home
+    Dly 1
+    Mov p8J4Min
+    Dly 1
+    Mov p0Home
+/**** 以下为点位值表   ****/
+...............
+*********************************************************************************
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''' Move display on cirbuit board   ''''''''''''''''''''''''
+' Default put display modules on L1/L2/L3/R1/R2, only leave R3 not occupied
+' Movement sequence: L3->R3;L2->L3;L1->L2;R1->L1;R2->R1;R3->R2
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''' Initial general output of CR751D and pnematics/cylinders
+M_Out(4) = 0         ' release gripper
+M_Out(5) = 0         ' release Right pnematic
+M_Out(6) = 0         ' release Left pnematic
+M_Out(7) = 0         ' release Work pnematic
+M_Out(8) = 0         ' release Position pnematic
+Accel 100,100          ' start low speed cycle movement
+Mov pdHome
+Prec On
+MaxSpeed=0
+*CONTROL
+If MaxSpeed<100 Then
+    MaxSpeed=MaxSpeed+10
+    Ovrd MaxSpeed
+    GoTo *SEQUENCE
+Else
+    iCycle=iCycle+1
+    If iCycle<10 Then
+        MaxSpeed=100
+        Ovrd MaxSpeed
+        GoTo *SEQUENCE
+    Else
+        MaxSpeed=10
+        GoTo *CONTROL
+        'Ovrd MaxSpeed
+        ' Here should add move up before Homing
+        'Mvs pdHome
+        'End
+    EndIf
+EndIf
+*SEQUENCE
+    'Ovrd 100
+    'JOvrd 100
+    'Spd 100
+    'MvTune 4        ' high precision mode movement
+    'pdCur = P_Curr
+    'Mov P_Curr,-20
+    '''''''' Start display movement
+    ''' Move L3 module to R3
+    Mvs pdL3H
+    Mvs pdL3L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable,unit=s
+    Mvs pdL3H
+    Mvs pdR3H
+    Mvs pdR3
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdR3H
+    ''' Move L2 module to L3
+    Mvs pdL2H
+    Mvs pdL2L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable,unit=s
+    Mvs pdL2H
+    Mvs pdL3H
+    Mvs pdL3
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdL3H
+    ''' Move L1 module to L2
+    Mvs pdL1H
+    Mvs pdL1L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable
+    Mvs pdL1H
+    Mvs pdL2H
+    Mvs pdL2
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdL2H
+    ''' Move R1 module to L1
+    Mvs pdR1H
+    Mvs pdR1L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable
+    Mvs pdR1H
+    Mvs pdL1H
+    Mvs pdL1
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdL1H
+    ''' Move R2 module to R1
+    Mvs pdR2H
+    Mvs pdR2L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable
+    Mvs pdR2H
+    Mvs pdR1H
+    Mvs pdR1
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdR1H
+    ''' Move R3 module to R2
+    Mvs pdR3H
+    Mvs pdR3L
+    M_Out(4)=1          ' Grip display module
+    Dly 0.05             ' wait air gripper stable
+    Mvs pdR3H
+    Mvs pdR2H
+    Mvs pdR2
+    M_Out(4)=0          ' place display module
+    Dly 0.01
+    Mvs pdR2H
+    GoTo *CONTROL
+Mvs pdHome
+End
+/**** 以下为点位值表   ****/
+...............
+************************************************************************************************************
+' Standard cycle movement is (Distance=300mm,Height=25mm)
+    Accel 100,100          ' start high speed cycle movement
+For MaxSpeed=10 To 100 Step 10
+    Ovrd MaxSpeed
+    'JOvrd MaxSpeed
+    'Spd MaxSpeed
+    Mvs p0DwLf      ' Down-Left
+    Mvs p1UpLf      ' Up-Left
+    Mvs p2UpRt      ' Up-Right
+    Mvs p3DwRt      ' Down-Right
+    Mvs p2UpRt      ' Up-Right
+    Mvs p1UpLf      ' Up-Left
+    Mvs p0DwLf      ' Down-Left
+Next
+    Accel 100,100          ' start high speed cycle movement
+    Ovrd 100
+    'JOvrd 100
+    'Spd 100
+    'MvTune 2        ' high speed mode movement
+For i=0 To 10
+    Mvs p0DwLf      ' Down-Left
+    Mvs p1UpLf      ' Up-Left
+    Mvs p2UpRt      ' Up-Right
+    Mvs p3DwRt      ' Down-Right
+    Mvs p2UpRt      ' Up-Right
+    Mvs p1UpLf      ' Up-Left
+    Mvs p0DwLf      ' Down-Left
+Next
+For MaxSpeed=100 To 10 Step -10
+    Ovrd MaxSpeed
+    'JOvrd MaxSpeed
+    'Spd MaxSpeed
+    Mvs p0DwLf      ' Down-Left
+    Mvs p1UpLf      ' Up-Left
+    Mvs p2UpRt      ' Up-Right
+    Mvs p3DwRt      ' Down-Right
+    Mvs p2UpRt      ' Up-Right
+    Mvs p1UpLf      ' Up-Left
+    Mvs p0DwLf      ' Down-Left
+Next
+'MvTune 1    ' standard mode movement
+Ovrd 10
+JOvrd 10
+Spd 10
+Mov p0Home
+/**** 以下为点位值表   ****/
+...............
+
+
+</pre>
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ 山东灵智机器人有限公司  ssht428@163.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
