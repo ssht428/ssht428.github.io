@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OpenCV中形态学操作</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">OpenCV中形态学操作</h1>
+                            </header>
+                            <div class="entry-content">
+<p>
+图像的形态学操作基本是处理图像的第一步操作，这个做好了对结果有很大影响。图像形态学中的几个基本操作：腐蚀、膨胀、开操作、闭操作。
+<pre>
+1.1 形态学概述  
+   形态学（morphology）一词通常表示生物学的一个分支，该分支主要研究动植物的形态和结构，而我们图像处理中指的形态学，往往表示的是数学形态学，下面一起来了解数学形态学的概念。
+   数学形态学（Mathematical morphology）是一门建立在格论和拓扑学基础之上的图像分析学科，是数学形态学图像处理的基本理论。其基本的运算包括：二值腐蚀和膨胀，二值开闭运算，骨架抽取，极限腐蚀，击中击不中变换，形态学梯度，Top-hat变换，颗粒分析，流域变换，灰值腐蚀和膨胀，灰值开闭运算，灰值形态学梯度等。
+   简单来讲，形态学操作就是基于形状的一系列图像处理操作。opencv为进行图像的形态学变换提供了快捷，方便的函数，最基本的形态学操作有二种，他们是：膨胀和腐蚀（Dilation与Erosion），膨胀与腐蚀能实现多种多样的功能，主要如下：
+    消除噪声
+    分割(isolate)出独立的图像元素，在图像中连接(join)相邻的元素。
+    寻找图像中的明显的极大值区域或极小值区域
+    求出图像的梯度
+   在进行腐蚀和膨胀的讲解之前，首先需要注意： 腐蚀和膨胀是对白色部分（高亮部分）而言的，不是黑色部分。 膨胀就是图像中的高亮部分进行膨胀，“邻域扩张”，效果图拥有比原图更大的高亮区域。腐蚀就是原图中高亮部分被腐蚀，“邻域被蚕食”，效果图拥有比原图更小的高亮区域。
+   1.2 膨胀    其实，膨胀就是求局部最大值的操作。按数学方面来说，膨胀或者腐蚀操作就是将图像（或图像的一部分区域，我们称之为A）与核（我们称之为B）进行卷积。
+   1.3 腐蚀     再来看一下腐蚀，，大家应该知道，膨胀和腐蚀是一对好基友，是相反的一对操作，所以腐蚀就是求局部最小值的操作，我们一般都会把腐蚀和膨胀对应起来理解和学习。下文就可以看到，两者的函数原型也是基本上一样的。
+
+</pre>
+
+<br> 下面转载几个相关的网页：
+<p>
+<br> <a href="http://www.opencv.org.cn/opencvdoc/2.3.2/html/doc/tutorials/imgproc/opening_closing_hats/opening_closing_hats.html"> OpenCV2.3.2 形态学变换   </a>
+<iframe src="http://www.opencv.org.cn/opencvdoc/2.3.2/html/doc/tutorials/imgproc/opening_closing_hats/opening_closing_hats.html" frameBorder="0" width="900" height="500" scrolling="auto"></iframe>
+</p>
+<p>
+<br> <a href="https://blog.csdn.net/zhangjunp3/article/details/79831117"> opencv 形态学处理   </a>
+<iframe src="https://blog.csdn.net/zhangjunp3/article/details/79831117" frameBorder="0" width="900" height="500" scrolling="auto"></iframe>
+</p>
+
+<br> <a href="https://www.cnblogs.com/wyuzl/p/6262714.html"> 学习 opencv---(9)形态学图像处理（一）：膨胀和腐蚀   </a>
+<br> <a href="https://www.cnblogs.com/aiguona/p/9370433.html"> Opencv学习笔记1：安装opencv和VS2015并进行环境配置  </a>
+<br> <a href="https://blog.csdn.net/qq_42312499/article/details/100587547"> VS2017+OpenCV4.1.0(VC15)VS2015+OpenCV3.4.1(VC14) 配置  </a>
+<p>
+<br> <a href="https://www.cnblogs.com/silence-cho/p/11069903.html"> (四)OpenCV-Python学习—形态学处理  </a>
+<pre>
+通过阈值化分割可以得到二值图，但往往会出现图像中物体形态不完整，变的残缺，可以通过形态学处理，使其变得丰满，或者去除掉多余的像素。常用的形态学处理算法包括：腐蚀，膨胀，开运算，闭运算，形态学梯度，顶帽运算和底帽运算。
+1. 腐蚀
+　　　腐蚀操作类似于中值平滑，也有一个核，但不进行卷积运算，而是取核中像素值的最小值代替锚点位置的像素值，这样就会使图像中较暗的区域面积增大，较亮的的区域面积减小。如果是一张黑底，白色前景的二值图，就会使白色的前景物体颜色变小，就像被腐蚀了一样。
+进行腐蚀操作的核，不仅可以是矩形，还可以是十字形和椭圆形，opencv提供getStructuringElement()函数来获得核.
+2.膨胀
+　　膨胀操作和腐蚀操作正好相反，是取核中像素值的最大值代替锚点位置的像素值，这样会使图像中较亮的区域增大，较暗的区域减小。如果是一张黑底，白色前景的二值图，就会使白色的前景物体颜色面积变大，就像膨胀了一样
+opencv提供dilate()函数进行膨胀操作.
+3.开运算，闭运算，顶帽，顶帽
+　　开运算：先进行腐蚀操作，后进行膨胀操作，主要用来去除一些较亮的部分，即先腐蚀掉不要的部分，再进行膨胀。
+　　闭运算：先进行膨胀操作，后进行腐蚀操作，主要用来去除一些较暗的部分。
+　　形态学梯度：膨胀运算结果减去腐蚀运算结果，可以拿到轮廓信息。
+　　顶帽运算：原图像减去开运算结果。
+　　底帽运算：原图像减去闭运算结果。　　
+　　进行开运算，闭运算，顶帽运算，底帽运算，形态学梯度，opencv提供了一个统一的函数cv2.morphologyEx().
+</pre>
+</p>
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

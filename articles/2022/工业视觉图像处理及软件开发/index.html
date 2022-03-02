@@ -1,0 +1,26 @@
+<script src="../../../style.js"></script>
+<pre id="title">工业视觉图像处理及软件开发</pre>
+<pre id="content">  
+首先要感谢公司给了机会和时间让我学习视觉检测方面的知识，并且提供了很多硬件供测试。#STRONG Thanks #-STRONG
+工业视觉是从20年4月份才开始学习的，当初为成本低选择了opencv，公司一开始只有个大恒的相机，先期仅做一个简单连接测试，但是经常会断开相机通信，并且导致电脑上的相机驱动也损坏，需要重新安装相机软件才可以。然后找大恒的销售，一开始还给些资料，并且给了个新式的“智能相机”试用，里面集成了Merlic软件，软件有点简单，无法实现项目要求，所以还是得自己写。后来再联系，就直接让一个客服接了，给了些N年前的代码，所以只好放弃了。
+后来公司收了两个Basler相机，于是就干脆试试Basler的，并且网上和github有很多案例和使用说明。前期用VS2015调试连接、采集图像都顺利。
+OpenCV一开始使用，按照各入门教程还算顺利，只是有时修改参数不方便，需要修改程序然后重新编译。或者使用opencv自带的createTrackbar，但是也是比较麻烦，所以要做界面才可以。找了下，好像有个cvUI可以，经过几天的试用，发现集成很简单，并且简单的界面还可以，但是稍微要加点功能，都无能为力了。
+过去只使用过VisualBasic 6.0做PC端的软件，但是OpenCV不能与那么老的VB6结合，只好找个新的编程语言了。 因为过去经常使用的是C编写后台和MCU之类的底层，所以首先想到的是有没有可以用C进行编程的界面，想起来GTK+，找了好多天，都没有很好的教程。
+看来只好新学一门语言了，由于我一直在windows上编程，所以首先看看windows上有什么好的速度快的，都说C#是最简单的，所以就先试试。试了几天发现，即使做最简单的界面，默认添加的杂代码太多，并且和OpenCV结合也不方便，所以再换。。。
+找来找去，还是选Qt试试，一开始不选Qt的原因是据说“Qt界面运行速度慢，程序体积有点大”，但是转来转去，只好硬着头皮学了，并且其中好多C++用法和标准的C++有差别。
+过程中还有很多其他的涉及，下面仅对其中有点用的进行转载，部分代码可能在文章中当成附件，如果是个大项目，有可能放在github单独一个project。
+
+此文目录如下：
+1. #HREF opencv-learning/index.html #-HREF1 OpenCV相关学习书籍 #-HREF2 
+1. #HREF opencv-install/index.html #-HREF1 OpenCV在Windows下的安装及VS2015中的配置 #-HREF2 
+1. #HREF opencv-functions/index.html #-HREF1 OpenCV部分函数简单说明 #-HREF2 
+1. #HREF opencv-morphology/index.html #-HREF1 OpenCV中形态学操作 #-HREF2 
+2. #HREF qt-install/index.html #-HREF1 Qt的安装及配置OpenCV  #-HREF2 
+2. #HREF merlic-try/index.html #-HREF1 Merlic视觉软件介绍  #-HREF2 
+3. #HREF keyence-debug/index.html #-HREF1 基恩士Keyence视觉软硬件介绍及调试  #-HREF2 
+4. #HREF basler-sw-hw/index.html #-HREF1 Basler软硬件介绍及驱动安装配置  #-HREF2 
+
+
+
+
+</pre>

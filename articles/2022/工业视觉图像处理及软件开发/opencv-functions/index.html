@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OpenCV部分函数简单说明</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">OpenCV部分函数简单说明</h1>
+                            </header>
+                            <div class="entry-content">
+<p>
+本文只是对OpenCV中使用的部分简单函数进行记录一下。
+<pre> 
+一.  waitKey()函数：这个函数因为waitKey仅对窗口机制起作用，即namedWindow产生的窗口。若在此之前没有产生窗口，则waitKey相当于未执行。
+waitKey有两个作用：
+1. It waits for x milliseconds for a key press. If a key was pressed during that time, it returns the key's ASCII code. Otherwise, it returns -1.
+2. It handles any windowing events, such as creating windows with cv::namedWindow(), or showing images with cv::imshow().
+格式：
+waitKey(x);
+第一个参数： 等待x ms，如果在此期间有按键按下，则立即结束并返回按下按键的ASCII码，否则返回-1
+如果x=0，那么无限等待下去，直到有按键按下
+另外，在imshow之后如果没有waitKey语句则不会正常显示图像。
+/**************************************************************************************
+按照网上结果应该是：第一个waitkey未运行，第二个waitkey正常等待10s。
+但是我测试是两个waitkey都是等待10s.
+***************************************************************************************/
+测试代码如下：
+#include < opencv2/highgui/highgui.hpp >
+#include < iostream >
+#include < Windows.h >
+
+using namespace cv;
+using namespace std;
+
+int main()
+{
+    double duration;  
+    // 测试没有namedWindow时的waitKey执行时间
+    duration = static_cast<</span>double>(getTickCount());
+    waitKey(10000);
+    duration = static_cast<</span>double>(getTickCount())
+             - duration;
+    duration /= getTickFrequency();
+    cout <<"第一个waitKey运行时间为：" << duration << 's' << endl;
+    
+    Mat im = imread("D:\Document\pictures\Lena.bmp",0);
+    namedWindow("Lena");
+    imshow("Lena",im);
+    // 测试有namedWindow时的waitKey执行时间
+    duration = static_cast<double>(getTickCount());
+    waitKey(10000);
+    duration = static_cast<double>(getTickCount())- duration;
+    duration /= getTickFrequency();
+    cout <<"第二个waitKey运行时间为：" << duration << 's' << endl;
+    Sleep(20000);
+    return 0;
+
+执行结果如下：从执行结果可以看出，第一个结果并未如期执行，第二个结果如期执行了。
+<br><img src="waitKey-web-result.png" width="387px" height="86px">
+下面是我测试的结果，两个都是正常等待10s:
+<br><img src="waitKey-mine-result.png" width="425px" height="99px">
+</pre>
+
+<p>
+<br> <a href="https://www.imooc.com/article/287720"> vs2017 或者 vs2015 安装、配置 opencv4.1_慕课手记   </a>
+<iframe src="https://www.imooc.com/article/287720" frameBorder="0" width="900" height="500" scrolling="auto"></iframe>
+</p>
+<br> <a href="https://www.jianshu.com/p/d51d431af7da"> vs2015配置OpenCv4.0 - 简书   </a>
+<br> <a href="https://blog.csdn.net/GreenHandCGL/article/details/80505701"> vs2015 + opencv3.4 配置_人工智能_君只见独不见的专栏-CSDN博客   </a>
+<br> <a href="https://www.cnblogs.com/aiguona/p/9370433.html"> Opencv学习笔记1：安装opencv和VS2015并进行环境配置  </a>
+<br> <a href="https://blog.csdn.net/qq_42312499/article/details/100587547"> VS2017+OpenCV4.1.0(VC15)VS2015+OpenCV3.4.1(VC14) 配置  </a>
+<br> <a href="">   </a>
+<br> <a href="">   </a>
+<br> <a href="">   </a>
+<br><img src="book-learning-opencv3.png" width="298px" height="309px">
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

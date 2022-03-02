@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OpenCV相关学习书籍</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">OpenCV相关学习书籍</h1>
+                            </header>
+                            <div class="entry-content">
+<p>
+<p>
+0. 关于学习书籍，基本上遇到问题上网搜索即可。或者上B站搜索一下相关视频，如果想找书的话，大概是"Learning OpenCV3","Mastering OpenCV3","Mastering Opencv With Practical Computer Vision Projects","学习OpenCV(中文版)","OpenCV教程-基础篇","OpenCV3编程入门_毛星云编著_电子工业出版",....
+<br><img src="book-learning-opencv3.png" width="298px" height="309px">
+      <img src="book-mastering-opencv3.jpg" width="250px" height="309px">
+<br><img src="book-OpenCV3编程入门.png" width="219px" height="309px">
+      <img src="book-Mastering-Opencv-With-Practical-Computer-Vision-Projects.png" width="232px" height="309px">
+<br> 其次就是一些基础类的图像处理方面的书籍了，毕竟OpenCV是库，实际使用还是需要自己根据项目确定使用哪些函数进行组合以实现最终效果。
+<br> 我看的相关书籍就一本："数字图像处理_第三版_冈萨雷斯","Digital Image Processing 4th Edition",....
+<br><img src="book-数字图像处理(第三版).png" width="215px" height="309px">
+      <img src="book-DigitalImageProcessing-4th.png" width="250px" height="309px">
+<br> 目前OpenCV是3.xx与4.xx同步更新，大概区别是：
+<br> <a href="https://answers.opencv.org/question/231600/what-are-the-differences-between-opencv-4x-and-3x/:~:text=OpenCV%204.x%20is%20the%20current%20development%20branch.%20OpenCV,branch.%20New%20features%20should%20go%20to%20OpenCV%203.x."> What are the differences between OpenCV 4.x and 3.x   </a>
+<pre>
+OpenCV 4.x is the current development branch.
+OpenCV 3.x is bugfix only branch. New features should go to OpenCV 3.x.
+Have a look at this <a href="https://github.com/opencv/opencv/wiki/Opencv4">wiki</a>.
+Also OpenCV 4.x needs C++11 and has new developments like G-API module or CUDA DNN features.
+In short, you better use OpenCV 4.x. Especially since potentially future OpenVINO releases would require OpenCV 4.x.
+=============================================================
+opencv4.0（官方版本）的主要特性如下。
+支持C 11
+放弃旧的C接口
+核心模块中的数据结构存储在JSON中，其他文件由C重写
+添加g-api模块，这与图形处理有关
+DNN模块用openvino更新
+DNN模块现在包含实验Vulkan后端，并支持onnx格式的网络
+实现了Kinect融合算法，并针对CPU和GPU（OpenCL）进行了优化
+在objdetect模块中添加了QR码检测器和解码器
+从OpenCV开发了高质量的dis-dense光流算法，Contrib被传输到视频模块
+我付出更多注意c11和DNN模块的支持。c11的全面支持使得OpenCV的使用更加友好，提高了编码效率和安全性。DNN模块符合深度学习的趋势，这是必然的，估计它将是后续版本更新的关键模块。但遗憾的是，DNN模块对GPU的支持还比较落后。目前只支持OpenCL加速的Intel显示。
+===========================================================================================
+记录一下opencv4和3 的区别，防止在升级opencv时遇到问题。有其它大的变化也请读者指出，谢谢。
+1.在扩展模块中去掉了SIFT与SURF相关API的调用文件
+现在如果想在OpenCV Python 4.x中想使用SIFT与SURF只有靠自己从源代码CMake来编译生成python版本的安装包才可以。
+2.全部取消CV_XXX这种枚举类型，比如在3.x中可以正常使用的语句
+# OpenCV 3.x中
+namedWindow(“input”, cv.CV_WINDOW_AUTOSIZE)
+# OpenCV4.x
+namedWindow(“input”, cv.WINDOW_AUTOSIZE)
+3.findContours函数返回结果由3.x的三个参数变为两个参数
+# 在OpenCV3.x中轮廓发现API返回三个值分别为
+# image 返回的图像
+# contours 每个轮廓的点集合
+# hierarchy 每个轮廓对应的层次信息
+binary, contours, hierarchy = cv.findContours(binary, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+OpenCV4.0中需要改为
+contours, hierarchy = cv.findContours(binary, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+4.增加了python语言版本的对DNN模块的加持！
+支持图像分类、对象检测(SSD、RCNN、Faster-RCNN、mask-RCNN)、图像分割等网络的使用
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
