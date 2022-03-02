@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href='https://fonts.googleapis.com/css?family=Hind:400,600|Nunito:400' rel='stylesheet' type='text/css'>
+<meta name="google-site-verification" content="O1O9I1LyVVih6Ejw0bCJg6Og2aPYGPIHBKAKl49eNws"></div>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KMVRSD');</script>
+
+
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/13401.js"></script>
+<title>Algorithm behind the pose_trans() script language function of a UR5e (Universal Robot) — DoF</title>
+<link rel="stylesheet" href="/applications/dashboard/design/style.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/applications/dashboard/design/style-compat.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/plugins/badges/design/badges.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/plugins/GooglePrettify/design/prettify.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/plugins/Reactions/design/reactions.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/plugins/Signatures/design/signature.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/plugins/Polls/design/polls.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/resources/design/vanillicon.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/plugins/editor/design/editor.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/plugins/AdvancedSearch/design/advanced-search.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/applications/vanilla/design/tag.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/themes/Robotiq/design/custom.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/plugins/Online/design/online.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="/applications/vanilla/design/spoilers.css?v=620c3b60" media="all" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/badges.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/reactions.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/elasticsearch-common.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/online.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/polls-common.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/qna-common.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/qna.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/ranks-common.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/vanilla.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/dashboard-common.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="stylesheet" href="https://dof.robotiq.com/dist/v1/forum/addons/dashboard.df49d3a116f7d3f64885.min.css" static="1" />
+<link rel="shortcut icon" href="https://us.v-cdn.net/6027406/uploads/favicon_bcfb0df636555d07.ico" type="image/x-icon" />
+<link rel="canonical" href="https://dof.robotiq.com/discussion/1618/algorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot" />
+<meta property="language" content="en" />
+<meta http-equiv="last-modified" property="last-modified-date" content="2019-11-25" />
+<meta property="og:type" content="article" />
+<meta property="fb:app_id" content="503283793207765" />
+<meta property="og:site_name" content="DoF" />
+<meta name="twitter:title" property="og:title" content="Algorithm behind the pose_trans() script language function of a UR5e (Universal Robot)" />
+<meta property="og:url" content="https://dof.robotiq.com/discussion/1618/algorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot" />
+<meta name="description" property="og:description" content="Hello guys, i am currently working on a UR5e (Universal Robots) where I have created a C# program that reads a list of drillings (up to 600 per file) transforms them and sends them in script language to the UR5e via socket ethernet connection." />
+<meta property="og:image" content="https://us.v-cdn.net/6027406/uploads/LP4ALXQTE7MD.png" />
+<meta name="twitter:description" content="Hello guys, i am currently working on a UR5e (Universal Robots) where I have created a C# program that reads a list of drillings (up to 600 per file) transforms them and sends them in script language to the UR5e via socket ethernet connection." />
+<meta name="twitter:card" content="summary" />
+<script>gdn=window.gdn||{};gdn.meta={"currentThemePath":"\/themes\/Robotiq","ConfirmDeleteCommentHeading":"Delete Comment","ConfirmDeleteCommentText":"Are you sure you want to delete this comment?","DiscussionID":"1618","Category":"Programming","ShowUserReactions":"popup","editorVersion":"1.8.2","editorPluginAssets":"\/plugins\/editor","fileUpload-remove":"Remove file","fileUpload-reattach":"Click to re-attach","fileUpload-inserted":"Inserted","fileUpload-insertedTooltip":"This image has been inserted into the body of text.","wysiwygHelpText":"You are using <a href=\"https:\/\/en.wikipedia.org\/wiki\/WYSIWYG\" target=\"_new\">WYSIWYG<\/a> in your post.","bbcodeHelpText":"You can use <a href=\"http:\/\/en.wikipedia.org\/wiki\/BBCode\" target=\"_new\">BBCode<\/a> in your post.","htmlHelpText":"You can use <a href=\"http:\/\/htmlguide.drgrog.com\/cheatsheet.php\" target=\"_new\">Simple HTML<\/a> in your post.","markdownHelpText":"You can use <a href=\"http:\/\/en.wikipedia.org\/wiki\/Markdown\" target=\"_new\">Markdown<\/a> in your post.","textHelpText":"You are using plain text in your post.","editorWysiwygCSS":"\/plugins\/editor\/design\/wysiwyg.css","canUpload":false,"fileErrorSize":"File size is too large.","fileErrorFormat":"File format is not allowed.","fileErrorAlreadyExists":"File already uploaded.","fileErrorSizeFormat":"File size is too large and format is not allowed.","maxUploadSize":104857600,"editorFileInputName":"editorupload","allowedImageExtensions":"{\"1\":\"jpg\",\"2\":\"jpeg\",\"3\":\"gif\",\"4\":\"png\",\"5\":\"bmp\",\"6\":\"tiff\"}","allowedFileExtensions":"[\"txt\",\"jpg\",\"jpeg\",\"gif\",\"png\",\"bmp\",\"tiff\",\"ico\",\"zip\",\"gz\",\"tar.gz\",\"tgz\",\"psd\",\"ai\",\"fla\",\"swf\",\"pdf\",\"doc\",\"xls\",\"ppt\",\"docx\",\"xlsx\",\"log\",\"rar\",\"7z\",\"mp4\",\"m4v\",\"mpeg\",\"mov\",\"avi\",\"wmv\",\"urp\",\"urcap\"]","maxFileUploads":"20","TagHint":"Start to type...","TagSearching":"Searching...","TagNoResults":"No results","searchAutocomplete":"1","Spoiler":"Spoiler","show":"show","hide":"hide","AnalyticsTask":"tick","TickExtra":"{\"CategoryID\":11,\"DiscussionID\":1618}","ForceEmbedForum":"0","ForceEmbedDashboard":"0","Path":"discussion\/1618\/algorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot","Query":"","InDashboard":"0","TaggingAdd":false,"TaggingSearchUrl":"\/tags\/search","MaxTagsAllowed":5,"emoji":{"assetPath":"https:\/\/dof.robotiq.com\/resources\/emoji","format":"<img class=\"emoji\" src=\"%1$s\" title=\"%2$s\" alt=\"%2$s\" height=\"20\" loading=\"lazy\" \/>","emoji":{"smile":"smile.png","smiley":"smiley.png","wink":"wink.png","blush":"blush.png","neutral":"neutral.png","relaxed":"relaxed.png","grin":"grin.png","joy":"joy.png","sweat_smile":"sweat_smile.png","lol":"lol.png","innocent":"innocent.png","naughty":"naughty.png","yum":"yum.png","relieved":"relieved.png","love":"love.png","sunglasses":"sunglasses.png","smirk":"smirk.png","expressionless":"expressionless.png","unamused":"unamused.png","sweat":"sweat.png","pensive":"pensive.png","confused":"confused.png","confounded":"confounded.png","kissing":"kissing.png","kissing_heart":"kissing_heart.png","kissing_smiling_eyes":"kissing_smiling_eyes.png","kissing_closed_eyes":"kissing_closed_eyes.png","tongue":"tongue.png","disappointed":"disappointed.png","worried":"worried.png","angry":"angry.png","rage":"rage.png","cry":"cry.png","persevere":"persevere.png","triumph":"triumph.png","frowning":"frowning.png","anguished":"anguished.png","fearful":"fearful.png","weary":"weary.png","sleepy":"sleepy.png","tired_face":"tired_face.png","grimace":"grimace.png","bawling":"bawling.png","open_mouth":"open_mouth.png","hushed":"hushed.png","cold_sweat":"cold_sweat.png","scream":"scream.png","astonished":"astonished.png","flushed":"flushed.png","sleeping":"sleeping.png","dizzy":"dizzy.png","no_mouth":"no_mouth.png","mask":"mask.png","star":"star.png","cookie":"cookie.png","warning":"warning.png","mrgreen":"mrgreen.png","heart":"heart.png","heartbreak":"heartbreak.png","kiss":"kiss.png","+1":"+1.png","-1":"-1.png","grey_question":"grey_question.png","trollface":"trollface.png","error":"grey_question.png"}},"LastCommentID":5693,"Vanilla_Comments_AutoRefresh":0,"RedirectTo":"","RedirectUrl":"","TransportError":"A fatal error occurred while processing the request.<br \/>The server returned the following response: %s","TransientKey":false,"WebRoot":"https:\/\/dof.robotiq.com\/","UrlFormat":"\/{Path}","Args":"","ResolvedPath":"vanilla\/discussion\/index","ResolvedArgs":{"DiscussionID":"1618","DiscussionStub":"algorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot","Page":""},"SignedIn":0,"ConfirmHeading":"Confirm","ConfirmText":"Are you sure you want to do that?","Okay":"Okay","Cancel":"Cancel","Search":"Search","ui":{"siteName":"DoF","orgName":"DoF","localeKey":"en","themeKey":"Robotiq","mobileThemeKey":"Robotiq","desktopThemeKey":"Robotiq","logo":"https:\/\/us.v-cdn.net\/6027406\/uploads\/WZ6BOX43YSO5.jpg","favIcon":"https:\/\/us.v-cdn.net\/6027406\/uploads\/favicon_bcfb0df636555d07.ico","shareImage":"https:\/\/us.v-cdn.net\/6027406\/uploads\/LP4ALXQTE7MD.png","bannerImage":null,"mobileAddressBarColor":null,"fallbackAvatar":"https:\/\/us.v-cdn.net\/6027406\/uploads\/defaultavatar\/nELI41VX3IXXZ.jpg","currentUser":{"userID":0,"name":"guest","email":"guest@example.com","photoUrl":"https:\/\/us.v-cdn.net\/6027406\/uploads\/defaultavatar\/nELI41VX3IXXZ.jpg","dateLastActive":null},"editContentTimeout":900,"bannedPrivateProfile":false,"useAdminCheckboxes":true,"siteTitle":"DoF","locale":"en","inputFormat":"wysiwyg"},"context":{"host":"","basePath":"","assetPath":"","debug":false,"translationDebug":false,"conversationsEnabled":true,"cacheBuster":"620c3b60","staticPathFolder":"","dynamicPathFolder":"","siteID":6027406},"embed":{"enabled":true,"isAdvancedEmbed":true},"search":{"defaultScope":"site","supportsScope":true,"activeDriver":"ElasticSearch"},"upload":{"maxSize":104857600,"maxUploads":20,"allowedExtensions":["txt","jpg","jpeg","gif","png","bmp","tiff","ico","zip","gz","tar.gz","tgz","psd","ai","fla","swf","pdf","doc","xls","ppt","docx","xlsx","log","rar","7z","mp4","m4v","mpeg","mov","avi","wmv","urp","urcap"]},"registrationUrl":"\/entry\/register","signInUrl":"\/entry\/signin","signOutUrl":"\/entry\/signout?TransientKey=","featureFlags":{"DeferredLegacyScripts":{"Enabled":false},"updateTokens":{"Enabled":true},"deferredNotifications":{"Enabled":true}},"themeFeatures":{"NewFlyouts":false,"SharedMasterView":false,"ProfileHeader":false,"DataDrivenTheme":false,"UserCards":false,"DisableKludgedVars":false,"NewEventsPage":false,"useNewSearchPage":false,"EnhancedAccessibility":false,"NewQuickLinks":false,"NewCategoryDropdown":false,"NewBadgesModule":false,"NewReactionsModule":false,"NewGuestModule":false,"NewPostMenu":false},"addonFeatures":{"NewFlyouts":false,"SharedMasterView":false,"ProfileHeader":false,"DataDrivenTheme":false,"UserCards":false,"DisableKludgedVars":false,"NewEventsPage":false,"useNewSearchPage":false,"EnhancedAccessibility":false,"NewQuickLinks":false,"NewCategoryDropdown":false,"NewBadgesModule":false,"NewReactionsModule":false,"NewGuestModule":false,"NewPostMenu":false},"siteSection":{"basePath":"","contentLocale":"en","sectionGroup":"vanilla","sectionID":"0","name":"DoF","apps":{"forum":true},"attributes":{"categoryID":-1}},"themePreview":null,"reCaptchaKey":"6Lcw5PwUAAAAAEZ9dIIezn_kchXS0YcqdwtGjH-U","roleToken":"","badges":{"showInUserCards":true},"reporting":{"url":"https:\/\/dof.robotiq.com\/categories\/elearning"},"useNewFlyouts":false};
+gdn.permissions={"permissions":{"activity.view":true,"profiles.view":true,"badges.view":true,"signatures.edit":true,"discussions.view":true},"bans":[],"isAdmin":false};
+</script>
+<script src="/js/library/jquery.js?v=620c3b60" static="1"></script>
+<script src="/js/library/jquery.form.js?v=620c3b60" static="1"></script>
+<script src="/js/library/jquery.popup.js?v=620c3b60" static="1"></script>
+<script src="/js/library/jquery.popin.js?v=620c3b60" static="1"></script>
+<script src="/js/library/jquery.gardenhandleajaxform.js?v=620c3b60" static="1"></script>
+<script src="/js/library/jquery.atwho.js?v=620c3b60" static="1"></script>
+<script src="/js/global.js?v=620c3b60" static="1"></script>
+<script src="/js/flyouts.js?v=620c3b60" static="1"></script>
+<script src="/js/library/jquery.autosize.min.js?v=620c3b60" static="1"></script>
+<script src="/applications/vanilla/js/discussion.js?v=620c3b60" static="1"></script>
+<script src="/plugins/GooglePrettify/js/prettify.js?v=620c3b60" static="1"></script>
+<script src="/js/library/jquery-ui.min.js?v=620c3b60" static="1"></script>
+<script src="/plugins/Reactions/js/reactions.js?v=620c3b60" static="1"></script>
+<script src="/plugins/Quotes/js/quotes.js?v=620c3b60" static="1"></script>
+<script src="/js/library/jquery.tokeninput.js?v=620c3b60" static="1"></script>
+<script src="/plugins/AuthorSelector/js/authorselector.js?v=620c3b60" static="1"></script>
+<script src="/plugins/LinkTypes/js/linktypes.js?v=620c3b60" static="1"></script>
+<script src="/plugins/editor/js/editor.js?v=620c3b60" static="1"></script>
+<script src="/plugins/editor/js/jquery.ui.widget.js?v=620c3b60" static="1"></script>
+<script src="/plugins/editor/js/jquery.iframe-transport.js?v=620c3b60" static="1"></script>
+<script src="/plugins/editor/js/jquery.fileupload.js?v=620c3b60" static="1"></script>
+<script src="/applications/vanilla/js/spoilers.js?v=620c3b60" static="1"></script>
+<script src="/applications/vanilla/js/tagging.js?v=620c3b60" static="1"></script>
+<script src="/js/embed_local.js?v=620c3b60" static="1"></script>
+<script src="/themes/Robotiq/js/custom.js?v=620c3b60" static="1"></script>
+<script>var supportsAllFeatures =
+    window.Promise &&
+    window.Promise.prototype.finally &&
+    window.fetch &&
+    window.Symbol &&
+    window.CustomEvent &&
+    Array.prototype.includes &&
+    Element.prototype.remove &&
+    Element.prototype.closest &&
+    Element.prototype.attachShadow &&
+    window.NodeList &&
+    NodeList.prototype.forEach &&
+    Object.fromEntries
+;
+
+if (!supportsAllFeatures) {
+    false && console.log("Older browser detected. Initiating polyfills.");
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.src = "https://dof.robotiq.com/dist/v1/polyfills.min.js?h=620c3b60";
+
+        script.async = false;
+    // document.write has to be used instead of append child for edge & old safari compatibility.
+    document.write(script.outerHTML);
+} else {
+    false && console.log("Modern browser detected. No polyfills necessary");
+}
+
+if (!window.onVanillaReady) {
+    window.onVanillaReady = function (handler) {
+        if (typeof handler !== "function") {
+            console.error("Cannot register a vanilla ready handler that is not a function.");
+            return;
+        }
+        document.addEventListener("X-DOMContentReady", function () {
+            if (!window.__VANILLA_INTERNAL_IS_READY__) {
+                return;
+            }
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        })
+
+        if (window.__VANILLA_INTERNAL_IS_READY__) {
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        }
+    }
+}</script>
+<script src="https://dof.robotiq.com/api/v2/locales/en/translations.js?h=620c3b60" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/runtime.98c6a9ea250423c08761.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-00a511ae.7f2cc9002ee1a04e6651.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/react-ade78a55.b2faaf9c1db9caae58a0.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-7bcf3cc8.c574a67cfc8e57d35a62.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/9584.ef4a7e0ef88e65fb8ccc.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/6837.e2d4f800d964819ed223.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/6714.d2294cecdbb6e75dcc3a.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/1523.2f8ef571811e27cef994.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/2599.8e35abd021eb052c8439.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/1330.debc05a3e88f1aae010a.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/1645.be5aeefbf485462f23a8.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-cc102d41.ba43dd78ba66e8844817.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-6b9cbaae.0feddf3efeed420678aa.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-556e59c5.76ef3fe7c4b49799c80d.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-b3ff4ff5.b9288638c3bac823dfbf.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-a6c02cb9.d839244053e952f5adce.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-701f8e3e.3b3341eeff8eeac5b4c6.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-e2afb1bb.64d9fbd9409627a5076a.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-620da1e1.23eaa2d4388390ba11f1.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-f2185337.6acd5ef5b09e545c0d5f.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-d4f2673a.8fb26fc82263cc0c802f.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-2f1652fc.3f24076d2fdf76435f5a.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-d18cf2a4.11fce28ac2ab4f9c8727.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-9aa6fe4f.3db4e151ae7b09cd0e66.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-3856f342.fa10227451a7c28e0c49.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-c19d9c43.cea2c020e763d34e2362.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-2f52832f.c54d50582a4f2ab7decd.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-2cb17f20.e748f4b49d19a9182682.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-c0766001.49ecd2eb9b7b4addc5ab.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-c097b2da.ebcd510f69678cec410a.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-9e6f795a.0888b240a682e9ef8366.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-2c111534.e6bdcdfdb40f1c479035.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-c12d084d.68cc4e044c30ebfc1b28.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-0a00c317.aff95707190f036a3818.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-b9a5ee6b.e9bdf1f2b1250f2a5f8f.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-7ce848a5.8f12f00f934c9bb3617d.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-125fb5ae.61accb9c5b7b52202268.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-d8b891f3.693af957a1cfd1aaf809.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-bd952247.9618e4d01bb147e13e0c.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-2da6cbf1.227394dbbfeed83b2ed0.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-31062dbb.019e03dbb2d9c695e8f2.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-3f9d9fa6.24489819f944e3710bbb.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-8b9734eb.926cdd875c09a227ea2f.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-37f4162e.161bb2e8d4f745be7e7b.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-b40b2b97.d33bd45876ade35adb8b.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-30dfea78.c0d7a137d1e3a2ff5258.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-d32abb57.40a3f29d108462c3dd67.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-fae66388.7a9976faae0ae989c21f.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-35a1f0cc.77c8122400d43bfade1a.min.js" static="1" defer="defer"></script>
+<script type="text/javascript">
+            function init() {
+                $('.Message').each(function () {
+                    if ($(this).data('GooglePrettify')) {
+                        return;
+                    }
+                    $(this).data('GooglePrettify', '1');
+
+                    pre = $('pre', this).addClass('prettyprint');
+
+                    // Let prettyprint determine styling, rather than the editor.
+                    $('code', this).removeClass('CodeInline');
+                    pre.removeClass('CodeBlock');
+
+                    prettyPrint();
+
+                    pre.removeClass('prettyprint');
+                });
+            }
+            window.onVanillaReady(init);</script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-d51a67ca.b24d79229e0e1b239dae.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-fdcde476.32480bc2a6916eebed11.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-02fa3f94.5ad0eda7a95e45d1c384.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-578a3663.61f8cbd468550ea1a356.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/library-70b9322c.76d4df2be89a12905e2c.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/react-e5bca7e4.33227d08c1b1db7c2817.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-cdd60c62.a1b670bb3fb004aaa474.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-d2eb5610.c33fa9a397314331539b.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-bb3d84b5.a13bd1a2893a31c5004b.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-9241dc7c.91199f31d07160fafa74.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-ea6fe73f.852765a9b4402eb2fde8.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-1cdde194.6934edef715e8d853f75.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-059be3de.29ef74d78d09c9c72fe9.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-ba5cce0a.e92814f821190869c04a.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-ffec2192.366ad76f95d2b5b98f1f.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-b63e7516.6fdb2bcef7aae5c06c32.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-5ee9077d.c82954c0a1fdece4ccb9.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-0bc0478e.4274d9fb59f8e36b59d3.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-386b9151.88434f516a837d05fd59.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-bc055ae5.77c02641c15001c31f89.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-38d4a983.b29975b2fd9ff5b743af.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-2a46b080.67c7589b965602149b57.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-59201cde.b78a97d2c93bce60a3b6.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-49ceb22a.4770b1bc239d4f2464ef.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-f501a089.6d1a5b43865ca78165c6.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-27545368.67924a9f013d2a47b26f.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-b0289113.040f2339ddb8bdf35c4b.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-866ab763.ea6e0d3920ccee0433ca.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-e96e9bea.1519f1dcdcce55e2433b.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-e07d7631.f1219358db43eedbda38.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/vendors-27e8e099.53db9c9be42836b255d0.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/8226.cf8da7f28e18a93f7ac3.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/3222.b50faf03d8c6237eab0a.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/rich-editor.f089243e2f29e056b4b2.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/badges.e9eee5de84e3d4a9414b.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/reactions.e78a58cffbb70a9c1d21.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/elasticsearch-common.0c52cf0af4b3772b7b45.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/online.cf6dc86f0fea53cd748a.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/polls-common.2d02d3db34d2e4cef744.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/qna-common.5773589bf1a9ca05357e.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/qna.f1d5dac417a59fd72340.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/ranks-common.2e6acf2f3a7d174cb5d6.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/advancedsearch.3830ac54399f5386836e.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/vanilla.ab61cfe85aca5c8b7191.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/dashboard-common.6bc4d8e03c20598d41f8.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/addons/dashboard.43d7cd20145ad3accb55.min.js" static="1" defer="defer"></script>
+<script src="https://dof.robotiq.com/dist/v1/forum/bootstrap.e103c0cfe55b23667a55.min.js" static="1" defer="defer"></script>
+<script>window["__ACTIONS__"]=[{"type":"@@locales\/GET_ALL_DONE","payload":{"result":[{"localeID":"en","localeKey":"en","regionalKey":"en","displayNames":{"en":"English","fr_CA":"Anglais"}},{"localeID":"vf_fr_CA","localeKey":"fr_CA","regionalKey":"fr_CA","displayNames":{"en":"French (Canada)","fr_CA":"Fran\u00e7ais (Canada)"}}],"params":[]}},{"type":"@@users\/GET_ME_DONE","payload":{"result":{"userID":0,"name":"Guest","photoUrl":"https:\/\/us.v-cdn.net\/6027406\/uploads\/defaultavatar\/nELI41VX3IXXZ.jpg","email":null,"dateLastActive":null,"isAdmin":false,"countUnreadNotifications":0,"countUnreadConversations":0,"permissions":["activity.view","badges.view","discussions.view","profiles.view","signatures.edit"],"extended":{},"ssoID":null},"params":[]}},{"type":"@@users\/GET_PERMISSIONS_DONE","payload":{"result":{"isAdmin":false,"isSysAdmin":false,"permissions":[{"type":"global","permissions":{"badges.view":true,"discussions.view":true,"profiles.view":true,"signatures.edit":true}},{"type":"category","id":2,"permissions":{"discussions.view":true}},{"type":"category","id":3,"permissions":{"discussions.view":true}},{"type":"category","id":5,"permissions":{"discussions.view":true}},{"type":"category","id":13,"permissions":{"discussions.view":true}},{"type":"category","id":35,"permissions":{"discussions.view":true}}],"junctions":{"category":[2,3,5,13,16,17,19,20,22,23,25,26,32,33,35,36]},"junctionAliases":{"category":{"29":26,"30":26}}},"params":[]}},{"type":"@@themes\/GET_DONE","payload":{"result":{"themeID":"Robotiq","type":"themeFile","name":"Robotiq","version":"1.1.3","revisionID":null,"revisionName":null,"insertUser":null,"dateInserted":null,"current":true,"active":true,"parentTheme":null,"assets":{"logo":{"url":"https:\/\/us.v-cdn.net\/6027406\/uploads\/WZ6BOX43YSO5.jpg?v=620c3b60","type":"image"},"mobileLogo":{"url":"https:\/\/us.v-cdn.net\/6027406\/uploads\/ZRD99VZO1Z70.jpg?v=620c3b60","type":"image"},"header":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/header.html?v=1.1.3-620c3b60","type":"html","content-type":"text\/html"},"footer":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/footer.html?v=1.1.3-620c3b60","type":"html","content-type":"text\/html"},"variables":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/variables.json?v=1.1.3-620c3b60","type":"json","content-type":"application\/json","data":{"quickLinks":{"links":[{"name":"All Categories","url":"\/categories","id":"all-categories","countLimit":null,"permission":"discussions.view"},{"name":"Recent Discussions","url":"\/discussions","id":"recent-discussions","countLimit":null,"permission":"discussions.view"},{"name":"Activity","url":"\/activity","id":"activity","countLimit":null,"permission":"discussions.view"},{"name":"My Bookmarks","url":"\/discussions\/bookmarked","id":"my-bookmarks","countLimit":null,"permission":"session.valid"},{"name":"My Discussions","url":"\/discussions\/mine","id":"my-discussions","countLimit":null,"permission":"session.valid"},{"name":"My Drafts","url":"\/drafts","id":"my-drafts","countLimit":null,"permission":"session.valid"},{"name":"Best Of","url":"\/bestof","id":"best-of","countLimit":null,"permission":null},{"name":"Unanswered","url":"\/discussions\/unanswered","id":"unanswered","countLimit":99,"permission":"discussions.view"}],"counts":{"all-categories":null,"recent-discussions":null,"activity":null,"my-bookmarks":0,"my-discussions":0,"my-drafts":0,"best-of":null,"unanswered":99}}}},"fonts":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/fonts.json?v=1.1.3-620c3b60","type":"json","content-type":"application\/json","data":[]},"scripts":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/scripts.json?v=1.1.3-620c3b60","type":"json","content-type":"application\/json"},"styles":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/styles.css?v=1.1.3-620c3b60","type":"css","content-type":"text\/css"},"javascript":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/javascript.js?v=1.1.3-620c3b60","type":"js","content-type":"application\/javascript"}},"preview":{"info":{"Description":{"type":"description","value":"Theme for Robotiq"},"Authors":{"type":"string","value":"St\u00e9phane LaFl\u00e8che"}},"imageUrl":"\/themes\/Robotiq\/screenshot.png","variables":{"globalPrimary":null,"globalBg":"#fff","globalFg":"#555a62","titleBarBg":null,"titleBarFg":null,"backgroundImage":null}},"features":{"NewFlyouts":false,"SharedMasterView":false,"ProfileHeader":false,"DataDrivenTheme":false,"UserCards":false,"DisableKludgedVars":false,"NewEventsPage":false,"useNewSearchPage":false,"EnhancedAccessibility":false,"NewQuickLinks":false,"NewCategoryDropdown":false,"NewBadgesModule":false,"NewReactionsModule":false,"NewGuestModule":false,"NewPostMenu":false},"supportedSections":[]},"params":{"key":{"themeID":"Robotiq","type":"themeFile","name":"Robotiq","version":"1.1.3","revisionID":null,"revisionName":null,"insertUser":null,"dateInserted":null,"current":true,"active":true,"parentTheme":null,"assets":{"logo":{"url":"https:\/\/us.v-cdn.net\/6027406\/uploads\/WZ6BOX43YSO5.jpg?v=620c3b60","type":"image"},"mobileLogo":{"url":"https:\/\/us.v-cdn.net\/6027406\/uploads\/ZRD99VZO1Z70.jpg?v=620c3b60","type":"image"},"header":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/header.html?v=1.1.3-620c3b60","type":"html","content-type":"text\/html"},"footer":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/footer.html?v=1.1.3-620c3b60","type":"html","content-type":"text\/html"},"variables":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/variables.json?v=1.1.3-620c3b60","type":"json","content-type":"application\/json","data":{"quickLinks":{"links":[{"name":"All Categories","url":"\/categories","id":"all-categories","countLimit":null,"permission":"discussions.view"},{"name":"Recent Discussions","url":"\/discussions","id":"recent-discussions","countLimit":null,"permission":"discussions.view"},{"name":"Activity","url":"\/activity","id":"activity","countLimit":null,"permission":"discussions.view"},{"name":"My Bookmarks","url":"\/discussions\/bookmarked","id":"my-bookmarks","countLimit":null,"permission":"session.valid"},{"name":"My Discussions","url":"\/discussions\/mine","id":"my-discussions","countLimit":null,"permission":"session.valid"},{"name":"My Drafts","url":"\/drafts","id":"my-drafts","countLimit":null,"permission":"session.valid"},{"name":"Best Of","url":"\/bestof","id":"best-of","countLimit":null,"permission":null},{"name":"Unanswered","url":"\/discussions\/unanswered","id":"unanswered","countLimit":99,"permission":"discussions.view"}],"counts":{"all-categories":null,"recent-discussions":null,"activity":null,"my-bookmarks":0,"my-discussions":0,"my-drafts":0,"best-of":null,"unanswered":99}}}},"fonts":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/fonts.json?v=1.1.3-620c3b60","type":"json","content-type":"application\/json","data":[]},"scripts":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/scripts.json?v=1.1.3-620c3b60","type":"json","content-type":"application\/json"},"styles":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/styles.css?v=1.1.3-620c3b60","type":"css","content-type":"text\/css"},"javascript":{"url":"https:\/\/dof.robotiq.com\/api\/v2\/themes\/Robotiq\/assets\/javascript.js?v=1.1.3-620c3b60","type":"js","content-type":"application\/javascript"}},"preview":{"info":{"Description":{"type":"description","value":"Theme for Robotiq"},"Authors":{"type":"string","value":"St\u00e9phane LaFl\u00e8che"}},"imageUrl":"\/themes\/Robotiq\/screenshot.png","variables":{"globalPrimary":null,"globalBg":"#fff","globalFg":"#555a62","titleBarBg":null,"titleBarFg":null,"backgroundImage":null}},"features":{"NewFlyouts":false,"SharedMasterView":false,"ProfileHeader":false,"DataDrivenTheme":false,"UserCards":false,"DisableKludgedVars":false,"NewEventsPage":false,"useNewSearchPage":false,"EnhancedAccessibility":false,"NewQuickLinks":false,"NewCategoryDropdown":false,"NewBadgesModule":false,"NewReactionsModule":false,"NewGuestModule":false,"NewPostMenu":false},"supportedSections":[]}}}}];
+</script>
+<script type="application/ld+json">{
+    "@context": "https:\/\/schema.org",
+    "@graph": [
+        {
+            "headline": "Algorithm behind the pose_trans() script language function of a UR5e (Universal Robot)",
+            "description": "Hello guys, i am currently working on a UR5e (Universal Robots) where I have created a C# program that reads a list of drillings (up to 600 per file) transforms them and sends them in script language to the UR5e via socket ethernet connection. Everything works fine, except for the performance of the UR5e which seems to…",
+            "discussionUrl": "https:\/\/dof.robotiq.com\/discussion\/1618\/algorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot",
+            "dateCreated": "2019-05-09 10:03:45",
+            "author": {
+                "@context": "https:\/\/schema.org",
+                "@type": "Person",
+                "name": "ur5eUser",
+                "image": "https:\/\/us.v-cdn.net\/6027406\/uploads\/defaultavatar\/nELI41VX3IXXZ.jpg",
+                "url": "https:\/\/dof.robotiq.com\/profile\/ur5eUser"
+            },
+            "@type": "DiscussionForumPosting"
+        },
+        {
+            "@type": "QAPage",
+            "mainEntity": {
+                "@type": "Question",
+                "name": "Algorithm behind the pose_trans() script language function of a UR5e (Universal Robot)",
+                "text": "Hello guys,\n\ni am currently working on a UR5e (Universal Robots) where I have created a C# program that reads a list of drillings (up to 600 per file) transforms them and sends them in script language to the UR5e via socket ethernet connection. Everything works fine, except for the performance of the UR5e which seems to reach its limits as it is needed to use 8 pose_trans() script functions per drill. I have contacted the Universal Robots support already and they recommended to do the calculations done by the pose trans() script function in my C# program. The function has got 2 inputs, one for the starting position of the tool, and the second one for the distance covered relative to the starting position. The output is defined as the target position, after the distance has been covered.\n\nIn order to do the calculations of the pose_trans() function in my C# program i need to know the algorithm behind it. However, so far I was not successfull searching on the zacobria and universal robots forums so far. If somebody faced a similar problem already and knows the algorithm behind this function, it would be very helpful to me.\n\nBest regards",
+                "answerCount": 4,
+                "dateCreated": "2019-05-09T10:03:45Z",
+                "author": {
+                    "@type": "Person",
+                    "name": "ur5eUser"
+                },
+                "acceptedAnswer": [
+                    {
+                        "@type": "Answer",
+                        "text": "@ur5eUser Please see the attached document and image. Hopefully, these help explain how I calculated the result. The results are more precise when using radians rather than degrees for theta. If you have any questions let me know!",
+                        "dateCreated": "2019-05-10T17:39:03Z",
+                        "url": "https:\/\/dof.robotiq.com\/discussion\/comment\/4929#Comment_4929",
+                        "author": {
+                            "@type": "Person",
+                            "name": "Kaleb_Rodes"
+                        },
+                        "upvoteCount": 1
+                    }
+                ],
+                "suggestedAnswer": []
+            }
+        }
+    ]
+}</script>
+<noscript><style>body {visibility: visible !important;}</style></noscript>
+
+</head>
+<body id="vanilla_discussion_index" class="Vanilla Discussion isDesktop index  Question Section-Discussion Section-Category-programming Section-Discussion Section-Category-programming">
+<!--[if lt IE 8]>
+    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+<div id="Frame">
+<header class="Header">
+<nav class="HeaderTop" role="navigation">
+<div class="Container">
+<ul class="Row">
+<li class="HeaderTop-NavEl Header-Home">
+<a href="http://robotiq.com" target="_blank" class="HeaderTop-Link HeaderTop-HomeLink">
+Go to robotiq.com
+</a>
+</li>
+<li class="HeaderTop-NavEl HeaderTop-SignIn">
+<a href="/entry/signin?Target=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2F1618%2Falgorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot" class="HeaderTop-SignInLink" format="%url">Log in</a>
+</li>
+<li class="HeaderTop-NavEl HeaderTop-Register">
+<a href="/entry/register?Target=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2F1618%2Falgorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot" class="HeaderTop-RegisterLink">Sign up</a>
+</li>
+</ul>
+</div>
+</nav>
+<div class="HeaderBottom">
+<div class="Container">
+<div class="Row">
+<a href="/" class="HeaderBottom-LogoLink">
+<img class="HeaderBottom-Logo" alt="DoF - a Robotiq Community" title="DoF - a Robotiq Community" src="https://dof.robotiq.com/themes/Robotiq/design/images/DoF-Logo.png?v=620c3b60">
+</a>
+<div class="HeaderBottom-Menu">
+<button id="menuButton" class="HeaderBottom-MenuButton Button">
+<span class="SrcOnly">
+Menu
+</span>
+<i class="icon icon-menu"></i>
+</button>
+<ul class="HeaderBottom-Nav">
+<li class="HeaderBottom-NavEl HeaderBottom-Categories "><a href="/categories" class="HeaderBottom-Link HeaderBottom-CategoriesLink">Categories</a></li>
+<li class="HeaderBottom-NavEl HeaderBottom-Discussions "><a href="/discussions" class="HeaderBottom-Link HeaderBottom-DiscussionsLink">Discussions</a></li>
+<li class="HeaderBottom-NavEl HeaderBottom-BestOf "><a href="/bestof" class="HeaderBottom-Link HeaderBottom-BestOfLink">Best Of</a></li>
+</ul>
+</div>
+</div>
+</div>
+</header>
+<main class="Main" role="main">
+<div class="Container">
+<div class="Row">
+</div>
+</div>
+<div class="Container">
+<div class="Container-Wrap ">
+<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb"><a href="https://dof.robotiq.com/"><span>Home</span></a></span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> <span class="CrumbLabel Category-programming Last"><a itemprop="item" href="https://dof.robotiq.com/categories/programming"><span itemprop="name">Programming</span></a></span></span></span>
+<section id="Content" class="Content" role="region">
+
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KMVRSD"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<h4 class="discussions-label Section-Title">Discussion</h4><div class="MessageList Discussion"><a href="/discussions" class="BackToDiscussion Button WithArrow Top FloatRight "><svg class="SVG SVG_LeftArrow" viewBox="0 0 54.126 54.126" xmlns="http://www.w3.org/2000/svg"><title>Left Arrow</title><path class="SVG_LeftArrow_Circle" d="M8775.938,1695.126a27.063,27.063,0,1,0-27.062-27.062A27.058,27.058,0,0,0,8775.938,1695.126Zm0-50.169a23.1,23.1,0,1,1-23.108,23.106A23.132,23.132,0,0,1,8775.938,1644.957Z" transform="translate(-8748.875 -1641)"></path><path class="SVG-LeftArrow-Arrow" d="M8762.02,1666.786a1.678,1.678,0,0,1-.1.145c-0.027.058-.055,0.113-0.081,0.167a0.394,0.394,0,0,0-.044.1,0.278,0.278,0,0,0-.017.047c-0.022.054-.04,0.115-0.059,0.174s-0.027.1-.041,0.151a0.973,0.973,0,0,0-.029.175c-0.008.051-.01,0.1-0.02,0.149a0.86,0.86,0,0,0,0,.188,0.914,0.914,0,0,0,0,.147,0.96,0.96,0,0,0,.025.188,0.547,0.547,0,0,0,.02.142c0.018,0.061.035,0.121,0.056,0.186a0.845,0.845,0,0,0,.047.143,0.7,0.7,0,0,1,.019.071c0.016,0.03.037,0.061,0.056,0.1s0.044,0.09.065,0.135a1.214,1.214,0,0,0,.1.156,0.6,0.6,0,0,0,.087.125,0.936,0.936,0,0,0,.13.152,0.327,0.327,0,0,0,.063.066l10.745,10.754a2.3,2.3,0,0,0,3.247-3.248l-6.828-6.829h21.264a2.3,2.3,0,0,0,2.3-2.3,2.306,2.306,0,0,0-2.3-2.295h-21.264l6.828-6.831a2.3,2.3,0,0,0-3.247-3.25l-10.753,10.756-0.059.064a0.949,0.949,0,0,0-.124.151C8762.08,1666.7,8762.049,1666.75,8762.02,1666.786Z" transform="translate(-8748.875 -1641)"></path></svg>Back to discussions page</a>
+<div id="Discussion_1618" class="DiscussionPreview Detailed Item ItemDiscussion Offline noPhotoWrap">
+<div class="ItemContent Discussion">
+<table class="DiscussionPreview-Table" role="presentation">
+<tbody>
+<tr class="DiscussionPreview-Row">
+<td class="DiscussionPreview-Cell DiscussionPreview-Content Top">
+<div class="DiscussionPreview-TitleWrap">
+
+<div id="Item_0" class="PageTitle"><div class="Options"></div><h1 class="BlockTitle DiscussionPreview-Title">Algorithm behind the pose_trans() script language function of a UR5e (Universal Robot)</h1></div>
+</div>
+</td>
+<td class="DiscussionPreview-Cell DiscussionPreview-Views" rowspan="2">
+<div class="DiscussionPreview-ViewsInfo">
+<span class="DiscussionPreview-Number DiscussionPreview-ViewsNumber">
+<span title="2,095 views" class="Number">2.1K</span> views </span>
+<span class="DiscussionPreview-Number DiscussionPreview-ViewsLabel">
+<svg class="SVG SVG_Eye" viewBox="0 0 40.181 24.164" xmlns="http://www.w3.org/2000/svg">
+<title>Eye</title>
+<path class="SVG_Eye_Outer" d="M6513.636,651.144c-8.422,0-15.465-5.937-19.055-9.527a3.669,3.669,0,0,1,0-5.109c3.59-3.589,10.633-9.527,19.055-9.527s15.465,5.938,19.055,9.527a3.669,3.669,0,0,1,0,5.109C6529.1,645.207,6522.06,651.144,6513.636,651.144Zm0-22.093c-8.008,0-14.775,6.214-17.4,8.837a1.157,1.157,0,0,0,0,1.935c2.622,2.622,9.526,8.836,17.4,8.836s14.775-6.214,17.4-8.836c0.691-.691.691-1.521,0-1.935C6528.548,635.265,6521.644,629.051,6513.636,629.051Z" transform="translate(-6493.545 -626.98)"></path>
+<path class="SVG_Eye_Iris" d="M6513.636,644.516a5.523,5.523,0,1,1,5.524-5.523A5.452,5.452,0,0,1,6513.636,644.516Zm0-8.836a3.313,3.313,0,1,0,3.315,3.313A3.358,3.358,0,0,0,6513.636,635.68Z" transform="translate(-6493.545 -626.98)"></path>
+</svg>
+</span>
+</div>
+</td>
+<td class="DiscussionPreview-Cell DiscussionPreview-Answered DiscussionPreview-AnsweredText">
+Answered </td>
+<td class="DiscussionPreview-Cell DiscussionPreview-Answered DiscussionPreview-AnsweredIcon DiscussionPreview-IconCell">
+<svg class="SVG SVG_Check" viewBox="0 0 37.502 37.503" xmlns="http://www.w3.org/2000/svg">
+<title>Check</title>
+<path class="SVG_Check-Circle" d="M6732.532,608.858a18.751,18.751,0,1,1,18.752-18.751A18.769,18.769,0,0,1,6732.532,608.858Zm0-35.3a16.545,16.545,0,1,0,16.546,16.545A16.594,16.594,0,0,0,6732.532,573.562Z" transform="translate(-6713.782 -571.355)"></path>
+<path class="SVG_Check-Check" d="M6740.189,583.471a1.586,1.586,0,0,0-2.045.287l-7.4,9.033-2.463-2.777a1.588,1.588,0,0,0-2.055-.215,1.208,1.208,0,0,0-.242,1.828l4.854,5.475,9.672-11.811A1.212,1.212,0,0,0,6740.189,583.471Z" transform="translate(-6713.782 -571.355)"></path>
+</svg>
+</td>
+</tr>
+<tr class="DiscussionPreview-Row">
+<td class="DiscussionPreview-Cell DiscussionPreview-Content Bottom">
+<p class="BlockContent DiscussionPreview-TimeAndUser">
+<time datetime="2019-11-25">
+November 25, 2019 </time> /
+<span class="MItem LastCommentBy">Most recent by <a href="/profile/yixiaoru" class="js-userCard" data-userid="3380">yixiaoru</a></span> </p>
+<div class="DiscussionPreview-Meta">
+<div class="Meta DiscussionMeta">
+<span class="MItem Category"> in <a href="https://dof.robotiq.com/categories/programming">Programming</a></span> </div>
+</div>
+</td>
+<td class="DiscussionPreview-Cell DiscussionPreview-Comments DiscussionPreview-CommentsText">
+<span title="4 comments" class="Number">4</span> comments </td>
+<td class="DiscussionPreview-Cell DiscussionPreview-Comments DiscussionPreview-IconCell">
+<svg class="SVG SVG_SpeechBubble" viewBox="0 0 38.961 29.221" xmlns="http://www.w3.org/2000/svg">
+<title>Speech Bubble</title>
+<path class="SVG_SpeechBubble_Path" d="M6749.591,662a3.512,3.512,0,0,1-2.292-.859l-3.725-3.151h-21.486a8.2,8.2,0,0,1-8.021-8.021V640.8a8.2,8.2,0,0,1,8.021-8.021h22.919a8.2,8.2,0,0,1,8.021,8.021V658.71A3.461,3.461,0,0,1,6749.591,662Zm-27.5-27.071a5.746,5.746,0,0,0-5.73,5.73v9.166a5.746,5.746,0,0,0,5.73,5.729h22.06a0.788,0.788,0,0,1,.716.286l4.153,3.726a1.078,1.078,0,0,0,1.863-.86V640.8a5.747,5.747,0,0,0-5.729-5.73C6745.007,634.933,6722.088,634.933,6722.088,634.933Z" transform="translate(-6714.067 -632.784)"></path>
+</svg>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="Discussion-Post">
+<div class="Item-Header DiscussionHeader">
+<div class="AuthorWrap">
+<span class="Author">
+<a title="ur5eUser" href="/profile/ur5eUser" class="PhotoWrap js-userCard Offline" aria-label="User: &quot;ur5eUser&quot;" data-userid="2979"><img src="https://us.v-cdn.net/6027406/uploads/defaultavatar/nELI41VX3IXXZ.jpg" alt="ur5eUser" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a><a href="/profile/ur5eUser" class="Username js-userCard" data-userid="2979">ur5eUser</a> </span>
+<span class="AuthorInfo">
+<span class="MItem PostCount">Posts: <b>3</b></span> <span class="Rank MItem" title="Apprentice">Apprentice</span> </span>
+</div>
+<div class="Meta DiscussionMeta">
+<span class="MItem DateCreated">
+<a href="https://dof.robotiq.com/discussion/1618/algorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot" class="Permalink" rel="nofollow"><time title="May 9, 2019 10:03AM" datetime="2019-05-09T10:03:45+00:00">May 2019</time></a> </span>
+<span class="MItem Category"> in <a href="https://dof.robotiq.com/categories/programming">Programming</a></span> </div>
+</div>
+<div class="Item-BodyWrap">
+<div class="Item-Body">
+<div class="Message">
+Hello guys,<br><br>i am currently working on a UR5e (Universal Robots) where I have created a C# program that reads a list of drillings (up to 600 per file) transforms them and sends them in script language to the UR5e via socket ethernet connection. Everything works fine, except for the performance of the UR5e which seems to reach its limits as it is needed to use 8 pose_trans() script functions per drill. I have contacted the Universal Robots support already and they recommended to do the calculations done by the pose trans() script function in my C# program. The function has got 2 inputs, one for the starting position of the tool, and the second one for the distance covered relative to the starting position. The output is defined as the target position, after the distance has been covered.<br><br>In order to do the calculations of the pose_trans() function in my C# program i need to know the algorithm behind it. However, so far I was not successfull searching on the zacobria and universal robots forums so far. If somebody faced a similar problem already and knows the algorithm behind this function, it would be very helpful to me.<br><br>Best regards </div>
+<div class="InlineTags Meta">
+Tagged:
+<ul>
+<li><a href="/discussions/tagged/RobotBrands-UniversalRobots" class="Tag_RobotBrands-UniversalRobots">Universal Robots</a></li>
+<li><a href="/discussions/tagged/Other-Programming" class="Tag_Other-Programming">Programming</a></li>
+ <li><a href="/discussions/tagged/Products-CollaborativeRobots" class="Tag_Products-CollaborativeRobots">Collaborative Robots</a></li>
+<li><a href="/discussions/tagged/ur5" class="Tag_ur5">UR5</a></li>
+<li><a href="/discussions/tagged/script" class="Tag_script">script</a></li>
+</ul>
+</div> <div class="DiscussionReact">
+<div class="Reactions"><span class="Column-Score Hidden">0</span><span class="ReactMenu"><span class="ReactButtons"> </span></span> <span class="Bullet">&middot;</span> <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2F1618%2Falgorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactFacebook"></span><span class="sr-only">Facebook</span></a><a href="https://twitter.com/share?url=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2F1618%2Falgorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactTwitter"></span><span class="sr-only">Twitter</span></a></div> </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="DataBox DataBox-AcceptedAnswers"><span id="accepted"></span>
+<h2 class="CommentHeading">Best Answer</h2>
+<ul class="MessageList DataList AcceptedAnswers pageBox">
+<li class="Item Alt ItemComment Offline noPhotoWrap Role_FoundingPro Role_Partner Role_BetaTesterVIsion11Program Role_TactileSensorBetaTesters Role_BetaTesterCameraURCap120-beta QnA-Item-Accepted pageBox" id="Comment_4929">
+<div class="Comment">
+<span id="latest"></span> <div class="Options">
+</div>
+<div class="Item-Header CommentHeader">
+<div class="AuthorWrap">
+<span class="Author">
+<a title="Kaleb_Rodes" href="/profile/Kaleb_Rodes" class="PhotoWrap js-userCard Offline" aria-label="User: &quot;Kaleb_Rodes&quot;" data-userid="65"><img src="https://us.v-cdn.net/6027406/uploads/defaultavatar/nELI41VX3IXXZ.jpg" alt="Kaleb_Rodes" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a><a href="/profile/Kaleb_Rodes" class="Username js-userCard" data-userid="65">Kaleb_Rodes</a> </span>
+<span class="AuthorInfo">
+<span class="MItem RoleTitle">Founding Pro, Partner, Beta Tester VIsion 1.1 Program, Tactile Sensor Beta Testers, Beta Tester Camera URCap 1.2.0-beta</span> <span class="MItem PostCount">Posts: <b>62</b></span> <span class="Rank MItem" title="Handy">Handy</span> </span>
+</div>
+<div class="Meta CommentMeta CommentInfo">
+<span class="MItem DateCreated">
+<a href="/discussion/comment/4929/#Comment_4929" class="Permalink" name="Item_0" rel="nofollow"><time title="May 10, 2019 5:39PM" datetime="2019-05-10T17:39:03+00:00">May 2019</time></a> </span>
+<span class="MItem"> <span title="Edited May 10, 2019 5:49PM by Kaleb_Rodes." class="DateUpdated">edited May 2019</span> </span> <span class="Tag QnA-Box QnA-Accepted" title="Answer ✓"><span>Answer ✓</span></span> </div>
+</div>
+<div class="Item-BodyWrap">
+ <div class="Item-Body">
+<div class="Message userContent">
+<p><a href="https://dof.robotiq.com/profile/ur5eUser" rel="nofollow">@ur5eUser</a> Please see the attached document and image. Hopefully, these help explain how I calculated the result. The results are more precise when using radians rather than degrees for theta. If you have any questions let me know!</p> </div>
+<div class="editor-upload-saved editor-upload-readonly" id="editor-uploads-commentid4929">
+<div class="editor-file-preview file-readonly" id="media-id-1510" title="Pose_Trans Function.docx">
+<input type="hidden" name="MediaIDs[]" value="1510" disabled="disabled" />
+<i class="file-preview icon icon-file"></i> <div class="file-data">
+<a class="filename" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document" href="https://us.v-cdn.net/6027406/uploads/editor/tg/5nmk6em8eqbx.docx" target="_blank" download="Pose_Trans Function.docx">
+Pose_Trans Function.docx </a>
+<span class="meta">21.4K</span>
+</div>
+<span class="editor-file-remove" title="Remove"></span>
+<span class="editor-file-reattach" title="Click to re-attach"></span>
+</div>
+<div class="editor-file-preview file-readonly" id="media-id-1511" title="pose.jpg">
+<input type="hidden" name="MediaIDs[]" value="1511" disabled="disabled" />
+<i class="file-preview img" style="background-image: url(https://us.v-cdn.net/6027406/uploads/editor/thumb/ao/80ig13izzpms.jpg)"></i> <div class="file-data">
+<a class="filename" data-type="image/jpeg" href="https://us.v-cdn.net/6027406/uploads/editor/hf/dz89asb0f2eg.jpg" target="_blank" data-width="3024" data-height="4032">
+pose.jpg </a>
+<span class="meta">2.4M</span>
+</div>
+<span class="editor-file-remove" title="Remove"></span>
+<span class="editor-file-reattach" title="Click to re-attach"></span>
+</div>
+</div>
+<div class="Signature UserSignature userContent "><div><b>Kaleb Rodes</b></div><div>Applications Engineer</div><div>Behco</div><div><a rel="nofollow"><span class="__cf_email__" data-cfemail="7e151f121b1c500c111a1b0d3e1c1b161d11501d1113">[email&#160;protected]</span></a></div></div><div class="Reactions"><span class="Column-Score Hidden">1</span><span class="ReactMenu"><span class="ReactButtons"> </span></span> <span class="Bullet">&middot;</span> <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2Fcomment%2F4929%23Comment_4929" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactFacebook"></span><span class="sr-only">Facebook</span></a><a href="https://twitter.com/share?url=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2Fcomment%2F4929%23Comment_4929" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactTwitter"></span><span class="sr-only">Twitter</span></a></div> </div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<h1 class="discussions-label">Comments</h1><div class="CommentsWrap"><span class="BeforeCommentHeading"></span><div class="DataBox DataBox-Comments"> <ul class="MessageList DataList Comments">
+<li class="Item ItemComment Offline noPhotoWrap Role_FoundingPro Role_Partner Role_BetaTesterVIsion11Program Role_TactileSensorBetaTesters Role_BetaTesterCameraURCap120-beta pageBox" id="Comment_4923">
+<div class="Comment">
+<div class="Options">
+</div>
+<div class="Item-Header CommentHeader">
+<div class="AuthorWrap">
+<span class="Author">
+<a title="Kaleb_Rodes" href="/profile/Kaleb_Rodes" class="PhotoWrap js-userCard Offline" aria-label="User: &quot;Kaleb_Rodes&quot;" data-userid="65"><img src="https://us.v-cdn.net/6027406/uploads/defaultavatar/nELI41VX3IXXZ.jpg" alt="Kaleb_Rodes" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a><a href="/profile/Kaleb_Rodes" class="Username js-userCard" data-userid="65">Kaleb_Rodes</a> </span>
+<span class="AuthorInfo">
+<span class="MItem RoleTitle">Founding Pro, Partner, Beta Tester VIsion 1.1 Program, Tactile Sensor Beta Testers, Beta Tester Camera URCap 1.2.0-beta</span> <span class="MItem PostCount">Posts: <b>62</b></span> <span class="Rank MItem" title="Handy">Handy</span> </span>
+</div>
+<div class="Meta CommentMeta CommentInfo">
+<span class="MItem DateCreated">
+<a href="/discussion/comment/4923/#Comment_4923" class="Permalink" name="Item_1" rel="nofollow"><time title="May 9, 2019 1:38PM" datetime="2019-05-09T13:38:57+00:00">May 2019</time></a> </span>
+</div>
+</div>
+<div class="Item-BodyWrap">
+<div class="Item-Body">
+<div class="Message userContent">
+<a rel="nofollow" href="https://www.universal-robots.com/how-tos-and-faqs/faq/ur-faq/explanation-on-robot-orientation-28126/" title="Link: https://www.universal-robots.com/how-tos-and-faqs/faq/ur-faq/explanation-on-robot-orientation-28126/">https://www.universal-robots.com/how-tos-and-faqs/faq/ur-faq/explanation-on-robot-orientation-28126/</a><br><br><img src="https://us.v-cdn.net/6027406/uploads/editor/46/q7cjaojkqce5.jpg" alt="" title="Image: https://us.v-cdn.net/6027406/uploads/editor/46/q7cjaojkqce5.jpg" class="embedImage-img importedEmbed-img"></img><br> </div>
+<div class="Signature UserSignature userContent "><div><b>Kaleb Rodes</b></div><div>Applications Engineer</div><div>Behco</div><div><a rel="nofollow"><span class="__cf_email__" data-cfemail="b8d3d9d4ddda96cad7dcddcbf8daddd0dbd796dbd7d5">[email&#160;protected]</span></a></div></div><div class="Reactions"><span class="Column-Score Hidden">0</span><span class="ReactMenu"><span class="ReactButtons"> </span></span> <span class="Bullet">&middot;</span> <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2Fcomment%2F4923%23Comment_4923" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactFacebook"></span><span class="sr-only">Facebook</span></a><a href="https://twitter.com/share?url=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2Fcomment%2F4923%23Comment_4923" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactTwitter"></span><span class="sr-only">Twitter</span></a></div> </div>
+</div>
+</div>
+</li>
+<li class="Item Alt ItemComment Offline noPhotoWrap isOriginalPoster pageBox" id="Comment_4924">
+<div class="Comment">
+<div class="Options">
+</div>
+<div class="Item-Header CommentHeader">
+<div class="AuthorWrap">
+<span class="Author">
+<a title="ur5eUser" href="/profile/ur5eUser" class="PhotoWrap js-userCard Offline" aria-label="User: &quot;ur5eUser&quot;" data-userid="2979"><img src="https://us.v-cdn.net/6027406/uploads/defaultavatar/nELI41VX3IXXZ.jpg" alt="ur5eUser" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a><a href="/profile/ur5eUser" class="Username js-userCard" data-userid="2979">ur5eUser</a> </span>
+<span class="AuthorInfo">
+<span class="MItem PostCount">Posts: <b>3</b></span> <span class="Rank MItem" title="Apprentice">Apprentice</span> </span>
+</div>
+<div class="Meta CommentMeta CommentInfo">
+<span class="MItem DateCreated">
+<a href="/discussion/comment/4924/#Comment_4924" class="Permalink" name="Item_2" rel="nofollow"><time title="May 9, 2019 4:48PM" datetime="2019-05-09T16:48:47+00:00">May 2019</time></a> </span>
+</div>
+</div>
+<div class="Item-BodyWrap">
+<div class="Item-Body">
+<div class="Message userContent">
+Thanks for your reply Kaleb,<br><br>I have taken both, the link and the description of the function in the script manual, into consideration already. However, it is not clear to me how exemplarily the result on the extract from the script manual that you posted is being calculated. <br><br>The first point is p[0.2,0.5,0.1,1.57,0,0]<br>The second point is p[0.2,0.5,0.6,1.57,0,0]<br>And the result is p[0.4,-0.0996,0.60048,3.14,0.0,0.0]<br><br>I have attached a picture of my calculation. I have used the transformation matrix for the rotation and translation (second point) relative to the first point. However, I dont get to the right result. <br><br>Anyone having a clue what I am missing here?<br><br><br><br> </div>
+<div class="editor-upload-saved editor-upload-readonly" id="editor-uploads-commentid4924">
+<div class="editor-file-preview file-readonly" id="media-id-1506" title="WhatsApp Image 2019-05-09 at 17.57.49.jpeg">
+<input type="hidden" name="MediaIDs[]" value="1506" disabled="disabled" />
+<i class="file-preview img" style="background-image: url(https://us.v-cdn.net/6027406/uploads/editor/thumb/c6/nq1nra7yosmr.jpeg)"></i> <div class="file-data">
+<a class="filename" data-type="image/jpeg" href="https://us.v-cdn.net/6027406/uploads/editor/zh/173511fwaiwi.jpeg" target="_blank" data-width="1600" data-height="1200">
+WhatsApp Image 2019-05-09 at 17.57.49.jpeg </a>
+<span class="meta">160.7K</span>
+</div>
+<span class="editor-file-remove" title="Remove"></span>
+<span class="editor-file-reattach" title="Click to re-attach"></span>
+</div>
+</div>
+<div class="Reactions"><span class="Column-Score Hidden">0</span><span class="ReactMenu"><span class="ReactButtons"> </span></span> <span class="Bullet">&middot;</span> <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2Fcomment%2F4924%23Comment_4924" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactFacebook"></span><span class="sr-only">Facebook</span></a><a href="https://twitter.com/share?url=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2Fcomment%2F4924%23Comment_4924" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactTwitter"></span><span class="sr-only">Twitter</span></a></div> </div>
+</div>
+</div>
+</li>
+<li class="Item ItemComment Offline noPhotoWrap Role_Unconfirmed pageBox" id="Comment_5693">
+<div class="Comment">
+<div class="Options">
+ </div>
+<div class="Item-Header CommentHeader">
+<div class="AuthorWrap">
+<span class="Author">
+<a title="yixiaoru" href="/profile/yixiaoru" class="PhotoWrap js-userCard Offline" aria-label="User: &quot;yixiaoru&quot;" data-userid="3380"><img src="https://us.v-cdn.net/6027406/uploads/defaultavatar/nELI41VX3IXXZ.jpg" alt="yixiaoru" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a><a href="/profile/yixiaoru" class="Username js-userCard" data-userid="3380">yixiaoru</a> </span>
+<span class="AuthorInfo">
+<span class="MItem RoleTitle">Unconfirmed</span> <span class="MItem PostCount">Posts: <b>1</b></span> <span class="Rank MItem" title="Recruit">Recruit</span> </span>
+</div>
+<div class="Meta CommentMeta CommentInfo">
+<span class="MItem DateCreated">
+<a href="/discussion/comment/5693/#Comment_5693" class="Permalink" name="Item_3" rel="nofollow"><time title="November 25, 2019 2:37PM" datetime="2019-11-25T14:37:50+00:00">November 2019</time></a> </span>
+</div>
+</div>
+<div class="Item-BodyWrap">
+<div class="Item-Body">
+<div class="Message userContent">
+Hallo I have a question. Your Solution had only show one situation with Rx=90 grad, right? But What should I do if Ry=5 Grad , Rz=48 Grad for Example? How should I calculate that? Thank you very much for your Help<br><br>Yiru<br> </div>
+<div class="Reactions"><span class="Column-Score Hidden">0</span><span class="ReactMenu"><span class="ReactButtons"> </span></span> <span class="Bullet">&middot;</span> <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2Fcomment%2F5693%23Comment_5693" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactFacebook"></span><span class="sr-only">Facebook</span></a><a href="https://twitter.com/share?url=https%3A%2F%2Fdof.robotiq.com%2Fdiscussion%2Fcomment%2F5693%23Comment_5693" class="ReactButton PopupWindow" rel="nofollow" role="button"><span aria-hidden="true" class="Sprite ReactSprite ReactTwitter"></span><span class="sr-only">Twitter</span></a></div> </div>
+</div>
+</div>
+</li>
+</ul>
+</div><div class="P PagerWrap"></div></div> <div class="Foot Closed pageBox">
+<div class="Note Closed SignInOrRegister"><a href="/entry/signin?Target=discussion%2F1618%2Falgorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot%3F" class="Popup">Sign In</a> or <a href="/entry/register?Target=discussion%2F1618%2Falgorithm-behind-the-pose-trans-script-language-function-of-a-ur5e-universal-robot%3F">Register</a> to comment. </div>
+</div>
+<a href="/discussions" class="BackToDiscussion Button WithArrow Bottom FloatRight "><svg class="SVG SVG_LeftArrow" viewBox="0 0 54.126 54.126" xmlns="http://www.w3.org/2000/svg"><title>Left Arrow</title><path class="SVG_LeftArrow_Circle" d="M8775.938,1695.126a27.063,27.063,0,1,0-27.062-27.062A27.058,27.058,0,0,0,8775.938,1695.126Zm0-50.169a23.1,23.1,0,1,1-23.108,23.106A23.132,23.132,0,0,1,8775.938,1644.957Z" transform="translate(-8748.875 -1641)"></path><path class="SVG-LeftArrow-Arrow" d="M8762.02,1666.786a1.678,1.678,0,0,1-.1.145c-0.027.058-.055,0.113-0.081,0.167a0.394,0.394,0,0,0-.044.1,0.278,0.278,0,0,0-.017.047c-0.022.054-.04,0.115-0.059,0.174s-0.027.1-.041,0.151a0.973,0.973,0,0,0-.029.175c-0.008.051-.01,0.1-0.02,0.149a0.86,0.86,0,0,0,0,.188,0.914,0.914,0,0,0,0,.147,0.96,0.96,0,0,0,.025.188,0.547,0.547,0,0,0,.02.142c0.018,0.061.035,0.121,0.056,0.186a0.845,0.845,0,0,0,.047.143,0.7,0.7,0,0,1,.019.071c0.016,0.03.037,0.061,0.056,0.1s0.044,0.09.065,0.135a1.214,1.214,0,0,0,.1.156,0.6,0.6,0,0,0,.087.125,0.936,0.936,0,0,0,.13.152,0.327,0.327,0,0,0,.063.066l10.745,10.754a2.3,2.3,0,0,0,3.247-3.248l-6.828-6.829h21.264a2.3,2.3,0,0,0,2.3-2.3,2.306,2.306,0,0,0-2.3-2.295h-21.264l6.828-6.831a2.3,2.3,0,0,0-3.247-3.25l-10.753,10.756-0.059.064a0.949,0.949,0,0,0-.124.151C8762.08,1666.7,8762.049,1666.75,8762.02,1666.786Z" transform="translate(-8748.875 -1641)"></path></svg>Back to discussions page</a>
+</section>
+</div>
+</div>
+</main>
+<footer class="Footer pageFooter">
+<div class="Container">
+<div class="Row">
+<div class="Column Col-1-3 Footer-ColLeft">
+<div class="Footer-CellContent">
+<div class="Footer-CellHeader Footer-LogoCellHeader">
+<a href="http://robotiq.com" target="_blank" class="Footer-Logo">
+<img alt="Robotiq" title="Robotiq" src="https://dof.robotiq.com/themes/Robotiq/design/images/Logo-Robotiq.png?v=620c3b60">
+</a>
+</div>
+<div class="Footer-TelContainer">
+<span class="Footer-Tel Footer-Tel1">
+1-888-ROBOTIQ (762-6847)
+</span>
+</div>
+<div class="Footer-TelContainer">
+<span class="Footer-Tel Footer-Tel2">
+1-418-380-2788 (outside US and Canada)
+</span>
+</div>
+</div>
+</div>
+<div class="Column Col-1-3 Footer-ColMiddle">
+<div class="Footer-CellContent">
+<div class="Footer-CellHeader Footer-social">
+<div class="Footer-SocialWrap">
+<a href="https://www.facebook.com/robotiq" target="_blank" class="Icon Footer-socialIcon icon-facebook">
+<span class="SrcOnly">Facebook</span>
+</a>
+<a href="https://www.youtube.com/user/RobotiqTV" target="_blank" class="Icon Footer-socialIcon Footer-YoutubeIcon">
+<svg class="SVG SVG_Youtube" viewBox="0 0 43.82 31.04" xmlns="http://www.w3.org/2000/svg">
+<title>YouTube</title>
+<path class='SVG-Youtube_Path' d='M385.116,2331.556a6.233,6.233,0,0,0-4.39-1.869c-6.133-.447-15.33-0.447-15.33-0.447h-0.019s-9.2,0-15.33.447a6.236,6.236,0,0,0-4.392,1.869c-1.314,1.338-1.74,4.379-1.74,4.379a67.2,67.2,0,0,0-.438,7.143v3.348a67.159,67.159,0,0,0,.438,7.142s0.427,3.041,1.74,4.38c1.668,1.758,3.858,1.7,4.832,1.886,3.507,0.339,14.9.444,14.9,0.444s9.207-.014,15.34-0.46a6.25,6.25,0,0,0,4.39-1.871c1.314-1.339,1.743-4.38,1.743-4.38a67.3,67.3,0,0,0,.438-7.142v-3.348a67.333,67.333,0,0,0-.437-7.143S386.43,2332.895,385.116,2331.556Zm-24.253,18.928,0-12.4,11.84,6.222Z' transform='translate(-343.477 -2329.24)' />
+</svg> </a>
+<a href="https://twitter.com/DoF_Community" target="_blank" class="Icon Footer-socialIcon icon-twitter-alt">
+<span class="SrcOnly">Twitter</span>
+</a>
+<a href="https://www.instagram.com/robotiqinc" target="_blank" class="Icon Footer-socialIcon icon-instagram">
+<span class="SrcOnly">Instagram</span>
+</a>
+<a href="https://www.linkedin.com/company/robotiq" target="_blank" class="Icon Footer-socialIcon icon-linkedin-alt">
+<span class="SrcOnly">LinkedIn</span>
+ </a>
+</div>
+</div>
+<div class="Footer-bottomLink Footer-Copyright">
+<a href="http://www.robotiq.com" target="_blank" class="Footer-bottomLink Footer-HomeLink">
+robotiq.com
+</a>
+<p class="Footer-CopyrightInfo">
+&copy; Robotiq 2022
+</p>
+</div>
+</div>
+</div>
+<div class="Column Col-1-3 Footer-ColRight">
+<div class="Footer-CellContent">
+<div class="Footer-ColRightWrap">
+<div class="Footer-CellHeader Footer-SitMapHeader">
+<span class="Footer-SiteMapTitle">
+Sitemap
+</span>
+</div>
+<div class="ClearFix Footer-SiteMap">
+<div class="Footer-SiteMapItem">
+<a href="http://robotiq.com" target="_blank" class="Footer-SiteMap-Home">Robotiq Home</a>
+</div>
+<div class="Footer-SiteMapItem">
+<a href="/categories" class="">Categories</a>
+</div>
+<div class="Footer-SiteMapItem">
+<a href="http://robotiq.com/ask-quote/" target="_blank" class="Footer-SiteMap-Quote">Get a Quote</a>
+</div>
+<div class="Footer-SiteMapItem">
+<a href="/discussions" class="">Discussions</a>
+</div>
+<div class="Footer-SiteMapItem">
+<a href="http://robotiq.com/company/about-robotiq/" target="_blank" class="Footer-SiteMap-About">About Us</a>
+</div>
+<div class="Footer-SiteMapItem">
+<a href="/bestof" class="Footer-SiteMap-Best">Best Of</a></li>
+</div>
+<div class="Footer-SiteMapItem">
+<a href="http://support.robotiq.com/" target="_blank" class="Footer-SiteMap-Help">Robotiq Support</a>
+</div>
+<div class="Footer-SiteMapItem">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+$(document).ready(function(){
+		var url=gdn.url('/profile.json');
+		$.getJSON(url,function(analyitcsjson){
+			var User= ''+analyitcsjson.UserRoles+'';
+			ga('set', 'dimension1', ''+User+'');
+
+			var RankName= ''+analyitcsjson.Rank.Name+'';
+			ga('set', 'dimension3', ''+RankName+'');
+
+			var categoryname = gdn.getMeta('Category');
+			if (categoryname) {
+                            ga('set', 'dimension2', ''+categoryname+'');}
+
+		})
+	});
+
+<!-- Reaction Tracking-->
+$('.ReactButton-Down').on('click', function() {ga('send', 'event', 'reaction', 'click-down', window.location.pathname, {nonInteraction: true});});
+	
+$('.ReactButton-Up').on('click', function() {ga('send', 'event', 'reaction', 'click-up', window.location.pathname, {nonInteraction: true});});
+
+$('.ReactButton-Flag').on('click', function() {ga('send', 'event', 'reaction', 'click-flag', window.location.pathname, {nonInteraction: true});});
+
+$('.QnA-Yes').on('click', function() {ga('send', 'event', 'accept-answer', 'Yes', window.location.pathname, {nonInteraction: true});});
+
+$('.QnA-No').on('click', function() {ga('send', 'event', 'accept-answer', 'No', window.location.pathname, {nonInteraction: true});});
+
+$('.dropdown-menu-link-create-zendesk-ticket').on('click', function() {ga('send', 'event', 'button', 'create-zendesk-ticket', window.location.pathname, {nonInteraction: true});});
+
+<!--Apply-->
+$('#Form_ApplyforMembership.Button.Primary').on('click', function() {ga('send', 'event','button', 'click', 'apply-for-membership');});
+
+<!--Social Sign-in-->
+$('a.SocialIcon.SocialIcon-Google,a.SocialIcon.SocialIcon-Google.HasText').on('click', function() {ga('send', 'event', 'button', 'click', 'social-signin');});
+
+<!--Standard Sign-in-->
+$('input#Form_SignIn.Button.Primary').on('click', function() {ga('send', 'event', 'button', 'click', 'standard-signin');});
+
+<!--New Discussion-->
+$('input#Form_PostDiscussion').on('click', function() {ga('send', 'event', 'button', 'click', 'new-discussion');});
+
+<!--New Question-->
+$('input#Form_AskQuestion').on('click', function() {ga('send', 'event', 'button', 'click', 'new-discussion');});
+
+<!--New Question-->
+$('input#Form_PollOption').on('click', function() {ga('send', 'event', 'button', 'click', 'new-discussion');});
+
+<!--New Comment-->
+$('input#Form_PostComment').on('click', function() {ga('send', 'event', 'button', 'click', 'new-comment');});
+
+<!--New Comment-->
+$('input#Form_SignUp.Button.Primary').on('click', function() {ga('send', 'event', 'button', 'click', 'signup');});
+
+
+</script>
+
+<script type='text/javascript'>
+                (function(d,s,i,r) {
+                if (d.getElementById(i)){return;}
+                var n=d.createElement(s),e=d.getElementsByTagName(s)[0];
+                n.id=i;n.src='//js.hs-analytics.net/analytics/'+(Math.ceil(new Date()/r)*r)+'/13401.js';
+                e.parentNode.insertBefore(n, e);
+                })(document,'script','hs-analytics',300000);
+            </script>
+
+</body>
+</html>

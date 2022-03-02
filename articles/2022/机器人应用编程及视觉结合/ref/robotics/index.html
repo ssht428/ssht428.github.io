@@ -1,0 +1,482 @@
+<script src="../../../../../style.js"></script>
+<pre id="title">robotics</pre>
+<pre id="content">  
+此文转载： #HREF https://learnchannel-tv.com/robot/ #-HREF1 robotics #-HREF2 
+Overview robotics
+
+The topic of robotics is very complex and includes topics from the fields of electrical engineering, sensor technology, computer science and mechanics. In the following, we will try to convey the basics of robotics in a practical way.
+Introduction-Robotics.gif
+Definition robot according VDI-guidline 2860
+
+    “Definition robot according VDI-guidline 2860 "Industrial robots are universal handling systems with several axes those motions with respect to movement sequence and paths or angles are freely programmable or sensor-guided. They can be equipped with grippers, tools or other means of production and can perform handling and / or production tasks."
+
+Definition robot according Norm EN 10218-1
+
+    “A robot / industrial robot is an automatically controlled, freely programmable multipurpose manipulator with three or more axes for use in automation technology either in a fixed location or movably."
+
+By this definition, a robot can be clearly distinguished from the so-called manipulators and pick-and-place equipment.
+
+Test yourself:  Classify these handling-devices and explain why!
+
+Robot-or-simple-Handling-station.png
+Robot or simple Handling station
+
+Pic a):   A simple manipulator. The hoses indicate that this device consists of simple cylinders.
+Pic b):   Actually an industrial robot (SCARA)
+*****************************   Split Line   ***********************************
+ A short overview:
+    Name	                   Figure	                     Note
+Emergency-Stop:
+Robot-Teach-Pendant-with-Emergency-Stop.png
+Robot Teach Pendant with Emergency Stop
+----------------------------------------------------------------------------
+Because an emergency-stop has to be always approachable it is also a part of the control panel. Activating an emergency-stop leads to an immediately stop of all drives of the robot.
+Stopp-categorie 0.
+============================================================================
+Robot Safety-cell:
+Robot-Safety-Cell-Learnchannel.png
+Robot Safety Cell
+----------------------------------------------------------------------------
+Burst proof Plexiglas pane also protects from accidentally thrown work pieces. The contact for verifying the door of the safety cell is normally integrated within the emergency-loop
+============================================================================
+Hold-to-run or Deadman switch:
+Deadman-switch-located-at-the-back-of-the-teach-pendant.png
+Deadman switch located at the back of the teach pendant
+----------------------------------------------------------------------------
+Only important for the programming mode or manual mode (safety cell can be opened):
+The drives of the robots can only be activated if this switch is in mid-position.
+============================================================================
+Test mode with reduced speed:
+Robot-safety-device-move-with-reduced-speed-300x103.png
+Robot safety device - move with reduced speed
+----------------------------------------------------------------------------
+For certain applications, like a test run of a program, the robot should move in slow motion. A selector switch is usually integrated within the hand-hold programming device.
+============================================================================
+Pressure sensitive matt
+Robot-Safety-Device-pressure-sensitive-matt-300x168.png
+Robot Safety Device - pressure sensitive matt
+----------------------------------------------------------------------------
+Supervising the danger area.
+============================================================================
+Torque monitoring
+Torque_Monitoring_Viedio.png
+----------------------------------------------------------------------------
+Collision detection via torque monitoring
+============================================================================
+Electric skin
+Electronic_Skin.jpg
+----------------------------------------------------------------------------
+Contact with the housing is detected.
+============================================================================
+Table: Robot Safety devices
+
+Note: What is a free-turning device of a robot?
+
+With the free-turning device, it is possible to move the robot axes by muscle power for example to free a trapped person. For this purpose, the control system must be shut down before.
+
+Choice of different modes
+
+For certain applications it is necessary to drive the robot in a reduced speed. Examples would be the teach-in programming, if you are close to the robot or the test run of a new program. Each robot, even with simple control, therefore, has at least two modes, namely, HAND 'and' AUTO '.
+
+*****************************   Split Line   ***********************************
+
+Methods to programm a robot
+
+The following video shows the online programming methods `Teach-in`,` Play-Back`, as well as Offline programming. Subtitles are to be activated above the bottom "Settings".
+
+
+Play-Back-method
+
+Let´s have a look how this robot is programmed by the play-back method (also called lead-through) which is typically associated with continuous path control. The programmer leads the robot manually within the desired path regarding the orientation of the robot-hand. At the same time the control stores the current position and orientation of the tool center point periodically, that means after certain microseconds.
+
+The advantage hereby is: Even complex paths are can easily be programmed with few skills in programming. You would use play-back to appliance such as spray painting and contour welding.
+Teach-In- Programming
+
+Here the robot is positioned to the desired points by means of the control panel, also called teach panel. When the operator gets the desired position and angle of the robot hand, the operator can saves these coordinates within the position list by pressing the Enter-key.
+
+Due to security reasons the robot can be driven in this operational mode only in slow motion. Because the operator works within the workings area each control panel must be equipped with an emergency bottom and deadman's switch. Typical applications therefore are spot welding and pick-and-place.
+Offline – Programming
+
+Here you can sit in your office. The movements of the robot are simulated within a virtual 3D environment. Even possible collisions can be recognized already in the phase of simulation. All programming commands are available. Once the program is written and simulated you just load it to the robot control. In the first run the robot should move in slow motion.
+
+*****************************   Split Line   ***********************************
+
+Movement pattern (Interpolation teqnics)
+Robot interpolation - PTP - LIN - CIRC
+Robot-interpolation-PTP-LIN-CIRC.png
+Fig.:   Robot interpolation - PTP - LIN - CIRC
+
+PTP: The TCP is moving the fastest way to the target position.
+
+LIN: The TCP moves within a straight line to the desired position.
+
+CIRC: The TCP moves within a circular path.
+
+The fastest movement pattern is the so called ´PTP´. But for accurate moving PTP is not applicable because no straight line is driven. The movement pattern ´Synchro PTP´ harmonizes the speed of the fast moving axis to the speed of the low moving axis. The movement patterns `LIN´ and ´CIRC ´require high computing power, because all drives of the axis have to be coordinated to each other.
+Robotics - moving in Synchro PtP
+Robotics-moving-in-Synchro-PtP.png
+fig.:   Robotics - moving in Synchro PtP
+
+Moving to reference position with tolerance- Why?
+Overriding position with tolerance
+Tolerance-of-Position.gif
+fig.:  Tolerance of Position
+
+In this picture as shown the point P2 is not hidden exactly but achieved within a permitted tolerance.
+
+Advantage: The robot has not to be slowed down completely. That implies less attrition and short-time cycle time.
+
+Exercise: Classify the following moving patterns as shown!
+Robotics moving pattern
+Robotics-moving-pattern.gif
+Fig 1: Moving in LIN ;     Fig.2: Moving in CIRC;   Fig. 3: Moving in PtP;  Fig. 4: Moving TCP with tolerance
+
+*****************************   Split Line   ***********************************
+
+Definition Kinematics
+
+Kinematic (gr.: kinema, movement) is the science of movement of dots and solids within the space described by coordinates, velocity v and acceleration a, without regarding the cause for the movement (forces). Kinematic is a sub-domain of the `mechanical science`.
+
+Kinematic describes the mechanism for moving of a robot. In this context the following items are to be explained in this lesson:
+
+1. Movement pattern of axis
+- Translational axis
+- Rotatory axis
+
+2. Assembly of axis
+- Order of the axis within the robotic-device
+- Position of the rotation axis, position of the fixed points of rotatory axis, direction of movement of translation axis
+
+3. Quantity of axis
+
+4. Shape of workspace
+
+In this video you get the kinematics and workspace as well as the advantages and appliance of the three most important industrial robots: the articulated robot, the SCARA and the Gantry robot.
+
+Terms:
+
+Workspace:  All the points which the robot can reach. The shape of the workspace is defined by the main axis.
+
+Degree of freedom (DOF):  The mechanical degree of freedom (DOF) is the number of possible independent movements. The universal robot has e.g. the degree of freedom (DOF) = 6: three axes for positioning the TCP within its operational space. In addition, three hand axes to rotate the tool at any angle.
+
+robot-workspace.png
+fig.:  robot workspace and degree of freedom
+
+*****************************   Split Line   ***********************************
+Movements pattern of axis
+
+The different kinematics of industrial robots are always based on the following three axis respectively joints:
+Figure	         Name and symbol	           Remark
+====================================================================================
+Prismatic-or-sliding-joint-P-2.png
+Symbol-prismatic-axis.png
+Symbol prismatic axis
+
+Prismatic-or-sliding-joint-P-300x133.png
+Prismatic or sliding joint (P)
+Symbol-prismatic-axis2.png
+------------------------------------------------------------------------------------
+Linear joint (L)
+- L-axis can be positioned precisely
+- mechanical solid
+- low agility
+- if its movement is orthogonal, it can be defined as orthogonal (type O)
+====================================================================================
+
+
+------------------------------------------------------------------------------------
+Rotational joint (type R)- fast moments are possible
+- mechanical weak compared to L-axis
+====================================================================================
+rotary-joint.png
+rotary joint
+Symbol-R-axis.png
+------------------------------------------------------------------------------------
+Revolving joint (type V)
+====================================================================================
+R-Axis.png
+R-Axis
+Symbol-R-axis2.png
+------------------------------------------------------------------------------------
+Twisting joint (type T)
+====================================================================================
+Spherical-or-ball-joint-S.png
+Spherical-or-ball-joint-S
+------------------------------------------------------------------------------------
+Spherical or ball joint (S)
+for IR (still) not matter
+====================================================================================
+Kinematics-Linked-joints.gif
+Kinematics-Linked-joints
+Linked joints:No standard symbol exists.
+------------------------------------------------------------------------------------
+- Precision can be reduced due to the tolerance of each joint
+- Possibility to move is reduced by additional levers
+====================================================================================
+Main- and hand-axis
+
+... using the example of the universal robot
+
+The axis 1,2 and 3 represent the main axis of the robot. By means of these axis it is possible for the robot to reach each point within the workspace.  The tool itself can be orientated by the axis 4,5 and 6 - also called auxiliary- or hand-axis.
+
+The number of the axis stands for the order the axis are mounted.
+Robot-main-and-hand-axis-with-symbols.png
+Robot main and hand axis with symbols
+====================================================================================
+Exercises Kinematics
+
+1. Classify the devices shown below according to their kinematics!
+      L   Δ    Linear Joint,     R  Δ    Rotational Joint
+Kinematics-axis.gif
+------------------------------------------------------------------------------------
+ Fig 1: RL ; Fig.2: LL; Fig. 3: RR; Fig. 4: LR
+ Fig 1: LR ; Fig.2: RR; Fig. 3: LL; Fig. 4: RL
+ Fig 1: RL ; Fig.2: RR; Fig. 3: LR; Fig. 4: LL
+ Fig 1: RL ; Fig.2: RR; Fig. 3: LL; Fig. 4: LR
+ Fig 1: RR ; Fig.2: RL; Fig. 3: LL; Fig. 4: LR
+
+*****************************   Split Line   ***********************************
+Classification robots
+
+Robots can be classified by their main axis. Furthermore the kinematic defines also the workspace.  The following compilation should give you an overview:
+Name	        Main axis, workspace	            Figure
+====================================================================================
+PPP,Linear robot, Cartesian robot
+
+PPP-robot.png
+PPP-robot
+
+PPP-Kinematikcs-symbol.png
+PPP-Kinematikcs-symbol.png
+------------------------------------------------------------------------------------
+Cartesian-robot-300x269.png
+Cartesian-robot
+
+Cartesian-or-Linear-robot-Kinematics-and-Workspace-300x217.png
+Cartesian or Linear robot - Kinematics and Workspace
+
+Due to the mechanical stiffness of the L(linear)-axes gantry robot are well suited for transport tasks over long distances. In addition, since the floor area is free. Metrologically translational axes are easier to handle than rotary axes. Thats why t-axis can be very accurately positioned. Applications of this robot therefore are: SMD-assembling machines, loading and unloading robots, etc.
+====================================================================================
+RPP robot
+
+RPP-symbol.png
+RPP-robot.png
+
+Here two translational axes are following the rotational axis. The first T-axis determines the height of the working area, the second T-axis determines the range of the effektor. The advantage is the relatively large range and the high speed at which the robot can rotate around its own axis. These robots are used mainly for loading and unloading workpieces on machines.
+====================================================================================
+RRP
+
+RRP-symbol.png
+RRP-Robot.png
+
+This robot can also work "overhead". If the third linear axle is realised as a telescope, this robot has a large range. This robot is often used for point and simple arc welding.
+====================================================================================
+RRP
+proper name:SCARA (Selectice Compliance Assembly Robot Arm)
+
+SCARA-Workspace-and-Kinematics-300x136.png
+SCARA Workspace and Kinematics
+
+Scara-Robots-300x198.png
+Scara Robots
+
+Due to its rotational axes of the robot is able to swivel rapidly to the side. Mechanically stable in the vertical direction the joines can be provid high forces. These robots are often applied to assembly tasks.
+====================================================================================
+RRR
+proper name: articulated robot or Universal robot
+
+Articulated-Robot-Kinematics-and-workspace-300x170.png
+Articulated Robot - Kinematics and workspace
+
+3R-or-RRR-robot.png
+3R or RRR-robot
+
+With three rotational axes of the robot has maximum flexibility, can operate over head and even complex paths can be driven. Application for this robot are for example complex assembly tasks, arc welding, etc.
+====================================================================================
+Delta-robot	
+
+Delta-robot.png
+Delta-robot
+
+Delta-robot-Workspace.jpg
+Delta-robot-Workspace
+
+Simple mounting and pick-and-place.The parallel or delta robot configuration (Figure 2.6) is one of the most recent configuration developments. This includes machines whose arms have concurrent prismatic or rotary joints. These were developed as overhead mounted machines with the motors contained in the base structure driving linked arms below. The benefit of this approach is that it reduces the weight within the arms and therefore provides very high acceleration and speed capability. 
+
+*****************************   Split Line   ***********************************
+
+Kinematics hand axis and orientation TCP
+
+To get the robot hand in the desired angle, you would need 3 handaxis.
+orientation-hand-axis.png
+robot orientation hand axis
+====================================================================================
+The angle of the robot hand is called orientation. The axes of the hand, designated A, B and C, allow three movements: Roll, Pitch and Yaw. These terms were derived from shipping and aviation.
+
+The angle position of the robot hand is called "orientation".
+
+TCP = engl. Tool Center Point
+orientation-robot-gripper.png
+fig: orientation-robot-gripper
+
+*****************************   Split Line   ***********************************
+
+Coordinates of a robot system
+
+For the programmer, various robot coordinate systems are available, which can be used to determine for example  the position and orientation of the TCP much easier, to get the geometry of a workpiece, etc.
+
+Robotics-coordinate-systems.png
+Robotics - coordinate systems
+
+Robotic systems are generally defined as Cartesian coordinate systems:
+
+    Robot World Coordinate System
+    Robot origin coordinate system or ROBROOT coordinate system
+    Workpiece and / or BASE coordinate system
+    Robot Tool coordinate system
+
+The ROBOOT-Koordinatensystem is a cartesian coordinate system, which has its origin at the footprint of a robot. It describes the position of the robot regarding the World-coordintes.
+
+It is useful to set the origin of the ROBOOT coordinate system with the origin of the WORLD coordinate system. See the figure above .
+
+*****************************   Split Line   ***********************************
+
+Robot - WORLD-coordinate system
+
+The WORLD-coordinate system is a cartesian coordinate system for describing the location of the points within the workspace. Here, a work point is specified in the form of coordinates:    P(x, y, z)
+
+World-Koordinatensystem.png
+World-Koordinatensystem
+
+Advantage:    Detailing the points in WORLD-coordinates is simple. Linear movements can be programmed easily.
+
+Disadvantage: Ambiguity - that means that a certain position can be achieved with a plurality of axial positions. This is concerns especially jointed-arm robots.
+
+Ambiguity-of-an-articulated-robot.gif
+Ambiguity-of-an-articulated-robot
+
+The coordinate details also have transformed into joint coordinates. This implicates a high computational effort for controlling and a major programming effort for the producer control unit.
+
+robot-coordinate-transormation.png
+robot-coordinate-transormation
+
+*****************************   Split Line   ***********************************
+
+Robot JOINT-coordinates
+
+The angle-position and length of each axis of an articulate robot axes describe the orientation of the TCP exactly. With the joint coordinate-system each robot axis can be moved particularly in positive or negative sense rotation.
+
+Coordinates:    P (angle A1, angle A2, ... , angle A6)
+
+Robot-joint-coordinates-Learnchannel.png
+fig: Robot-joint-coordinates-Learnchannel
+
+Advantage:
+
+    ambiguity can be avoided
+    no transformation of coordinates necessary
+
+*****************************   Split Line   ***********************************
+
+Robot tool coordinates
+
+robot-tool-coordinates-249x300.png
+
+Tool-coordinates include data of the tool, such as:
+
+    where is the TCP(tool center point)
+    the geometry of the tool (the orientation of the tool)
+
+Gripper coordinates describe the orientation and position of the effector in space. The zero point of the coordinate systems is located at the Tool-Center-Point (TCP) of the effector. Usually the coordinates are stated Cartesian, whereas one of the axes have to point into the extended direction of the gripper.
+
+Which advantages you have by using tool-coordinate-system? By using the tool coordinate system, many applications are easier to program for the user. Examples from the practice in which the tool measurement is used:
+
+Robot-Tool-coordinates.gif
+Robot-Tool-coordinates
+Fig.1:  To rotate the tool round the TCP or move in a predetermined angle along the path while keeping the orientation constant.
+Gluing: adhesive must be applied along the edge in a constant angle.
+
+Robot-Tool-Coordinates2.gif
+Robot-Tool-Coordinates2
+Fig .2: The workpiece must be inserted into the holder in a precisely fitting manner. For this purpose, the geometry of the gripper must be known.
+
+The following tasks are easier to program using the tool coordinate system:
+
+    Turning the tool around the TCP (tool center point)
+    To maintain the speed at the TCP even with ccomplex paths
+    Topush the tool in a certain direction 
+
+*****************************   Split Line   ***********************************
+
+The workpiece-coordinate-system is a Cartesian coordinate-system whose origin is within the work piece or at a corner of the workpiece.
+
+Advantages of measuring the base :
+
+1.    Thereby you can determine a specific point on the pallet, the clamping table or the workpiece. To these points all future teach-points can refer to. In the program mode, you now have the option to move the base or to rotate it. Automatically all operation points will be adapted.
+2.    If there are several workpieces on the pallet, it is sufficient to know the workpiece geometry of one workpiece. Only the zero point of a new pallet has to determined.
+
+Robotics-Workpiece-Coordinate-System.png
+fig: Robotics-Workpiece-Coordinate-System
+
+*****************************   Split Line   ***********************************
+
+Mostly used robot grippers
+
+The robot grabs the workpiece, holds it and places it in the desired location. Whether it's large car body parts, window panes or electronic components - it's your job to find the right gripper for any application and workpiece.
+The grippers are effectors for gripping workpieces or tools. Workpieces that can be gripped with this jaw gripper can be electronic components on the one hand, or large body parts on the other. You can choose from pneumatic, electric or hydraulic (for large forces) grippers.
+
+The Two-finger-gripper, also named as jaw-gripper, as shown on the right - is suitable for rectangular workpieces.
+
+robot-2-finger-Gripper.png
+robot-2-finger-Gripper
+
+If cylindrically workpieces, even with different radius, are to be gripped, you would use a Three-finger gripper. Pneumatic grippers are often used here.
+
+Due to its number of joints, the Joint gripper can adapt itself to its workpiece. Thus, it is also possible to hold workpieces of different sizes and shapes with only one gripper.
+
+robot-grapper-gripper.png
+robot grapper gripper
+
+Robot_3-Finger-gripper.png
+Robot_3-Finger-gripper
+--------------------------------------------------------------------------------
+Suction grippers are suitable for smooth, large workpieces. The surface should be clean, also the weight of the workpieces is limited. The main application of this gripper is to grasp window panes. Suction pads allow gripping of the component from "above", which enables gapless positioning or depositing next to each other.
+
+robot-suction-gripper.png
+robot-suction-gripper
+--------------------------------------------------------------------------------
+Magnetic grippers are well suited for large-area metal sheets. These sheets can have different dimensions, drill holes or recesses.
+Magnetic grippers can be built as permanent or electromagnetic grippers. With permanent magnet grippers, the gripping force is generated by means of a permanent magnet, which is why the workpieces must be "taken" from the gripper.
+If you have an electromagnetic gripper, it is supplied with DC voltage. In this case, the ferromagnetic workpieces can be picked up and released by switching the power supply on and off.
+
+electropneumatic-gripper.png
+electropneumatic gripper
+
+*****************************   Split Line   ***********************************
+
+Coordinate transformation
+
+For the control of a robot, the position of the tool is usually specified by the programmer in Cartesian coordinates. In order to control the drives, these data must be converted into joint coordinates. The following figure illustrates this as well as the terms in this context:
+
+robot-cordinate-transformation.png
+robot-cordinate-transformation
+
+Work order: Coordinate transformation with conventional geometry
+Given is the RLL robot within the cylinder coordinate system. Transform with these details the position of the TCP witihin the cartesian coordinate system!
+
+robot-coordinates-work-order.png
+robot-coordinates-work-order
+
+calculation-Robot-Coordinate-System-Transformation.png
+calculation Robot Coordinate System Transformation
+
+*****************************   Split Line   ***********************************
+
+https://www.youtube.com/embed/I-M1x6aWPs8?list=PLKyLX1dBFAo2hTHojzmOQOqjcHwTvWvLX
+
+https://www.youtube.com/embed/0jokZ9FkjhY
+
+*****************************   Split Line   ***********************************
+
+https://www.youtube.com/channel/UCy9UQv9SaA-fKpqoE1VWjCg
+</pre>
