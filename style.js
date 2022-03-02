@@ -37,7 +37,7 @@ function format_content(raw)
         {
             if(item.length == 0)
                 continue;
-            if(item.endsWith(".png") || item.endsWith(".jpg"))
+            if(item.endsWith(".png") || item.endsWith(".jpg") || item.endsWith(".gif"))
             {
                 formated += "<p><img src = '" + item + "'></p>";
                 
@@ -63,7 +63,7 @@ window.onload = function()
 {
     var title = document.getElementById("title").innerText;
     var content = document.getElementById("content").innerText;
-    var footer = "孙悟空 from 吉林大学自动化 @ 山东灵智机器人有限公司  ssht428@163.com";
+    var footer = "孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com";
     document.write('                                                                                \
         <html>                                                                                      \
             <head>                                                                                  \
