@@ -1,0 +1,60 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>手眼标定2D</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">手眼标定2D</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+因为个人太笨了，相机自身畸变校准(calibrateCamera)公式及结果参数还能看懂，但是看了将近1年的各种handeye资料，还是没法理解opencv中的坐标变换及各矩阵参数意思，所以我目前还无法使用OpenCV进行手眼标定(也就是调用直接使用calibrateHandeye())。
+<br> 结果就是现在勉强能对平面2D进行简单的标定(采用特殊方式，使用手动计算offset及旋转角，或者使用 estimateRigidTransform())，对于3D空间深度的校准就实在无能为力啦。。。
+<br>下面先放一些当时看的手动计算手眼标定的链接：
+<br> <a href="cvx/index.html"> 基恩士CVX视觉检测产品生产日期及批号 </a>
+<br> <img src="cvx/cvx-date-ui.jpg" width="520px" height="390px">
+<br> 
+<br> <a href="cvx/index.html"> 基恩士CVX视觉检测产品生产日期及批号 </a>
+<br> <img src="cvx/cvx-date-ui.jpg" width="520px" height="390px">
+<br> 
+<br> <a href="cvx/index.html"> 基恩士CVX视觉检测产品生产日期及批号 </a>
+<br> <img src="cvx/cvx-date-ui.jpg" width="520px" height="390px">
+<br> 
+<br> <a href="cvx/index.html"> 基恩士CVX视觉检测产品生产日期及批号 </a>
+<br> <img src="cvx/cvx-date-ui.jpg" width="520px" height="390px">
+<br> 
+<br> <a href="cvx/index.html"> 基恩士CVX视觉检测产品生产日期及批号 </a>
+<br> <img src="cvx/cvx-date-ui.jpg" width="520px" height="390px">
+<br> 
+<br>=========================================================================================
+<br> 任何视觉检测项目的重点在于“<strong>光源</strong>”，光源设计基本决定是否成功的50%，该项目因为客户“要求相机全防护”，造成光源更改了三次。外壳设计三次如下：
+
+<br>  0-产品箱子整体图 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;1-调整摄像头
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
