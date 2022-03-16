@@ -31,7 +31,18 @@
 <br><a href="data/空载C/iDASRD Channel Data Speed50 2022-03-04_10-21-27.txt"> iDASRD Channel Data Speed50 2022-03-04_10-21-27.txt  </a>
 <br><a href="data/空载静态/iDASRD Channel Data 2022-03-04_09-59-18.txt"> iDASRD Channel Data 2022-03-04_09-59-18.txt  </a>
 <br><a href="data/空载.zip"> 所有数据打包.zip  </a>
+<p>
+更新@20220316: 先用matlab进行分析一下^.^  然后再自己写滤波算法。。。
+<br> 开始以为采集的数据含有高频杂波，所以想用FFT分析一下杂波频率，然后用个低通滤波器消除。
+<p><img src="origin-noise.png" width="432px" height="385px"></p>
+<br>但是对原始数据FFT之后，频率根本没有明显的规律，后来想了下，现在机器人/上位机端采集数据是200Hz,而力矩传感器这种东西放在机器人上，只要机器人不动，其数据只能在固定值上下波动和缓慢漂移。而所谓高频信号已经在厂家自己的转换器中处理过了。
+<br>下图是原始数据的FFT图：
+<p><img src="fft-analysis.png" width="432px" height="385px"></p>
+<br>既然没有高频杂波，只能考虑常规的滤波方法了，比如平均滤波、中值滤波等等，kalman滤波是机器人控制器厂商做的，我就不测试了。下面是我用滑动平均滤波测试结果：
+<p><img src="filter-moving-average.png" width="432px" height="385px"></p>
+<br>设置滑动窗口大小，发现可以明显降低滤波率。 注意，初值最好设成“去皮值”，这样可以补偿平均滤波导致的相位偏移。
 
+</p>
 
 </p>
 
