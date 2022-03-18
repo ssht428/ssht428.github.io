@@ -9,6 +9,8 @@ function format_content(raw)
         [/#HREF/g, "<a href="], [/#-HREF1/g, ">"], [/#-HREF2/g, "</a>"],
         [/#TABLE/g, "<table>"], [/#-TABLE/g, "</table>"],
         [/#TBODY/g, "<tbody>"], [/#-TBODY/g, "</tbody>"],
+        [/#BR/g, "<br>"],
+        [/#P/g, "<p>"], [/#-P/g, "</p>"],
         [/#TH/g, "<th>"], [/#-TH/g, "</th>"],
         [/#TR/g, "<tr>"], [/#-TR/g, "</tr>"],
         [/#TD/g, "<td>"], [/#-TD/g, "</td>"],
