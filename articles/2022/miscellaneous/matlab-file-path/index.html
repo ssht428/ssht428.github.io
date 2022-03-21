@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Matlab File Path test</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Matlab File Path test</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>Matlab导入数据文件，m脚本中相对路径写法：
+<br>假设整个文件夹如下图所示：
+<br><img src="file-path.png" width="602px" height="336px">
+<br>m脚本代码如下：
+<pre>
+clear all;
+close all;
+% import data from file
+x = importdata('data.txt');
+txt=x.textdata
+clear x;
+x = importdata('folderB_A\data.txt');
+txt=x.textdata
+clear x;
+x = importdata('..\data.txt');
+txt=x.textdata
+clear x;
+x = importdata('..\folderA\data.txt');
+txt=x.textdata
+clear x;
+</pre>
+<br>输出结果如下：
+<pre>
+>> read_data
+txt = 
+    'B'
+txt = 
+    'B_A'
+txt = 
+    'parent'
+txt = 
+    'A'
+</pre>
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
