@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>UR机器人使用二维码QrCode校准</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">UR机器人使用二维码QrCode校准</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 因为有个项目是AGV+协作机器人+3D相机实现无人图书馆，这个项目因为AGV定位精度差(>30mm)，而3D相机厂家只是做物体识别，只能与机器人通信校准末端位置，无法控制AGV，所以有时AGV错位导致相机无法找到要抓取的书。
+<br> 其实这个项目有若干可以改善的地方，但是由于我只是简单参与一下，无法决定什么，所以自己就用公司内现有的机器人+相机进行实验一下单相机2D识别可否实现抓取。
+<br> 本文仅仅写一下在已经通过9点手眼标定后，再通过二维码方式在相机全视野中进行采集图像，然后提高标定的精度。
+<br>首先将机器人移动到原点(也就是固定拍摄点)，然后二维码图像放置在相机视野中心：
+<br> <img src="preset-center.png" width="617px" height="462px">
+<br> <strong>执行XY方向校准，采集图像保存在本地文件夹中：</strong>
+<br> <img src="x-files.png" width="820px" height="380px">
+<br> <strong>XY方向校准过程视频：</strong>
+<br> <a href="https://www.bilibili.com/video/BV1ri4y1r7Qu/"> UR机器人二维码QrCode手眼标定校准－XY方向标定 </a>
+<br> <a href="https://www.bilibili.com/video/BV1b3411s7Vw/"> UR机器人二维码QrCode手眼标定校准－XY方向标定－UI界面 </a>
+<br>
+<br> <strong>执行Z方向校准，采集图像保存在本地文件夹中：</strong>
+<br> <img src="preset-center.png" width="830px" height="457px">
+<br> <strong>Z方向视频见：</strong>
+<br> <a href="https://www.bilibili.com/video/BV1sS4y1g7XN/"> UR机器人二维码QrCode手眼标定校准－Z方向标定 </a>
+<br> <a href="https://www.bilibili.com/video/BV1fT4y1v721/"> UR机器人二维码QrCode手眼标定校准－Z方向标定－UI界面 </a>
+
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+
+<br>=========================================================================================
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
