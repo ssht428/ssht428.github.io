@@ -1,0 +1,92 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>九点手眼标定</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">九点手眼标定</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本文是根据下面链接进行的九点标定(在类目录中也有相关介绍)：
+<br> <a href="https://blog.csdn.net/weixin_44789544/article/details/103692629"> <strong>基于OpenCv的机器人手眼标定（九点标定法）</strong> </a>
+<br> 下面两图是我实际操作：
+<br> <img src="nine-points-handeye-calib.png" width="960px" height="540px">
+<br> <img src="nine-points-move.png" width="520px" height="660px">
+<br> 下图是我使用的9点标定图(分辨率2870x2000,circle_diameter=50mm,space=90x125mm)，可以用A4纸打印：
+<br> <img src="myHandEyeCalibBoard_50_90x125mm.png" width="574px" height="400px">
+<br> 此处再转载一次"基于OpenCv的机器人手眼标定（九点标定法）"全文：
+<br> 对于初学者而言，对相机的标定经常模糊不清。不知道机器坐标与相机坐标如何转换，两个坐标系又是如何建立？
+<br> 我们通常是利用张氏标定法，针对于相机的畸变进行标定，利用校正得到的参数对图形进行处理后再呈现出来。这个方法网上用的人很多，资料也较为全面。这里就不做说明了。本文主要是针对机械手的手眼标定，一般而言目前相机的畸变较小，精度也较为准确，使用该方法进行标定也能得到较好的效果。
+<br> 首先，对于九点标定而言。我们使用到的是OpenCv中的estimateRigidTransform 函数。
+函数定义如下：
+<br> Mat estimateRigidTransform(InputArraysrc,InputArraydst,boolfullAffine)
+<br> 前两个参数，可以是 ：src=srcImage (变换之前的图片Mat) dst=transImage（变换之后的图片Mat）
+<br> 也可以： src=array（变换之前的关键点Array） dst=array（变换之后的关键点Array）
+<br> 第三个参数： 1（全仿射变换,包括：rotation, translation, scaling,shearing,reflection）
+<br> 其主要原理为：如果我们有一个点变换之前是[x,y,1],变换后是[x’,y’,1] 则fullAffine表示如下:
+<br> <img src="pic1.png">
+<br> TX=Y
+<br> <img src="pic2.png">
+<br> 展开后表示
+<br> <img src="pic3.png">
+<br> 如果我们想求这【a-f】 6个变量需要有6个方程，也就是3组点。但是比三个点多呢？
+<br> 比如：20个点。那就是用最小方差。
+<br> <img src="pic4.png">
+<br> 标定步骤
+<br> 1、首先我们需要准备一块，标定板。如果条件不足，可以使用白纸画上九个圆进行代替。
+<br> <img src="pic5.bmp">
+<br> 2、相机位置，机械手位置全部固定好，标定针固定在机械手上，固定好后不能够再移动。标定针的位置一定要与夹手或吸盘之内的工具同一位置高度。
+<br> 3、将标定板放到相机下方，位置区域要与机械手工作的区域一样，包括高度必须尽量一致，这是标定准确度的关键。
+<br> 4、调整好相机焦距，拍照，然后识别9个圆圆心的坐标并进行记录。关于如何找圆，可以参考我的上一篇博文，对于圆形的查找十分精准。
+<br> 5、将机械手依次移动到9个圆的圆心位置，记下机械手坐标
+<br> 
+<br> 做完以上五步，我们会得到两个点集。一个为9个圆圆心坐标（points_camera），一个为9个圆心对应的机械手坐标（points_robot）。
+
+<pre>
+          Mat warpMat;
+	vector<Point2f>points_camera;
+	vector<Point2f>points_robot;`
+	vector<Point2f>points_camera;
+	vector<Point2f>points_robot;
+	warpMat =estimateRigidTransform(points_camera, points_robot, true);
+	A = warpMat.ptr<double>(0)[0];
+	B = warpMat.ptr<double>(0)[1];
+	C = warpMat.ptr<double>(0)[2];
+	D = warpMat.ptr<double>(1)[0];
+	E = warpMat.ptr<double>(1)[1];
+	F = warpMat.ptr<double>(1)[2];
+</pre>
+<br> 得出来的6个double类型的参数，就是我们此次标定最终得到的标定参数了。
+<br> 之后我们把检测得到的图像坐标（t_px，t_py）代入，就可以得到与之相对应的机械手坐标（t_rx,t_ry）
+<br> t_rx= (A * t_px) + B * t_py + C)；
+<br> t_ry= (D * t_px) + E * t_py+ F)；
+<br> 至此标定结束，我们可以控制相机拍照进行定位，然后转换成机械手坐标，指哪打哪了。
+<br>=========================================================================================
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
