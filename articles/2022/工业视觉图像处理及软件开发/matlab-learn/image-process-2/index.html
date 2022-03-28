@@ -191,17 +191,20 @@ delete(h)  % Delete previously drawn circles
 <br> <img src="v2-fa3d7393ca37d761df42a891f197b829_1440w.jpg" >
 <br> 检测到所有筹码。应该注意的是，更加“激进地”调整参数，会发现更多的筹码，但同时也会增加检测到错误筹码的可能性。在可以找到的真实筹码的数量（检测率）和在其中找到的真实筹码的数量（错误警报率）之间需要权衡。
 <br> 
-<br> 下面是我测试的代码及结果：
+<br><strong> 我的测试结果及程序  </strong>
+<br> 下面是我测试的代码：
 <pre>
  clear all 
  close all
  rgb = imread('coloredChips.png');
+ figure(1);
  imshow(rgb);
  [x,y] = ginput(2)
  dist = sum(sqrt(diff(x).^2+diff(y).^2))
  minRadius = int8(dist/2 - 3)
  maxRadius = int8(dist/2 + 3)
  gray_image = rgb2gray(rgb);
+ figure(2);
  imshow(gray_image);
  [centers,radii] = imfindcircles(gray_image,[minRadius maxRadius],'ObjectPolarity','dark','Sensitivity',0.94,'Method','twostage');    % radiu must be integer type
  h=viscircles(centers,radii);
