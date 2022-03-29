@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：06：显示RGB图像的单独色彩通道</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：06：显示RGB图像的单独色彩通道</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例创建一个简单的RGB图像，然后分离颜色通道。该示例将每个颜色通道显示为灰度强度图像和彩色图像。
+
+<br> 创建具有红色，绿色和蓝色连续区域的RGB图像。显示图像。
+<pre>
+ imSize = 200;
+ RGB = reshape(ones(imSize,1)*reshape(jet(imSize),1,imSize*3),[imSize,imSize,3]);
+ imshow(RGB)
+ title('Original RGB Image')
+</pre>
+<br> <img src="v2-4161811c434c09b9b69eeaed223ad74a_720w.jpg" >
+<br>分离三个颜色通道。
+<pre>
+ [R,G,B] = imsplit(RGB);
+</pre>
+<br> <img src="v2-4161811c434c09b9b69eeaed223ad74a_720w.jpg" >
+<br>用灰度显示每个颜色通道。请注意，图中每个单独的颜色平面都包含一个白色区域。白色对应于每种单独颜色的最高值（最纯粹的色调）。例如，在红色通道图像中，白色代表最高浓度的纯红色值。当红色与绿色或蓝色混合时，会出现灰色像素。图像中的黑色区域显示不包含红色值的像素值，换句话说，R == 0。
+<pre>
+ figure
+ subplot(1,3,1)
+ imshow(R)
+ title('Red Channel')
+ ​
+ subplot(1,3,2)
+ imshow(G)
+ title('Green Channel')
+ ​
+ subplot(1,3,3)
+ imshow(B)
+ title('Blue Channel')
+</pre>
+<br> <img src="v2-c044cb4a403b864766256ee012a48204_720w.jpg" >
+<br>显示每个颜色通道的颜色表示。在这些图像中，所需的颜色通道保持其原始强度值，而其他两个颜色通道中的像素值设置为0。
+
+<br> 创建一个全黑通道。
+<pre>
+ allBlack = zeros(size(RGB,1,2),class(RGB));
+ justR = cat(3,R,allBlack,allBlack);
+ justG = cat(3,allBlack,G,allBlack);
+ justB = cat(3,allBlack,allBlack,B);
+</pre>
+<br>显示所有色彩通道。
+<pre>
+ figure
+ montage({justR,justG,justB},'Size',[1 3], ...
+     "BackgroundColor",'w',"BorderSize",10);
+ title('Color Representation of the Red, Green, and Blue Color Channels');
+</pre>
+<br> <img src="v2-f93ee0685208b38697b92978a28906cb_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

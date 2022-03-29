@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：16：将色标添加到显示的灰度图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：16：将色标添加到显示的灰度图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何显示带有色标的灰度图像，该色标指示数据值到颜色的映射。如果您将非常规范围数据显示为图像，则查看数据值与使用颜色栏显示的颜色之间的对应关系特别有用。
+<br>读取并显示灰度图像。
+<pre>
+ I = imread('liftingbody.png');
+</pre>
+<br>将图像转换为数据类型double。数据在[0，1]范围内。
+<pre>
+ I = im2double(I);
+ dataRangeI = [min(I(:)) max(I(:))]
+ dataRangeI = 1×2
+ ​
+      0     1
+</pre>
+<br>使用边缘检测过滤器过滤图像。过滤后的数据超出默认范围[0，1]，因为未对过滤器进行标准化。
+<pre>
+ h = [1 2 1; 0 0 0; -1 -2 -1];
+ J = imfilter(I,h);
+ dataRangeJ = [min(J(:)) max(J(:))]
+ dataRangeJ = 1×2
+ ​
+    -2.5961    2.5451
+</pre>
+<br>使用已过滤数据的整个显示范围显示已过滤图像。imshow将最小数据值显示为黑色，将最大数据值显示为白色。
+<pre>
+ imshow(J,[])
+</pre>
+<br>使用该colorbar功能将色标添加到图像。
+<pre>
+ colorbar
+</pre>
+<br> <img src="v2-46cfb0a3bc8b9ec9aa60957e3f2f14d0_720w.jpg" >
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

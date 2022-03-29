@@ -1,0 +1,91 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：11：计算测试图上CIE94颜色的色差</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：11：计算测试图上CIE94颜色的色差</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何使用CIE94标准计算测量色和参考色的色差。默认情况下，measureColor函数使用CIE76标准计算测试图上测得的颜色和参考颜色之间的色差。您可以使用imcolordiff函数通过CIE94或CIEDE2000标准计算色差。
+<br>将X-Rite®ColorChecker®图表的图像读取到工作区中。
+<pre>
+ I = imread('colorCheckerTestImage.jpg');
+</pre>
+<br>创建一个colorChecker对象，然后显示带有ROI批注的图表。
+<pre>
+ chart = colorChecker(I);
+ displayChart(chart)
+</pre>
+<br> <img src="v2-bde7f70d16a78dabd3ff2515522bb76d_720w.jpg" >
+<br>测量每个色标ROI中的颜色，然后在表colorTable中返回测量值。Delta_E表格变量中的色差测量结果遵循CIE76标准。
+<pre>
+ colorTable = measureColor(chart);
+</pre>
+<br>在色块图上，显示测得的颜色和参考色，并在每个色块上叠加相应的CIE76色差。
+<pre>
+ displayColorPatch(colorTable)
+</pre>
+<br> <img src="v2-80355c9b664c86f145eeb85dd9296ead_720w.jpg" >
+<br>将参考值L * a * b *和测量的RGB颜色值提取到表格中。
+<pre>
+ referenceLab = colorTable{:,{'Reference_L','Reference_a','Reference_b'}};
+ measuredRGB = colorTable{:,{'Measured_R','Measured_G','Measured_B'}};
+</pre>
+<br>将测量的RGB颜色转换为L * a * b *颜色空间，并指定D50白点。
+<pre>
+ measuredLab = rgb2lab(measuredRGB,"WhitePoint","d50");
+</pre>
+<br>使用imcolordiff函数计算色差，指定颜色确保测量值在L * a * b *颜色空间中。默认情况下，此功能使用CIE94标准计算色差。
+<pre>
+ dE = imcolordiff(measuredLab,referenceLab,"isInputLab",true);
+</pre>
+<br>使用新的色差测量值创建新的色表。
+<pre>
+ colorTable94 = colorTable;
+ colorTable94{:,"Delta_E"} = dE;
+</pre>
+<br>在色块图上，显示测得的颜色和参考色，并在每个色块上叠加相应的CIE94色差。
+<pre>
+ displayColorPatch(colorTable94)
+</pre>
+<br> <img src="v2-54affbc12b73f3c45272e181c48dbb63_720w.jpg" >
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
