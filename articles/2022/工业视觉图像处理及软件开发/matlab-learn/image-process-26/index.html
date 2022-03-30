@@ -1,0 +1,78 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：26：图像旋转</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：26：图像旋转</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何使用imrotate函数旋转图像。旋转图像时，可以指定要旋转的图像和旋转角度（以度为单位）。如果指定正旋转角度，则图像逆时针旋转；如果指定负旋转角度，则图像将顺时针旋转。
+<br> 默认情况下，输出图像足够大，可以包含整个原始图像。超出原始图像边界的像素将设置为0，并在输出图像中显示为黑色背景。但是，您可以使用' crop'参数将输出图像指定为与输入图像相同的尺寸。
+
+<br> 默认情况下，imrotate使用最近邻插值确定输出图像中的像素值，但是您可以指定其他插值方法。有关imrotate支持的插值方法的列表，请参见参考页。
+<br><strong> 逆时针旋转图像  </strong>
+<br>将图像读入工作区。
+<pre>
+ I = imread('circuit.tif');
+</pre>
+<br>将图像逆时针旋转35度。在此示例中，指定双线性插值。
+<pre>
+ J = imrotate(I,35,'bilinear');
+</pre>
+<br>显示原始图像和旋转的图像。
+<pre>
+ figure
+ imshowpair(I,J,'montage')
+</pre>
+<br> <img src="v2-db0fad72de5fd4d0b6b16df4d4b8fe0d_720w.jpg" >
+<br><strong> 裁剪旋转图像  </strong>
+<br>将原始图像逆时针旋转35度，指定将旋转后的图像裁切为与原始图像相同的尺寸。
+<pre>
+ K = imrotate(I,35,'bilinear','crop');
+</pre>
+<br>显示原始图像和新图像。
+<pre>
+ figure
+ imshowpair(I,K,'montage')
+</pre>
+<br> <img src="v2-df7d9d284c16d95003171ad894af2367_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

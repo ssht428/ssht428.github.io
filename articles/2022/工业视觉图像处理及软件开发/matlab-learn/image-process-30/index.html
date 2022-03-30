@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：30：移动显示图像的X和Y坐标范围</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：30：移动显示图像的X和Y坐标范围</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何通过更改显示图像的XData和YData属性来指定非默认的世界坐标系。
+<br>读取图像。
+<pre>
+ I = imread("peppers.png");
+</pre>
+<br>使用固有坐标系显示图像，并在ax中返回图像的属性。打开轴以显示坐标系。
+<pre>
+ figure
+ ax = imshow(I);
+ title('Image Displayed with Intrinsic Coordinates')
+ axis on
+</pre>
+<br> <img src="v2-5996efab451e3f04e128432057dedb94_720w.jpg" >
+<br>检查x和y坐标的范围，这些范围存储在ax中的XData和YData属性。范围与图像的维度匹配。
+<pre>
+ xrange = ax.XData
+ xrange = 1×2
+ ​
+      1   512
+ yrange = ax.YData
+ yrange = 1×2
+ ​
+      1   384
+</pre>
+<br>更改x和y坐标的范围。本示例通过将x坐标加100将图像向右移动，并通过将y坐标减去25来向上移动图像。
+<pre>
+ xrangeNew = xrange + 100;
+ yrangeNew = yrange - 25;
+</pre>
+<br>显示图像，指定偏移的空间坐标。
+<pre>
+ figure
+ axNew = imshow(I,'XData',xrangeNew,'YData',yrangeNew);
+ title('Image Displayed with Nondefault Coordinates');
+ axis on
+</pre>
+<br> <img src="v2-19c553e5a1ffd379e101e4679a370bb9_720w.jpg" >
+<br>确认新图像的x和y坐标范围与xrangeNew和yrangeNew指定的移动范围相匹配。
+<pre>
+ axNew.XData
+ ans = 1×2
+ ​
+    101   612
+ axNew.YData
+ ans = 1×2
+ ​
+    -24   359
+</pre>
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

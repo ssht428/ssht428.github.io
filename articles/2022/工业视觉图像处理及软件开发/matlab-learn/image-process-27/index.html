@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：27：使用imtranslate函数平移图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：27：使用imtranslate函数平移图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何使用imtranslate函数对图像执行平移操作。平移操作将图像在x或y方向或两者上移动指定数量的像素。
+<br>将图像读入工作区。
+<pre>
+ I = imread('cameraman.tif');
+</pre>
+<br>显示图像。图像的大小为256 x 256像素。默认情况下，imshow显示图像的左上角坐标为（0,0）。
+<pre>
+ figure
+ imshow(I)
+ title('Original Image')
+</pre>
+<br> <img src="v2-3d525724a47dc2db2593d8117684446c_720w.jpg" >
+<br>平移所述图像，在X -方向移位图像15个像素，在ÿ -方向移位25个像素。请注意，默认情况下，imtranslate在原始256 x 256图像的边界（或限制）内显示转换后的图像。这导致某些移位的图像被剪切。
+<pre>
+ J = imtranslate(I,[15, 25]);
+</pre>
+<br>显示移位的图像。图像的大小为256 x 256像素。
+<pre>
+ figure
+ imshow(J)
+ title('Translated Image')
+</pre>
+<br> <img src="v2-c6745cf3c34fd76605ec46443c5794cc_720w.jpg" >
+<br>设置'OutputView'参数为'full'，防止剪切平移的图像。新图像的大小为281 x 271像素。
+<pre>
+ K = imtranslate(I,[15, 25],'OutputView','full');
+</pre>
+<br>显示平移的图像。
+<pre>
+ figure
+ imshow(K)
+ title('Translated Image, Unclipped')
+</pre>
+<br> <img src="v2-00c7ce443ece565ee49cff776ac06da0_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
