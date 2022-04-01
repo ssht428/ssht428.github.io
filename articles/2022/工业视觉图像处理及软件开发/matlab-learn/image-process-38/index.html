@@ -1,0 +1,179 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：38：弱光图像增强</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：38：弱光图像增强</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 由于光线不足，在户外场景中拍摄的图像可能会严重退化。这些图像可能具有较低的动态范围和较高的噪声水平，从而影响了计算机视觉算法的整体性能。要使计算机视觉算法在弱光条件下更强大，需要使用弱光图像增强功能来改善图像的可见性。弱光图像或HDR图像的像素级反转直方图与朦胧图像的直方图非常相似。因此，您可以使用除雾技术来增强低光图像。
+
+<br>使用除雾技术来增强低光图像包括三个步骤：
+
+<br>    步骤1：将弱光图像反转。
+<br>    第2步：将雾度消除算法应用于倒置的弱光图像。
+<br>    步骤3：反转增强型图片。
+<br><strong> 使用除雾算法增强弱光图像  </strong>
+<br>导入在弱光下捕获的RGB图像。
+<pre>
+ A = imread('lowlight_11.jpg');
+ figure, imshow(A);
+</pre>
+<br> <img src="v2-65b40b1370328d3e1035af8953b70fa1_720w.jpg" >
+<br>反转图像并注意原始图像中的弱光区域显得模糊。
+<pre>
+ AInv = imcomplement(A);
+ figure, imshow(AInv);
+</pre>
+<br> <img src="v2-7681d40b559714ce591ae0c7ddeeab4a_720w.jpg" >
+<br>使用imreducehaze函数减少雾度。
+<pre>
+ BInv = imreducehaze(AInv);
+ figure, imshow(BInv);
+</pre>
+<br> <img src="v2-fc3c197cfdd1dea85063e1003dc39fc7_720w.jpg" >
+<br>反转结果以获得增强的图像。
+<pre>
+ B = imcomplement(BInv);
+</pre>
+<br>并排显示原始图像和增强图像。
+<pre>
+ figure, montage({A, B});
+</pre>
+<br> <img src="v2-823bc4880545a6887e5415310473812a_720w.jpg" >
+<br><strong>  使用imreducehaze可选参数进一步改善结果 </strong>
+<br>为了获得更好的结果，再次调用imreducehaze处理反转的图像，这次指定一些可选参数。
+<pre>
+ BInv = imreducehaze(AInv, 'Method','approx','ContrastEnhancement','boost');
+ BImp = imcomplement(BInv);
+ figure, montage({A, BImp});
+</pre>
+<br> <img src="v2-b302d627d5373a9baced2bbbd4a7caa3_720w.jpg" >
+<br><strong> 改善低光照图像的另一个例子  </strong>
+<br>导入在弱光下捕获的RGB图像。
+<pre>
+ A = imread('lowlight_21.jpg');
+</pre>
+<br>反转图像。
+<pre>
+ AInv = imcomplement(A);
+</pre>
+<br>应用除雾算法。
+<pre>
+BInv = imreducehaze(AInv, 'ContrastEnhancement', 'none');
+</pre>
+<br>反转结果。
+<pre>
+B = imcomplement(BInv);
+</pre>
+<br>并排显示原始图像和增强图像
+<pre>
+figure, montage({A, B});
+</pre>
+<br> <img src="v2-db5a82e6a2c01414b94fd25302b13cfb_720w.jpg" >
+<br><strong> 通过使用不同的色彩空间减少色彩失真  </strong>
+<br>将输入图像从RGB颜色空间转换为L * a * b *颜色空间。
+<pre>
+Lab = rgb2lab(A);
+</pre>
+<br>反转L * a * b *图像。
+<pre>
+LInv = imcomplement(Lab(:,:,1) ./ 100);
+</pre>
+<br>使用imreducehaze函数对倒置的图像进行除雾。
+<pre>
+LEnh = imcomplement(imreducehaze(LInv,'ContrastEnhancement','none'));
+</pre>
+<br>增加饱和度。
+<pre>
+LabEnh(:,:,1)   = LEnh .* 100;
+LabEnh(:,:,2:3) = Lab(:,:,2:3) * 2; % Increase saturation
+</pre>
+<br>将图像转换回RGB图像，并排显示原始图像和增强图像。
+<pre>
+AEnh = lab2rgb(LabEnh);
+figure, montage({A, AEnh});
+</pre>
+<br> <img src="v2-a9887596b3613ff71b1892b65a2838b3_720w.jpg" >
+<br><strong>  使用降噪改善结果 </strong>
+<br>弱光图像可能会具有较高的噪点级别。增强弱光图像可能会增加此噪声级别。去噪可能是有用的后处理步骤。
+
+<br>使用imguidedfilter函数消除增强图像中的噪点。
+<pre>
+B = imguidedfilter(BImp);
+figure, montage({BImp, B});
+</pre>
+<br> <img src="v2-8669cdf0a1f848614369c962e40e8741_720w.jpg" >
+<br><strong> 估算照明图  </strong>
+<br>导入在弱光下捕获的RGB图像。
+<pre>
+A = imread('lowlight_21.jpg');
+</pre>
+<br>反转图像。
+<pre>
+AInv = imcomplement(A);
+</pre>
+<br>将除雾算法应用于图像。
+<pre>
+[BInv, TInv] = imreducehaze(AInv, 'Method', 'approxdcp', 'ContrastEnhancement', 'none');
+</pre>
+<br>反转增强的图像。
+<pre>
+T = imcomplement(TInv);
+</pre>
+<br>对照显示伪彩色照明图和原始图像。
+<pre>
+figure,
+subplot(1,2,1);
+imshow(A), title('Lowlight Image');
+subplot(1,2,2);
+imshow(T), title('Illumination Map');
+colormap(gca, hot(256));
+</pre>
+<br> <img src="v2-fa6eb511edc13744f1988762f05e765a_720w.jpg" >
+<br><strong> 局限性  </strong>
+<br>由于暗通道在弱光条件下的适应性较差，因此该方法可能会丢失一些细节或变得过分增强。
+<br><strong> 参考文献  </strong>
+<br>Dong, Xuan, et al. "Fast efficient algorithm for enhancement of low lighting video." Multimedia and Expo (ICME), 2011 IEEE International Conference on. IEEE, 2011.
+<br>[1] Dong, X., G. Wang, Y. Pang, W. Li, J. Wen, W. Meng, and Y. Lu. "Fast efficient algorithm for enhancement of low lighting video." Proceedings of IEEE® International Conference on Multimedia and Expo (ICME). 2011, pp. 1–6.
+
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

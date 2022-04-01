@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：34：使用控制点配准具有投影失真的图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：34：使用控制点配准具有投影失真的图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明了如何通过选择两个图像共有的控制点并推断对齐控制点的几何变换来配准两个图像。
+<br><strong>  读取图像 </strong>
+<br>将图像westconcordorthophoto.png读入工作区。该图像是已配准到地面的正射影像。
+<pre>
+ ortho = imread('westconcordorthophoto.png');
+ imshow(ortho)
+ text(size(ortho,2),size(ortho,1)+15, ...
+     'Image courtesy of Massachusetts Executive Office of Environmental Affairs', ...
+     'FontSize',7,'HorizontalAlignment','right');
+</pre>
+<br> <img src="v2-47ec23050c29c01cc4caab1bd4087024_720w.jpg" >
+<br>将图像westconcordaerial.png读入工作区。该图像是从飞机上拍摄的，并且相对于正射影像有失真。因为未配准的图像是从远处拍摄的，并且地形相对平坦，所以大多数失真属于投影变换的。
+<pre>
+ unregistered = imread('westconcordaerial.png');
+ imshow(unregistered)
+ text(size(unregistered,2),size(unregistered,1)+15, ...
+     'Image courtesy of mPower3/Emerge', ...
+     'FontSize',7,'HorizontalAlignment','right');
+</pre>
+<br> <img src="v2-1b2e27e0b597bc200f491f6549c9b143_720w.jpg" >
+<br><strong> 选择控制点对  </strong>
+<br>要以交互方式选择控制点，请使用cpselect函数打开“控制点选择”工具。控制点是您可以在两个图像中找到的地标，例如道路交叉口或自然特征。选择至少四对控制点，以便cpselect可以对这些控制点进行投影变换。选择相应的移动点和固定点后，关闭工具以返回到工作区。
+<pre>
+ [mp,fp] = cpselect(unregistered,ortho,'Wait',true);
+</pre>
+<br> <img src="v2-4adfb286a5dc29b8d00f3ee451708f26_720w.jpg" >
+<br><strong> 推断几何变换  </strong>
+<br>通过使用fitgeotrans函数，找到最能使移动点和固定点对齐的投影变换的参数。
+<pre>
+ t = fitgeotrans(mp,fp,'projective');
+</pre>
+<br><strong> 变换未配准的图像  </strong>
+<br>要将转换应用于未配准的航拍图像，请使用imwarp函数。通过使用OutputView名称/值对参数指定转换后的图像的大小和位置与正射图像的大小和位置匹配。
+<pre>
+ Rfixed = imref2d(size(ortho));
+ registered = imwarp(unregistered,t,'OutputView',Rfixed);
+</pre>
+<br>通过将转换后的图像叠加在原始正射影像上，查看配准的结果。
+<pre>
+ imshowpair(ortho,registered,'blend')
+</pre>
+<br> <img src="v2-ae73c3b6187d0bf0b21b6ea9c9c4c5e6_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
