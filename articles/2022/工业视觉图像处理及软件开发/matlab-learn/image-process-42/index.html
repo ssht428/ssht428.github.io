@@ -1,0 +1,78 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：42：使用预定义滤波器过滤图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：42：使用预定义滤波器过滤图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何使用fspecial函数创建预定义的高斯拉普拉斯（LoG）滤波器，以及如何使用函数imfilter将滤波器应用于图像。LoG滤波器突出显示强度快速变化的区域，并减少了由噪声引起的变化的影响。fspecial函数以相关内核的形式生成几种其他类型的预定义过滤器。
+<br><strong> 读取并显示图像。  </strong>
+<pre>
+ I = imread('moon.tif');
+ imshow(I)
+</pre>
+<br> <img src="v2-4fc8830b62be4bb115dd43d341456fc3_720w.jpg" >
+
+<br>使用fspecial，创建的一个标准差是0.4的7×7 LoG滤波器。
+<pre>
+ h = fspecial('log',7,0.4)
+ h = 7×7
+ ​
+     0.1263    0.1263    0.1263    0.1263    0.1263    0.1263    0.1263
+     0.1263    0.1263    0.1263    0.1267    0.1263    0.1263    0.1263
+     0.1263    0.1263    0.2333    1.1124    0.2333    0.1263    0.1263
+     0.1263    0.1267    1.1124  -10.4357    1.1124    0.1267    0.1263
+     0.1263    0.1263    0.2333    1.1124    0.2333    0.1263    0.1263
+     0.1263    0.1263    0.1263    0.1267    0.1263    0.1263    0.1263
+     0.1263    0.1263    0.1263    0.1263    0.1263    0.1263    0.1263
+</pre>
+<br>使用imfilter，将滤波器应用于图像。
+<pre>
+ I2 = imfilter(I,h);
+</pre>
+<br>显示滤波后的图像。
+<pre>
+ imshow(I2)
+</pre>
+<br> <img src="v2-74b26691e5217d18fd44632b10b6ef78_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

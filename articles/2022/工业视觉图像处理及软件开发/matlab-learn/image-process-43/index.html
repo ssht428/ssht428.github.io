@@ -1,0 +1,134 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：43：用高斯平滑滤波器处理图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：43：用高斯平滑滤波器处理图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明了如何使用imgaussfilt来对图像应用不同的高斯平滑滤波器。高斯平滑滤波器通常用于降低噪声。
+<br><strong> 将图像读入工作区。  </strong>
+<pre>
+ I = imread('cameraman.tif');
+</pre>
+<br>使用各向同性的高斯平滑核增加标准偏差来过滤图像。高斯滤波器通常是各向同性的，也就是说，它们在两个维度上具有相同的标准偏差。通过为sigma指定标量值，可以通过各向同性的高斯滤波器对图像进行滤波。
+<pre>
+ Iblur1 = imgaussfilt(I,2);
+ Iblur2 = imgaussfilt(I,4);
+ Iblur3 = imgaussfilt(I,8);
+</pre>
+<br>显示原始图像和所有过滤的图像。
+<pre>
+ figure
+ imshow(I)
+ title('Original image')
+</pre>
+<br> <img src="v2-c72aeca5cbdbe433ff5cebbcac28fdf6_720w.jpg" >
+<pre>
+ figure
+ imshow(Iblur1)
+ title('Smoothed image, \sigma = 2')
+</pre>
+<br> <img src="v2-461ed41a7756fa952e90445553e9c91b_720w.jpg" >
+<pre>
+ figure
+ imshow(Iblur2)
+ title('Smoothed image, \sigma = 4')
+</pre>
+<br> <img src="v2-ca3866e1c712b21e833e60de8df4dff8_720w.jpg" >
+<pre>
+ figure
+ imshow(Iblur3)
+ title('Smoothed image, \sigma = 8')
+</pre>
+<br> <img src="v2-845f3424f2053c9e07f60aedfa6a4974_720w.jpg" >
+<br><strong>   </strong>
+<br>用各向异性高斯平滑核滤波图像。imgaussfilt允许高斯核沿着行和列的尺寸具有不同的标准偏差。这些被称为轴对准各向异性高斯滤波器。使用各向异性过滤器时，要为sigma指定2元素向量。
+<pre>
+ IblurX1 = imgaussfilt(I,[4 1]);
+ IblurX2 = imgaussfilt(I,[8 1]);
+ IblurY1 = imgaussfilt(I,[1 4]);
+ IblurY2 = imgaussfilt(I,[1 8]);
+</pre>
+<br>显示滤波的图像。
+<pre>
+ figure
+ imshow(IblurX1)
+ title('Smoothed image, \sigma_x = 4, \sigma_y = 1')
+</pre>
+<br> <img src="v2-73c577faa148c74f559c6c6d31327288_720w.jpg" >
+<pre>
+ figure
+ imshow(IblurX2)
+ title('Smoothed image, \sigma_x = 8, \sigma_y = 1')
+</pre>
+<br> <img src="v2-fc6816371dd6014bfd97a56f6de1c1ce_720w.jpg" >
+<pre>
+ figure
+ imshow(IblurY1)
+ title('Smoothed image, \sigma_x = 1, \sigma_y = 4')
+</pre>
+<br> <img src="v2-cb082a9f10e6570a89329d858363ad9d_720w.jpg" >
+<pre>
+ figure
+ imshow(IblurY2)
+ title('Smoothed image, \sigma_x = 1, \sigma_y = 8')
+</pre>
+<br> <img src="v2-a53acaa95d7102a1151bc53907bbcf19_720w.jpg" >
+<br><strong>   </strong>
+<br>抑制原始图像中的天空区域中可见的水平带。各向异性高斯滤镜可以抑制图像中的水平或垂直特征。提取图像的天空区域的一部分，并使用沿X轴（列增加的方向）具有较高标准偏差的高斯滤波器。
+<pre>
+ I_sky = imadjust(I(20:50,10:70));
+ IblurX1_sky = imadjust(IblurX1(20:50,10:70));
+</pre>
+<br>显示原始天空图块以及滤波版本的图块。
+<pre>
+ figure
+ imshow(I_sky), title('Sky in original image')
+</pre>
+<br> <img src="v2-9010bff964415d966ba4cbd05fdbad1c_720w.jpg" >
+<pre>
+ figure
+ imshow(IblurX1_sky), title('Sky in filtered image')
+</pre>
+<br> <img src="v2-87193aa129ff4d45e2574bdc94ad5286_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
