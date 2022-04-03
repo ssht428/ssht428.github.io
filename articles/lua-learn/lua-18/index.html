@@ -1,0 +1,240 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>C调用Lua</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">C调用Lua</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+&nbsp;&nbsp;&nbsp; <span style="font-size: 15px; color: rgba(128, 0, 128, 1)">1. 基础：</span><br>&nbsp;&nbsp;&nbsp; Lua的一项重要用途就是作为一种配置语言。现在从一个简单的示例开始吧。<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp;&nbsp; --这里是用Lua代码定义的窗口大小的配置信息</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp;&nbsp; width = 200</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp;&nbsp; height = 300</span><br>&nbsp;&nbsp;&nbsp; 下面是读取配置信息的C/C++代码：&nbsp;&nbsp;&nbsp; </p>
+
+<pre> #include &lt;stdio.h&gt;
+ #include &lt;<span style="color: rgba(0, 0, 255, 1)">string</span>.h&gt;
+ #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">void</span> load(lua_State* L, <span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* fname, <span style="color: rgba(0, 0, 255, 1)">int</span>* w, <span style="color: rgba(0, 0, 255, 1)">int</span>*<span style="color: rgba(0, 0, 0, 1)"> h) {
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (luaL_loadfile(L,fname) || lua_pcall(L,<span style="color: rgba(128, 0, 128, 1)">0</span>,<span style="color: rgba(128, 0, 128, 1)">0</span>,<span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Error Msg is %s.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>,lua_tostring(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">));
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     lua_getglobal(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">width</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_getglobal(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">height</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_isnumber(L,-<span style="color: rgba(128, 0, 128, 1)">2</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">'width' should be a number\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)"> );
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_isnumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">'height' should be a number\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)"> );
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     *w = lua_tointeger(L,-<span style="color: rgba(128, 0, 128, 1)">2</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     *h = lua_tointeger(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ 
+ <span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> main()
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     lua_State* L =<span style="color: rgba(0, 0, 0, 1)"> luaL_newstate();
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> w,h;
+</span>     load(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">D:/test.lua</span><span style="color: rgba(128, 0, 0, 1)">"</span>,&amp;w,&amp;<span style="color: rgba(0, 0, 0, 1)">h);
+</span>     printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">width = %d, height = %d\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">,w,h);
+</span> <span style="color: rgba(0, 0, 0, 1)">    lua_close(L);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+<p>&nbsp;&nbsp; &nbsp;下面是针对新函数的解释：<br>&nbsp;&nbsp;&nbsp; <span style="color: rgba(0, 0, 255, 1)">lua_getglobal</span>是宏，其原型为：<span style="color: rgba(0, 0, 255, 1)">#define lua_getglobal(L,s)&nbsp; lua_getfield(L, LUA_GLOBALSINDEX, (s))</span>。<br>&nbsp;&nbsp;&nbsp; 每次调用这个宏的时候，都会将Lua代码中与之相应的全局变量值压入栈中，第一次调用时将全局变量"width"的值压入栈中，之后再次调用时再将"height"的值也压入栈中。<br><br>&nbsp;&nbsp;&nbsp; <span style="font-size: 15px; color: rgba(128, 0, 128, 1)">2. table操作：</span><br>&nbsp;&nbsp;&nbsp; 我们可以在C语言的代码中操作Lua中的table数据，这是一个非常非常方便且实用的功能。这样不仅可以使Lua代码的结构更加清晰，也可以在C语言代码中定义等同的结构体与之对应，从而大大提高代码的可读性。见如下代码：</p>
+
+<pre> #include &lt;stdio.h&gt;
+ #include &lt;<span style="color: rgba(0, 0, 255, 1)">string</span>.h&gt;
+ #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">void</span> load(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L) {
+</span> 
+     <span style="color: rgba(0, 0, 255, 1)">if</span> (luaL_loadstring(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">background = { r = 0.30, g = 0.10, b = 0 }</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">) 
+</span>         || lua_pcall(L,<span style="color: rgba(128, 0, 128, 1)">0</span>,<span style="color: rgba(128, 0, 128, 1)">0</span>,<span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Error Msg is %s.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>,lua_tostring(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">));
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     lua_getglobal(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">background</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_istable(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">'background' is not a table.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)"> );
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     lua_getfield(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">r</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_isnumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Invalid component in background color.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span> r = (<span style="color: rgba(0, 0, 255, 1)">int</span>)(lua_tonumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>) * <span style="color: rgba(128, 0, 128, 1)">255</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pop(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_getfield(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">g</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_isnumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Invalid component in background color.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span> g = (<span style="color: rgba(0, 0, 255, 1)">int</span>)(lua_tonumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>) * <span style="color: rgba(128, 0, 128, 1)">255</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pop(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span> 
+     lua_pushnumber(L,<span style="color: rgba(128, 0, 128, 1)">0.4</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_setfield(L,-<span style="color: rgba(128, 0, 128, 1)">2</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">b</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span> 
+     lua_getfield(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">b</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_isnumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Invalid component in background color.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span> b = (<span style="color: rgba(0, 0, 255, 1)">int</span>)(lua_tonumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>) * <span style="color: rgba(128, 0, 128, 1)">255</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">r = %d, g = %d, b = %d\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">,r,g,b);
+</span>     lua_pop(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pop(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> main()
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     lua_State* L =<span style="color: rgba(0, 0, 0, 1)"> luaL_newstate();
+</span> <span style="color: rgba(0, 0, 0, 1)">    load(L);
+</span> <span style="color: rgba(0, 0, 0, 1)">    lua_close(L);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+<p>&nbsp;&nbsp;&nbsp; <span style="color: rgba(0, 0, 255, 1)">void lua_getfield(lua_State *L, int idx, const char *k)</span>; 第二个参数是table变量在栈中的索引值，最后一个参数是table的键值，该函数执行成功后会将字段值压入栈中。<br>&nbsp;&nbsp;&nbsp; <span style="color: rgba(0, 0, 255, 1)">void lua_setfield(lua_State *L, int idx, const char *k);</span> 第二个参数是table变量在栈中的索引值，最后一个参数是table的键名称，而字段值是通过上一条命令lua_pushnumber(L,0.4)压入到栈中的，该函数在执行成功后会将刚刚压入的字段值弹出栈。<br>&nbsp;&nbsp;&nbsp; <br>&nbsp;&nbsp; &nbsp;下面的代码示例是在C语言代码中构造table对象，同时初始化table的字段值，最后再将table对象赋值给Lua中的一个全局变量。</p>
+
+<pre> #include &lt;stdio.h&gt;
+ #include &lt;<span style="color: rgba(0, 0, 255, 1)">string</span>.h&gt;
+ #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">void</span> load(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L) 
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span> <span style="color: rgba(0, 0, 0, 1)">    lua_newtable(L);
+</span>     lua_pushnumber(L,<span style="color: rgba(128, 0, 128, 1)">0.3</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_setfield(L,-<span style="color: rgba(128, 0, 128, 1)">2</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">r</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span> 
+     lua_pushnumber(L,<span style="color: rgba(128, 0, 128, 1)">0.1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_setfield(L,-<span style="color: rgba(128, 0, 128, 1)">2</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">g</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span> 
+     lua_pushnumber(L,<span style="color: rgba(128, 0, 128, 1)">0.4</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_setfield(L,-<span style="color: rgba(128, 0, 128, 1)">2</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">b</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_setglobal(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">background</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span> 
+     lua_getglobal(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">background</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_istable(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">'background' is not a table.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)"> );
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     lua_getfield(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">r</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_isnumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Invalid component in background color.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span> r = (<span style="color: rgba(0, 0, 255, 1)">int</span>)(lua_tonumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>) * <span style="color: rgba(128, 0, 128, 1)">255</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pop(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_getfield(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">g</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_isnumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Invalid component in background color.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span> g = (<span style="color: rgba(0, 0, 255, 1)">int</span>)(lua_tonumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>) * <span style="color: rgba(128, 0, 128, 1)">255</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pop(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span> 
+     lua_getfield(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">b</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_isnumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Invalid component in background color.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span> b = (<span style="color: rgba(0, 0, 255, 1)">int</span>)(lua_tonumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>) * <span style="color: rgba(128, 0, 128, 1)">255</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">r = %d, g = %d, b = %d\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">,r,g,b);
+</span>     lua_pop(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pop(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> main()
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     lua_State* L =<span style="color: rgba(0, 0, 0, 1)"> luaL_newstate();
+</span> <span style="color: rgba(0, 0, 0, 1)">    load(L);
+</span> <span style="color: rgba(0, 0, 0, 1)">    lua_close(L);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+<p>&nbsp;&nbsp;&nbsp; 上面的代码将输出和之前代码相同的结果。<br>&nbsp;&nbsp;&nbsp; <span style="color: rgba(0, 0, 255, 1)">lua_newtable</span>是宏，其原型为：<span style="color: rgba(0, 0, 255, 1)">#define lua_newtable(L) lua_createtable(L, 0, 0)</span>。调用该宏后，Lua会生成一个新的table对象并将其压入栈中。<br>&nbsp;&nbsp;&nbsp; <span style="color: rgba(0, 0, 255, 1)">lua_setglobal</span>是宏，其原型为：<span style="color: rgba(0, 0, 255, 1)">#define lua_setglobal(L,s) lua_setfield(L,LUA_GLOBALSINDEX,(s))</span>。调用该宏后，Lua会将当前栈顶的值赋值给第二个参数指定的全局变量名。该宏在执行成功后，会将刚刚赋值的值从栈顶弹出。<br><br>&nbsp;&nbsp;&nbsp; <span style="color: rgba(128, 0, 128, 1); font-size: 15px">3. 调用Lua函数：</span><br>&nbsp;&nbsp;&nbsp; 调用函数的API也很简单。首先将待调用函数压入栈，再压入函数的参数，然后使用lua_pcall进行实际的调用，最后将调用结果从栈中弹出。见如下代码：</p>
+
+<pre> #include &lt;stdio.h&gt;
+ #include &lt;<span style="color: rgba(0, 0, 255, 1)">string</span>.h&gt;
+ #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* lua_function_code = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">function add(x,y) return x + y end</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">void</span> call_function(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L) 
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">luaL_dostring 等同于luaL_loadstring() || lua_pcall()
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">注意：在能够调用Lua函数之前必须执行Lua脚本，否则在后面实际调用Lua函数时会报错，
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">错误信息为:"attempt to call a nil value."</span>
+     <span style="color: rgba(0, 0, 255, 1)">if</span><span style="color: rgba(0, 0, 0, 1)"> (luaL_dostring(L,lua_function_code)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Failed to run lua code.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 0, 255, 1)">double</span> x = <span style="color: rgba(128, 0, 128, 1)">1.0</span>, y = <span style="color: rgba(128, 0, 128, 1)">2.3</span><span style="color: rgba(0, 0, 0, 1)">;
+</span>     lua_getglobal(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">add</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span> <span style="color: rgba(0, 0, 0, 1)">    lua_pushnumber(L,x);
+</span> <span style="color: rgba(0, 0, 0, 1)">    lua_pushnumber(L,y);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">下面的第二个参数表示带调用的lua函数存在两个参数。
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">第三个参数表示即使带调用的函数存在多个返回值，那么也只有一个在执行后会被压入栈中。
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">lua_pcall调用后，虚拟栈中的函数参数和函数名均被弹出。</span>
+     <span style="color: rgba(0, 0, 255, 1)">if</span> (lua_pcall(L,<span style="color: rgba(128, 0, 128, 1)">2</span>,<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">error is %s.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>,lua_tostring(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">));
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">此时结果已经被压入栈中。</span>
+     <span style="color: rgba(0, 0, 255, 1)">if</span> (!lua_isnumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">)) {
+</span>         printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">function 'add' must return a number.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>         <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 0, 255, 1)">double</span> ret = lua_tonumber(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pop(L,-<span style="color: rgba(128, 0, 128, 1)">1</span>); <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">弹出返回值。</span>
+     printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">The result of call function is %f.\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">,ret);
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> main()
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     lua_State* L =<span style="color: rgba(0, 0, 0, 1)"> luaL_newstate();
+</span> <span style="color: rgba(0, 0, 0, 1)">    call_function(L);
+</span> <span style="color: rgba(0, 0, 0, 1)">    lua_close(L);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

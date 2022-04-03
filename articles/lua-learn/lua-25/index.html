@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>三、Lua调用C++函数</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">三、Lua调用C++函数</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-pid="xjehwceC">上一篇文章中我们已经知道了，C++怎么调用Lua中的函数，接下来我们学习一下，Lua怎么调用C++中的函数。</p><p data-pid="ANo7Cua4">这篇文章主要讲在Lua中执行average()函数，怎么调用到C++中的Average函数。然后把Average函数的执行结果再返回给Lua中。</p><h2>一、直接上代码：</h2><p data-pid="rM1g5eZ9"><b>1、在Test.lua文件内添加如下代码：</b></p><pre><p data-pid="P1lppODl">print &#34;Hello, Lua! Demo3&#34;</p><p data-pid="NNH_HP6K">avg, sum = average(10,20,30,40,50);</p><p data-pid="L5zpEvWF">print(&#34;The average is &#34;, avg)</p><p data-pid="i_hLWnBG">print(&#34;The sum is &#34;, sum)</p></pre><p data-pid="QpnzYkGA"><b>2、在LuaTest.cpp文件内添加如下代码：</b></p><pre><p data-pid="OBZjnsXs">#include &lt;stdio.h&gt;</p><p data-pid="9xRAzWlC">extern &#34;C&#34; {</p><p data-pid="oGgW_1uS">#include &#34;lua.h&#34;</p><p data-pid="cUr_PH3O">#include &#34;lualib.h&#34;</p><p data-pid="TnwTvWi9">#include &#34;lauxlib.h&#34;</p><p data-pid="1-Je6hCO">}</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="EJHMdw4d">lua_State* L;</p><p data-pid="yV5FLP7s">static int Average(lua_State *L)</p><p data-pid="urQPuZ4X">{</p><p data-pid="Ub2NJXrn">//code3</p><p data-pid="CGFk0_3K">	int n = lua_gettop(L);</p><p data-pid="RENOo85G">	double sum = 0;</p><p data-pid="u_720wECx0R">//code4</p><p data-pid="hiDR6d9u">	for (int i = 1; i &lt;= n; ++i)</p><p data-pid="kNOr1i0B">	{</p><p data-pid="nFlihRso">		sum += lua_tonumber(L, i);</p><p data-pid="CGZy-F2R">	}</p><p data-pid="CQO5Ci9E">//code5</p><p data-pid="klZ0zsA_">	lua_pushnumber(L, sum / n);</p><p data-pid="_k8a6o0C">	lua_pushnumber(L, sum);</p><p data-pid="plhkNgk7">//code6</p><p data-pid="6aVtvI22">	return 2;</p><p data-pid="aVjd_kiC">}<br/></p><p data-pid="8Viwvi8s">int main(int argc, char *argv[])</p><p data-pid="_dwtYM2P">{</p><p data-pid="uMCkwtV5">	L = lua_open();</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="dGnSxdnU">	luaL_openlibs(L);</p><p data-pid="pr-BcVYw">//code1</p><p data-pid="JMzUYESq">	lua_720wegister(L, &#34;average&#34;, Average);</p><p data-pid="KJ6tkuIc">//code2</p><p data-pid="4ik7VehM">	luaL_dofile(L, &#34;Test.lua&#34;);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="cUeRIbRZ">	lua_close(L);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="I2lbj9VE">	printf(&#34;Press enter to exit...&#34;);</p><p data-pid="9p9JsKgr">	getchar();</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="RaGPo7QU">	return 0;</p><p data-pid="v3owZwyo">}</p></pre><p class="ztext-empty-paragraph"><br/></p><h2>二、代码分析，和上一篇C++调用Lua中重复的函数，这里就不做分析了，不明白的，可以去看上一篇。</h2><p data-pid="wee4e6YI"><b>code1、</b>lua_720wegister注册函数把Lua函数和C++函数进行绑定。我们F12看一下lua_720wegister里面怎么定义的。lua_720wegister其实是一个宏定义</p><img src="v2-c0ded54c78a6b6095d7924f4e95e7b8a_720w.png" width="671" height="47" ><p data-pid="XLEXQyw-">包括lua_pushcfunction和lua_setglobal操作。其实就是先用lua_pushcfunction把在c++中定义的函数压如栈中，然后lua_setglobal来设置栈顶的元素对应的值，这样就可以把lua函数和栈顶的c++函数建立引用关系。</p><p data-pid="GSnwpgTZ">lua_setglobal其实也是一个宏定义，就是一个特殊的lua_setfield操作。</p><img src="v2-c756ae796e914c2c968044860293d8b4_720w.png" width="537" height="62" ><br><img src="v2-4b29f3d96068439f9e5d2400663b1ac8_720w.jpg" width="385" height="136"><br><b>code2、</b>加载并执行lua脚本，此时lua中的函数average被执行，同时向栈中压如5个参数。参考栈的运行图Log index 1</p><p data-pid="xUQ7P3B1"><b>code3、</b> lua_gettop是取出栈顶的索引值。此时栈顶的索引值大小就是站内元素的个数。</p><p data-pid="L81mbLBP"><b>code4、</b>使用循环变量站内所有的元素，通过lua_tonumber取出站内的值，然后进行相加操作。</p><p data-pid="ZU38yg0e"><b>code5、</b>把要返回的值再压如栈。此时此时栈内7条数据，参考栈的运行图Log index 2</p><p data-pid="ahG4eMSx"><b>code6、</b>告诉lua主程序，返回2个值。lua这是可以用参数接受这两个值</p><h2>三、运行结果如下图</h2><img src="v2-d015d5bda81e7eb1abab9b0ef0c69dc9_720w.jpg" width="532" height="151" ><h2>四、程序运行时栈内的变化情况如下图：</h2><img src="v2-4c8c820f9a0d309a75a498b73c59044d_720w.jpg" width="769" height="519" ><blockquote data-pid="2NaYMqJi"><i>项目测试源码地址在第一篇文章末尾：<a href="https://zhuanlan.zhihu.com/p/96403566" class="internal">炉石不传说：一、搭建C++调用Lua环境</a></i><br/><b>如果你感觉这篇文章对你有用，请随手点赞或评论，你的点赞操作可以让更多想学习的人更容易找到这篇文章，谢谢！</b></blockquote>
+
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

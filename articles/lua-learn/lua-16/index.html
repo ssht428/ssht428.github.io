@@ -1,0 +1,176 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Lua系统库</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Lua系统库</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+&nbsp;&nbsp;&nbsp; Lua为了保证高度的可移植性，因此，它的标准库仅仅提供了非常少的功能，特别是和OS相关的库。但是Lua还提供了一些扩展库，比如Posix库等。对于文件操作而言，该库仅提供了<span style="color: rgba(0, 0, 255, 1)">os.rename</span>函数和<span style="color: rgba(0, 0, 255, 1)">os.remove</span>函数。<br>&nbsp;&nbsp; &nbsp;<br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp; &nbsp;1. 日期和时间：</span><br>&nbsp;&nbsp; &nbsp;在Lua中，函数<span style="color: rgba(0, 0, 255, 1)">time</span>和<span style="color: rgba(0, 0, 255, 1)">date</span>提供了所有的日期和时间功能。<br>&nbsp;&nbsp; &nbsp;如果不带任何参数调用time函数，它将以数字形式返回当前的日期和时间。如果以一个table作为参数，它将返回一个数字，表示该table中所描述的日期和时间。该table的有效字段如下：</p>
+<table style="width: 600px" border="0" align="center">
+<tbody>
+<tr>
+<td style="text-align: center"><span style="font-size: 12px"><strong><span style="color: rgba(0, 0, 255, 1)">字段名</span></strong></span></td>
+<td style="text-align: center"><span style="font-size: 12px"><strong><span style="color: rgba(0, 0, 255, 1)">描述</span></strong></span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">year</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">一个完整的年份</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">month</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">01-12</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">day</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">01-31</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">hour</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">00-23</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">min</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">00-59</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">sec</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">00-59</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">isdst</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">布尔值，true表示夏令时</span></td>
+
+</tr>
+
+</tbody>
+
+</table>
+<p>&nbsp;&nbsp;&nbsp; <span style="color: rgba(0, 0, 255, 1)">print(os.time{year = 1970, month = 1, day = 1, hour = 8, min = 0}) <span style="color: rgba(0, 128, 0, 1)">--北京是东八区，所以hour等于时表示UTC的0。</span></span><br>&nbsp;&nbsp;&nbsp; <span style="color: rgba(0, 128, 0, 1)"><span style="color: rgba(0, 0, 255, 1)">print(os.time())</span>&nbsp; --输出当前时间距离1970-1-1 00:00:00所经过的秒数。输出值为 1333594721</span><br>&nbsp;&nbsp;&nbsp; 函数date是time的反函数，即可以将time返回的数字值转换为更高级的可读格式，其第一个参数是格式化字符串，表示期望的日期返回格式，第二个参数是日期和时间的数字，缺省为当前日期和时间。如：</p>
+
+<pre> dd = <span style="color: rgba(255, 0, 255, 1)">os.date</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">*t</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(255, 0, 255, 1)">os.time</span>())  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">如果格式化字符串为"*t"，函数将返回table形式的日期对象。</span><span style="color: rgba(0, 128, 0, 1)">如果为"!*t"，则表示为UTC时间格式。<br></span> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">year = </span><span style="color: rgba(128, 0, 0, 1)">"</span> .. dd.year)<br> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">month = </span><span style="color: rgba(128, 0, 0, 1)">"</span> .. dd.month)<br> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">day = </span><span style="color: rgba(128, 0, 0, 1)">"</span> .. dd.day)<br> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">weekday = </span><span style="color: rgba(128, 0, 0, 1)">"</span> .. dd.wday)  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">一个星期中的第几天，周日是第一天</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">yearday = </span><span style="color: rgba(128, 0, 0, 1)">"</span> .. dd.yday)  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">一年中的第几天，1月1日是第一天</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hour = </span><span style="color: rgba(128, 0, 0, 1)">"</span> .. dd.hour)<br> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">min = </span><span style="color: rgba(128, 0, 0, 1)">"</span> .. dd.min)<br> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">sec = </span><span style="color: rgba(128, 0, 0, 1)">"</span> .. dd.sec)<br>     <br> <span style="color: rgba(0, 128, 0, 1)">--[[</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 128, 0, 1)">year = 2012<br></span> <span style="color: rgba(0, 128, 0, 1)">month = 4<br></span> <span style="color: rgba(0, 128, 0, 1)">day = 5<br></span> <span style="color: rgba(0, 128, 0, 1)">weekday = 5<br></span> <span style="color: rgba(0, 128, 0, 1)">yearday = 96<br></span> <span style="color: rgba(0, 128, 0, 1)">hour = 11<br></span> <span style="color: rgba(0, 128, 0, 1)">min = 13<br></span> <span style="color: rgba(0, 128, 0, 1)">sec = 44<br></span> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">]]</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; date函数的格式化标识和C运行时库中的strftime函数的标识完全相同，见下表：</p>
+<table style="width: 600px" border="0" align="center">
+<tbody>
+<tr>
+<td style="text-align: center"><strong><span style="color: rgba(0, 0, 255, 1); font-size: 12px">关键字</span></strong></td>
+<td style="text-align: center"><strong><span style="color: rgba(0, 0, 255, 1); font-size: 12px">描述</span></strong></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%a</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">一星期中天数的缩写，如Wed</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%A</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">一星期中天数的全称，如Friday</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%b</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">月份的缩写，如Sep</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%B</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">月份的全称，如September</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%c</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">日期和时间</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%d</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">一个月中的第几天(01-31)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%H</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">24小时制中的小时数(00-23)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%I</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">12小时制中的小时数(01-12)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%j</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">一年中的第几天(001-366)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%M</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">分钟(00-59)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%m</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">月份(01-12)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%p</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">"上午(am)"或"下午(pm)"</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%S</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">秒数(00-59)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%w</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">一星期中的第几天(0--6等价于星期日--星期六)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%x</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">日期，如09/16/2010</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%X</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">时间，如23:48:20</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%y</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">两位数的年份(00-99)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%Y</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">完整的年份(2012)</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%%</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">字符'%'</span></td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;&nbsp;&nbsp; <span style="color: rgba(0, 0, 255, 1)">print(os.date("%Y-%m-%d"))&nbsp;<span style="color: rgba(0, 128, 0, 1)"> --输出2012-04-05</span></span><br>&nbsp;&nbsp;&nbsp; 函数os.clock()返回CPU时间的描述，通常用于计算一段代码的执行效率。如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> x = <span style="color: rgba(255, 0, 255, 1)">os.clock</span>()<br> <span style="color: rgba(0, 0, 255, 1)">local</span> s = <span style="color: rgba(128, 0, 128, 1)">0</span><br> <span style="color: rgba(0, 0, 255, 1)">for</span> i = <span style="color: rgba(128, 0, 128, 1)">1</span>, <span style="color: rgba(128, 0, 128, 1)">10000000</span> <span style="color: rgba(0, 0, 255, 1)">do</span> <br>     s = s + i <br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(255, 0, 255, 1)">string.format</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">elapsed time: %.2f\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(255, 0, 255, 1)">os.clock</span>() - x))<br> <br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出结果为：</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">elapsed time: 0.21    </span></pre>
+
+<p><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp; &nbsp;2. 其他系统调用：</span><br>&nbsp;&nbsp; &nbsp;函数<span style="color: rgba(0, 0, 255, 1)">os.exit()</span>可中止当前程序的执行。函数<span style="color: rgba(0, 0, 255, 1)">os.getenv()</span>可获取一个环境变量的值。如：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(os.getenv("PATH"))&nbsp; <span style="color: rgba(0, 128, 0, 1)">--如果环境变量不存在，返回nil。</span></span><br>&nbsp;&nbsp; &nbsp;<span style="color: rgba(0, 0, 255, 1)">os.execute</span>函数用于执行和操作系统相关的命令，如：<br>&nbsp;&nbsp; <span style="color: rgba(0, 0, 255, 1)">&nbsp;os.execute("mkdir " .. "hello")</span></p>
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

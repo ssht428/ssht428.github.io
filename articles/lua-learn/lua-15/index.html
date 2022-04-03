@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Lua输入输出库</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Lua输入输出库</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+&nbsp;&nbsp;&nbsp; I/O库为文件操作提供了两种不同的模型，简单模型和完整模型。简单模型假设一个当前输入文件和一个当前输出文件，他的I/O操作均作用于这些文件。完整模型则使用显式的文件句柄，并将所有的操作定义为文件句柄上的方法。<br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp; &nbsp;1. 简单模型：</span><br>&nbsp;&nbsp; &nbsp;I/O库会将进程标准输入输出作为其缺省的输入文件和输出文件。我们可以通过<span style="color: rgba(0, 0, 255, 1)">io.input(filename)</span>和<span style="color: rgba(0, 0, 255, 1)">io.output(filename)</span>这两个函数来改变当前的输入输出文件。<br>&nbsp;&nbsp; &nbsp;1). io.write函数：<br>&nbsp;&nbsp; &nbsp;函数原型为io.write(...)。该函数将所有参数顺序的写入到当前输出文件中。如：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;io.write("hello","world") <span style="color: rgba(0, 128, 0, 1)">--写出的内容为helloworld</span></span><br><br>&nbsp;&nbsp; &nbsp;2). io.read函数：<br>&nbsp;&nbsp; &nbsp;下表给出了该函数参数的定义和功能描述：</p>
+<table style="width: 600px" border="0" align="center">
+<tbody>
+<tr>
+<td style="text-align: center"><strong><span style="color: rgba(0, 0, 255, 1); font-size: 12px">参数字符串</span></strong></td>
+<td style="text-align: center"><strong><span style="color: rgba(0, 0, 255, 1); font-size: 12px">含义</span></strong></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">"*all"</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">读取整个文件</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">"*line"</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">读取下一行</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">"*number"</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">读取一个数字</span></td>
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">&lt;num&gt;</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">读取一个不超过&lt;num&gt;个字符的字符串</span></td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;&nbsp;&nbsp; 调用<span style="color: rgba(0, 0, 255, 1)">io.read("*all")</span>会读取当前输入文件的所有内容，以当前位置作为开始。如果当前位置处于文件的末尾，或者文件为空，那个该调用返回一个空字符串。由于Lua可以高效的处理长字符串，因此在Lua中可以先将数据从文件中完整读出，之后在通过Lua字符串库提供的函数进行各种处理。<br>&nbsp;&nbsp; &nbsp;调用<span style="color: rgba(0, 0, 255, 1)">io.read("*line")</span>会返回当前文件的下一行，但不包含换行符。当到达文件末尾时，该调用返回nil。如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">for</span> count = <span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(255, 0, 255, 1)">math.huge</span> <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(0, 0, 255, 1)">local</span> line = <span style="color: rgba(255, 0, 255, 1)">io.read</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">*line</span><span style="color: rgba(128, 0, 0, 1)">"</span>)  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">如果不传参数，缺省值也是"*line"</span><span style="color: rgba(0, 128, 0, 1)"><br></span>     <span style="color: rgba(0, 0, 255, 1)">if</span> line == <span style="color: rgba(0, 0, 255, 1)">nil</span> <span style="color: rgba(0, 0, 255, 1)">then</span> <br>         <span style="color: rgba(0, 0, 255, 1)">break</span><br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br>     <span style="color: rgba(255, 0, 255, 1)">io.write</span>(<span style="color: rgba(255, 0, 255, 1)">string.format</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">%6d  </span><span style="color: rgba(128, 0, 0, 1)">"</span>,count),line,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 如果只是为了迭代文件中的所有行，可以使用<span style="color: rgba(0, 0, 255, 1)">io.lines</span>函数，以迭代器的形式访问文件中的每一行数据，如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> lines = {}<br> <span style="color: rgba(0, 0, 255, 1)">for</span> line <span style="color: rgba(0, 0, 255, 1)">in</span> <span style="color: rgba(255, 0, 255, 1)">io.lines</span>() <span style="color: rgba(0, 0, 255, 1)">do</span>   <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">通过迭代器访问每一个数据</span><span style="color: rgba(0, 128, 0, 1)"><br></span>     lines[#lines + <span style="color: rgba(128, 0, 128, 1)">1</span>] = line<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(255, 0, 255, 1)">table.sort</span>(lines)  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">排序，Lua标准库的table库提供的函数。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">for</span> _,l <span style="color: rgba(0, 0, 255, 1)">in</span> <span style="color: rgba(255, 0, 255, 1)">ipairs</span>(lines) <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(255, 0, 255, 1)">io.write</span>(l,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 调用<span style="color: rgba(0, 0, 255, 1)">io.read("*number")</span>会从当前输入文件中读取一个数字。此时read将直接返回一个数字，而不是字符串。"*number"选项会忽略数字前面所有的空格，并且能处理像-3、+5.2这样的数字格式。如果当前读取的数据不是合法的数字，read返回nil。在调用read是可以指定多个选项，函数会根据每个选项参数返回相应的内容。如：</p>
+
+<pre> <span style="color: rgba(0, 128, 0, 1)">--[[</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 128, 0, 1)">    6.0  -3.23   1000<br></span> <span style="color: rgba(0, 128, 0, 1)">    ... ...<br></span> <span style="color: rgba(0, 128, 0, 1)">    下面的代码读取注释中的数字<br></span> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">]]</span><br> <span style="color: rgba(0, 0, 255, 1)">while</span> <span style="color: rgba(0, 0, 255, 1)">true</span> <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(0, 0, 255, 1)">local</span> n1,n2,n3 = <span style="color: rgba(255, 0, 255, 1)">io.read</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">*number</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">*number</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">*number</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br>     <span style="color: rgba(0, 0, 255, 1)">if</span> <span style="color: rgba(0, 0, 255, 1)">not</span> n1 <span style="color: rgba(0, 0, 255, 1)">then</span><br>         <span style="color: rgba(0, 0, 255, 1)">break</span><br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br>     <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(255, 0, 255, 1)">math.max</span>(n1,n2,n3))<br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 调用<span style="color: rgba(0, 0, 255, 1)">io.read(&lt;num&gt;)</span>会从输入文件中最多读取n个字符，如果读不到任何字符，返回nil。否则返回读取到的字符串。如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">while</span> <span style="color: rgba(0, 0, 255, 1)">true</span> <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(0, 0, 255, 1)">local</span> block = <span style="color: rgba(255, 0, 255, 1)">io.read</span>(<span style="color: rgba(128, 0, 128, 1)">2</span>^<span style="color: rgba(128, 0, 128, 1)">13</span>)<br>     <span style="color: rgba(0, 0, 255, 1)">if</span> <span style="color: rgba(0, 0, 255, 1)">not</span> block <span style="color: rgba(0, 0, 255, 1)">then</span><br>         <span style="color: rgba(0, 0, 255, 1)">break</span><br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br>     <span style="color: rgba(255, 0, 255, 1)">io.write</span>(block)<br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp;<span style="color: rgba(0, 0, 255, 1)"> io.read(0)</span>是一种特殊的情况，用于检查是否到达了文件的末尾。如果没有到达，返回空字符串，否则nil。<br><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 2. 完整I/O模型：</span><br>&nbsp;&nbsp; &nbsp;Lua中完整I/O模型的使用方式非常类似于C运行时库的文件操作函数，它们都是基于文件句柄的。<br>&nbsp;&nbsp; &nbsp;1). 通过<span style="color: rgba(0, 0, 255, 1)">io.open</span>函数打开指定的文件，并且在参数中给出对该文件的打开模式，其中<span style="color: rgba(0, 0, 255, 1)">"r"</span>表示读取，<span style="color: rgba(0, 0, 255, 1)">"w"</span>表示覆盖写入，即先删除文件原有的内容，<span style="color: rgba(0, 0, 255, 1)">"a"</span>表示追加式写入，<span style="color: rgba(0, 0, 255, 1)">"b"</span>表示以二进制的方式打开文件。在成功打开文件后，该函数将返回表示该文件的句柄，后面所有基于该文件的操作，都需要将该句柄作为参数传入。如果打开失败，返回nil。其中错误信息由该函数的第二个参数返回，如：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;assert(io.open(filename,mode))&nbsp; <span style="color: rgba(0, 128, 0, 1)">--如果打开失败，assert将打印第二个参数给出的错误信息。</span></span><br>&nbsp;&nbsp; &nbsp;<br>&nbsp;&nbsp; &nbsp;2). 文件读写函数<span style="color: rgba(0, 0, 255, 1)">read/write</span>。这里需要用到冒号语法，如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> f = <span style="color: rgba(255, 0, 255, 1)">assert</span>(<span style="color: rgba(255, 0, 255, 1)">io.open</span>(filename,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">r</span><span style="color: rgba(128, 0, 0, 1)">"</span>))<br> <span style="color: rgba(0, 0, 255, 1)">local</span> t = f:read(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">*all</span><span style="color: rgba(128, 0, 0, 1)">"</span>)  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">对于read而言，其参数完全等同于简单模型下read的参数。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> f:close()</pre>
+
+<p>&nbsp;&nbsp;&nbsp; 此外，I/O库还提供了3个预定义的文件句柄，即<span style="color: rgba(0, 0, 255, 1)">io.stdin(标准输入)、io.stdout(标准输出)、io.stderr(标准错误输出)</span>。如：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;io.stderr:write("This is an error message.")</span><br>&nbsp;&nbsp; &nbsp;事实上，我们也可以混合使用简单模式和完整模式，如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> temp = <span style="color: rgba(255, 0, 255, 1)">io.input</span>()   <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">将当前文件句柄保存</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(255, 0, 255, 1)">io.input</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">newInputfile</span><span style="color: rgba(128, 0, 0, 1)">"</span>)  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">打开新的输入文件</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(255, 0, 255, 1)">io.input</span>():close()        <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">关闭当前文件</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(255, 0, 255, 1)">io.input</span>(temp)            <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">恢复原来的输入文件</span></pre>
+
+<p><br>&nbsp;&nbsp;&nbsp; 3). 性能小技巧：<br>&nbsp;&nbsp; &nbsp;由于一次性读取整个文件比逐行读取要快一些，但对于较大的文件，这样并不可行，因此Lua提供了一种折中的方式，即一次读取指定字节数量的数据，如果当前读取中的最后一行不是完整的一行，可通过该方式将该行的剩余部分也一并读入，从而保证本次读取的数据均为整行数据，以便于上层逻辑的处理。如：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;local lines,rest = f:read(BUFSIZE,"*line") <span style="color: rgba(0, 128, 0, 1)">--rest变量包含最后一行中没有读取的部分。</span></span><br>&nbsp;&nbsp; &nbsp;下面是Shell中wc命令的一个简单实现。</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> BUFSIZE = <span style="color: rgba(128, 0, 128, 1)">8192</span><br> <span style="color: rgba(0, 0, 255, 1)">local</span> f = <span style="color: rgba(255, 0, 255, 1)">io.input</span>(arg[<span style="color: rgba(128, 0, 128, 1)">1</span>])  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">打开输入文件</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">local</span> cc, lc, wc, = <span style="color: rgba(128, 0, 128, 1)">0</span>, <span style="color: rgba(128, 0, 128, 1)">0</span>, <span style="color: rgba(128, 0, 128, 1)">0</span>  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">分别计数字符、行和单词    </span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">while</span> <span style="color: rgba(0, 0, 255, 1)">true</span> <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(0, 0, 255, 1)">local</span> lines,rest = f:read(BUFSIZE,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">*line</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br>     <span style="color: rgba(0, 0, 255, 1)">if</span> <span style="color: rgba(0, 0, 255, 1)">not</span> lines <span style="color: rgba(0, 0, 255, 1)">then</span><br>         <span style="color: rgba(0, 0, 255, 1)">break</span><br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br>     <span style="color: rgba(0, 0, 255, 1)">if</span> rest <span style="color: rgba(0, 0, 255, 1)">then</span><br>         lines = lines .. rest .. <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br>     cc = cc + #lines<br>     <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">计算单词数量</span><span style="color: rgba(0, 128, 0, 1)"><br></span>     <span style="color: rgba(0, 0, 255, 1)">local</span> _, t = <span style="color: rgba(255, 0, 255, 1)">string.gsub</span>(lines.<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">%S+</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(128, 0, 0, 1)">""</span>)<br>     wc = wc + t<br>     <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">计算行数</span><span style="color: rgba(0, 128, 0, 1)"><br></span>     _,t = <span style="color: rgba(255, 0, 255, 1)">string.gsub</span>(line,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br>     lc = lc + t<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(255, 0, 255, 1)">print</span>(lc,wc,cc)</pre>
+
+<p><br>&nbsp;&nbsp;&nbsp; 4). 其它文件操作：<br>&nbsp;&nbsp; &nbsp;如<span style="color: rgba(0, 0, 255, 1)">io.flush</span>函数会将io缓存中的数据刷新到磁盘文件上。<span style="color: rgba(0, 0, 255, 1)">io.close</span>函数将关闭当前打开的文件。<span style="color: rgba(0, 0, 255, 1)">io.seek</span>函数用于设置或获取当前文件的读写位置，其函数原型为<span style="color: rgba(0, 0, 255, 1)">f:seek(whence,offset)</span>，如果whence的值为<span style="color: rgba(0, 0, 255, 1)">"set"</span>，offset的值则表示为相对于文件起始位置的偏移量。如为<span style="color: rgba(0, 0, 255, 1)">"cur"(默认值)</span>,offset则为相对于当前位置的偏移量，如为<span style="color: rgba(0, 0, 255, 1)">"end"</span>，则为相对于文件末尾的偏移量。函数的返回值与whence参数无关，总是返回文件的当前位置，即相对于文件起始处的偏移字节数。offset的默认值为0。如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">function</span> fsize(file)<br>     <span style="color: rgba(0, 0, 255, 1)">local</span> current = <span style="color: rgba(255, 0, 255, 1)">file:seek</span>()   <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">获取当前位置</span><span style="color: rgba(0, 128, 0, 1)"><br></span>     <span style="color: rgba(0, 0, 255, 1)">local</span> size = <span style="color: rgba(255, 0, 255, 1)">file:seek</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">end</span><span style="color: rgba(128, 0, 0, 1)">"</span>) <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">获取文件大小</span><span style="color: rgba(0, 128, 0, 1)"><br></span>     <span style="color: rgba(255, 0, 255, 1)">file:seek</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">set</span><span style="color: rgba(128, 0, 0, 1)">"</span>,current)      <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">恢复原有的当前位置</span><span style="color: rgba(0, 128, 0, 1)"><br></span>     <span style="color: rgba(0, 0, 255, 1)">return</span> size<br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 最后需要指出的是，如果发生错误，所有这些函数均返回nil和一条错误信息。</p>
+
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Lua弱引用table</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Lua弱引用table</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+&nbsp;&nbsp;&nbsp; Lua采用了基于垃圾收集的内存管理机制，因此对于程序员来说，在很多时候内存问题都将不再困扰他们。然而任何垃圾收集器都不是万能的，在有些特殊情况下，垃圾收集器是无法准确的判断是否应该将当前对象清理。这样就极有可能导致很多垃圾对象无法被释放。为了解决这一问题，就需要Lua的开发者予以一定程度上的配合。比如，当某个table对象被存放在容器中，而容器的外部不再有任何变量引用该对象，对于这样的对象，Lua的垃圾收集器是不会清理的，因为容器对象仍然引用着他。如果此时针对该容器的应用仅限于查找，而不是遍历的话，那么该对象将永远不会被用到。事实上，对于这样的对象我们是希望Lua的垃圾收集器可以将其清理掉的。见如下代码：</p>
+
+<pre> a = {}<br> key = {}<br> a[key] = <span style="color: rgba(128, 0, 128, 1)">1</span><br> key = {}<br> a[key] = <span style="color: rgba(128, 0, 128, 1)">2</span><br> <span style="color: rgba(255, 0, 255, 1)">collectgarbage</span>()<br> <span style="color: rgba(0, 0, 255, 1)">for</span> k,v <span style="color: rgba(0, 0, 255, 1)">in</span> <span style="color: rgba(255, 0, 255, 1)">pairs</span>(a) <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(255, 0, 255, 1)">print</span>(v)<br> <span style="color: rgba(0, 0, 255, 1)">end</span>    <br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出1和2</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 在执行垃圾收集之后，table a中的两个key都无法被清理，但是对value等于1的key而言，如果后面的逻辑不会遍历table a的话，那么我们就可以认为该对象内存泄露了。在Lua中提供了一种被称为弱引用table的机制，可以提示垃圾收集器，如果某个对象，如上面代码中的第一个table key，只是被弱引用table引用，那么在执行垃圾收集时可以将其清理。<br>&nbsp;&nbsp; &nbsp;Lua中的弱引用表提供了3中弱引用模式，即key是弱引用、value是弱引用，以及key和value均是弱引用。不论是哪种类型的弱引用table，只要有一个key或value被回收，那么它们所在的整个条目都会从table中删除。<br>&nbsp;&nbsp; &nbsp;一个table的弱引用类型是通过其元表的<span style="color: rgba(0, 0, 255, 1)">__mode</span>字段来决定的。如果该值为包含字符<strong><span style="color: rgba(0, 0, 255, 1)">"k"</span></strong>，那么table就是key弱引用，如果包含<strong><span style="color: rgba(0, 0, 255, 1)">"v"</span></strong>，则是value若引用，如果两个字符均存在，就是key/value弱引用。见如下代码：</p>
+
+<pre> a = {}<br> b = {__mode = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">k</span><span style="color: rgba(128, 0, 0, 1)">"</span>}<br> <span style="color: rgba(255, 0, 255, 1)">setmetatable</span>(a,b)<br> key = {}<br> a[key] = <span style="color: rgba(128, 0, 128, 1)">1</span><br> key = {}<br> a[key] = <span style="color: rgba(128, 0, 128, 1)">2</span><br> <span style="color: rgba(255, 0, 255, 1)">collectgarbage</span>()<br> <span style="color: rgba(0, 0, 255, 1)">for</span> k,v <span style="color: rgba(0, 0, 255, 1)">in</span> <span style="color: rgba(255, 0, 255, 1)">pairs</span>(a) <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(255, 0, 255, 1)">print</span>(v)<br> <span style="color: rgba(0, 0, 255, 1)">end</span>    <br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">仅仅输出2</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 在上面的代码示例中，第一个key在被存放到table a之后，就被第二个key的定义所覆盖，因此它的唯一引用来自key弱引用表。事实上，这种机制在Java中也同样存在，Java在1.5之后的版本中也提供了一组弱引用容器，其语义和Lua的弱引用table相似。<br>&nbsp;&nbsp;&nbsp; 最后需要说明的是，Lua中的弱引用表只是作用于table类型的变量，对于其他类型的变量，如数值和字符串等，弱引用表并不起任何作用。<br><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 1. 备忘录(memoize)函数：</span><br>&nbsp;&nbsp; &nbsp;用“空间换时间”是一种通用的程序运行效率优化手段，比如：对于一个普通的Server，它接受到的请求中包含Lua代码，每当其收到请求后都会调用Lua的loadstring函数来动态解析请求中的Lua代码，如果这种操作过于频率，就会导致Server的执行效率下降。要解决该问题，我们可以将每次解析的结果缓存到一个table中，下次如果接收到相同的Lua代码，就不需要调用loadstirng来动态解析了，而是直接从table中获取解析后的函数直接执行即可。这样在有大量重复Lua代码的情况下，可以极大的提高Server的执行效率。反之，如果有相当一部分的Lua代码只是出现一次，那么再使用这种机制，就将会导致大量的内存资源被占用而得不到有效的释放。在这种情况下，如果使用弱引用表，不仅可以在一定程度上提升程序的运行效率，内存资源也会得到有效的释放。见如下代码：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> results = {}<br> <span style="color: rgba(255, 0, 255, 1)">setmetatable</span>(results,{__mode = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">v</span><span style="color: rgba(128, 0, 0, 1)">"</span>}) <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">results表中的key是字符串形式的Lua代码</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">function</span> mem_loadstring(s)<br>     <span style="color: rgba(0, 0, 255, 1)">local</span> res = results[s]<br>     <span style="color: rgba(0, 0, 255, 1)">if</span> res == <span style="color: rgba(0, 0, 255, 1)">nil</span> <span style="color: rgba(0, 0, 255, 1)">then</span><br>         res = <span style="color: rgba(255, 0, 255, 1)">assert</span>(<span style="color: rgba(255, 0, 255, 1)">loadstring</span>(s))<br>         results[s] = res<br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br>     <span style="color: rgba(0, 0, 255, 1)">return</span> res<br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

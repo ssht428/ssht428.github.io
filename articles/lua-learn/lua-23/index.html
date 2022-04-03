@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>一、搭建C++调用Lua环境</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">一、搭建C++调用Lua环境</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-pid="RSLVuuXB">题外话：这将是一个系列教程，主要是讲Lua和C++交互的内容。内容来源自2019下半年自己给自己制定的学习计划内容。2019年也即将结束，所有把这半年的学习情况整理一下发出来，与那些想学习Lua和C++交互的同学共勉。（其实也是为了方便自己以后查阅）</p><h2>一、环境准备</h2><p data-pid="0QLjqo3l">        从Lua5.1.4开始官方给出的文件只有源代码和makefile文件了，官网给出的bulid方式也是在类linux平台，如果只是想找个库使用下可以到这里来下载：<a href="http://joedf.ahkscript.org/LuaBuilds/">http://joedf.ahkscript.org/LuaBuilds</a> ，如果需要自定修改库配置的话，就需要自己编译。关于编译Windows版本的教程网上也有很多，如果我有时间，后续也会写一篇编译教程。</p><p data-pid="Lilq88eE"><b>附录</b></p><p data-pid="f-jKWiaY">1、Lua5.1.4 for Windows之前的下载地址：<u><a href="http://files.luaforge.net/releases/luaforwindows/luaforwindows">http://files.luaforge.net/releases/luaforwindows/luaforwindows</a></u></p><p data-pid="3EWCRN9A">2、源码的下载地址：<u><a href="https://www.lua.org/ftp/#source">https://www.lua.org/ftp/#source</a></u></p><p class="ztext-empty-paragraph"><br/></p><h2>二、开发环境</h2><p data-pid="J9WEzqz0">1、我使用的是vs2017写的测试用例，首先建立一个空的C++控制台应用程序，然后在里面创建一个LuaTest.cpp文件和一个Test.lua文件，目录结构如下：</p><img src="v2-56356496a3544c76d152dfe682e77e4c_720w.jpg" width="244" height="287"><p data-pid="La2C4iHl">2、添加项目包含目录和依赖项。我是把安装的Lua文件直接拷贝到新建的项目工程内的，这样做的好处，是方便把测试工程给大家，不需要安装Lua，工程就可以直接运行。</p><img src="v2-b19215280f62986caf3d6f37d6996c84_720w.jpg" width="934" height="561"   ><img src="v2-2798446cf3b3b3397f7fc0c264adc49b_720w.jpg" width="934" height="561" ><h2>三、代码</h2><p data-pid="qOIfOtUG"><b>1、在Test.lua文件内添加如下代码：</b></p><p data-pid="t5_FbTCt">print &#34;Hello, Lua! Demo1&#34;</p><p data-pid="IX66Ch9z"><b>2、在LuaTest.cpp文件内添加如下代码：</b></p>
+<pre><p data-pid="oucefymJ">#include &lt;stdio.h&gt;</p><p data-pid="j4o1MIoG">extern &#34;C&#34; {</p><p data-pid="VcB9g30T">#include &#34;lua.h&#34;</p><p data-pid="osHmAaJL">#include &#34;lualib.h&#34;</p><p data-pid="VAeLT3H6">#include &#34;lauxlib.h&#34;</p><p data-pid="rJ8ki0VG">}</p><p data-pid="etdvGgbW">lua_State* L;</p><p data-pid="iu8QKADT">int main(int argc, char *argv[])</p><p data-pid="DNIDnl0s">{</p><p data-pid="NPXEno2r">	L = lua_open();</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="XMbFpEHy">	luaL_openlibs(L);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="JTAfNIeh">	luaL_dofile(L, &#34;Test.lua&#34;);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="XGgjuQJE">	lua_close(L);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="zpg5m4vr">	printf(&#34;Press enter to exit...&#34;);</p><p data-pid="M_Fsb_hK">	getchar();</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="a2PwRQav">	return 0;</p><p data-pid="Bu1Avq75">}</p><p class="ztext-empty-paragraph"><br/></p></pre><p data-pid="YmKV8xoL">四、测试</p><p data-pid="qx5f5OZe">如果一切顺利，此时你按下F5,应该会弹窗如下窗口，说明你环境搭建成功了。后续我也会把整个系列文章的测试工程地址发给大家。</p><blockquote data-pid="UExt6yaO">今天周末，刚好有时间，就把项目测试工程的源码整理了一下放到了Github上面了，地址如下，有需要的自取：<a href="https://github.com/hong672850430/Lua514CallCPlusPlus.git" >hong672850430/Lua514CallCPlusPlus</a></blockquote><img src="v2-e7cac6897f445f16f49c014be056426c_720w.jpg" width="646" height="161" >
+
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

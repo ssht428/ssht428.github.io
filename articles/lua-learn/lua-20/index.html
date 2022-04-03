@@ -1,0 +1,248 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>编写C函数的技巧</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">编写C函数的技巧</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 1. 数组操作：</span><br>&nbsp;&nbsp; &nbsp;在Lua中，“数组”只是table的一个别名，是指以一种特殊的方法来使用table。出于性能原因，Lua的C API为数组操作提供了专门的函数，如：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;void lua_rawgeti(lua_State* L, int index, int key);</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;void lua_rawseti(lua_State* L, int index, int key);</span><br>&nbsp;&nbsp; &nbsp;以上两个函数分别用于读取和设置数组中的元素值。其中index参数表示待操作的table在栈中的位置，key表示元素在table中的索引值。由于这两个函数均为原始操作，比涉及元表的table访问更快。通常而言，作为数组使用的table很少会用到元表。<br>&nbsp;&nbsp; &nbsp;见如下代码示例和关键性注释：</p>
+
+<pre> #include &lt;stdio.h&gt;
+ #include &lt;<span style="color: rgba(0, 0, 255, 1)">string</span>.h&gt;
+ #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> mapFunc(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">检查Lua调用代码中传递的第一个参数必须是table。否则将引发错误。</span>
+     luaL_checktype(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">,LUA_TTABLE);
+</span>     luaL_checktype(L,<span style="color: rgba(128, 0, 128, 1)">2</span><span style="color: rgba(0, 0, 0, 1)">,LUA_TFUNCTION);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">获取table中的字段数量，即数组的元素数量。</span>
+     <span style="color: rgba(0, 0, 255, 1)">int</span> n = lua_objlen(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">Lua中的数组起始索引习惯为1，而不是C中的0。</span>
+     <span style="color: rgba(0, 0, 255, 1)">for</span> (<span style="color: rgba(0, 0, 255, 1)">int</span> i = <span style="color: rgba(128, 0, 128, 1)">1</span>; i &lt;= n; ++<span style="color: rgba(0, 0, 0, 1)">i) {
+</span>         lua_pushvalue(L,<span style="color: rgba(128, 0, 128, 1)">2</span>);  <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">将Lua参数中的function(第二个参数)的副本压入栈中。</span>
+         lua_rawgeti(L,<span style="color: rgba(128, 0, 128, 1)">1</span>,i);  <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">压入table[i]</span>
+         lua_call(L,<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 128, 1)">1</span>);     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">调用function(table[i])，并将函数结果压入栈中。</span>
+         lua_rawseti(L,<span style="color: rgba(128, 0, 128, 1)">1</span>,i);  <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">table[i] = 函数返回值，同时将返回值弹出栈。</span>
+ <span style="color: rgba(0, 0, 0, 1)">    }
+</span> 
+     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">无结果返回给Lua代码。</span>
+     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+<p><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 2. 字符串操作：</span><br>&nbsp;&nbsp; &nbsp;当一个C函数从Lua收到一个字符串参数时，必须遵守两条规则：不要在访问字符串时从栈中将其弹出，不要修改字符串。在Lua的C API中主要提供了两个操作Lua字符串的函数，即：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;void&nbsp; lua_pushlstring(lua_State *L, const char *s, size_t l);</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;const char* lua_pushfstring(lua_State* L, const char* fmt, ...);</span><br>&nbsp;&nbsp; &nbsp;第一个API用于截取指定长度的子字符串，同时将其压入栈中。而第二个API则类似于C库中的sprintf函数，并将格式化后的字符串压入栈中。和sprintf的格式说明符不同的是，该函数只支持<strong><span style="color: rgba(0, 0, 255, 1)">%%</span></strong>(表示字符%)、<strong><span style="color: rgba(0, 0, 255, 1)">%s</span></strong>(表示字符串)、<strong><span style="color: rgba(0, 0, 255, 1)">%d</span></strong>(表示整数)、<strong><span style="color: rgba(0, 0, 255, 1)">%f</span></strong>(表示Lua中的number)及<strong><span style="color: rgba(0, 0, 255, 1)">%c</span></strong>(表示字符)。除此之外，不支持任何例如宽度和精度的选项。</p>
+
+<pre> #include &lt;stdio.h&gt;
+ #include &lt;<span style="color: rgba(0, 0, 255, 1)">string</span>.h&gt;
+ #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> splitFunc(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     <span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* s = luaL_checkstring(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* sep = luaL_checkstring(L,<span style="color: rgba(128, 0, 128, 1)">2</span>); <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">分隔符</span>
+     <span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>*<span style="color: rgba(0, 0, 0, 1)"> e;
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span> i = <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span>     lua_newtable(L); <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">结果table</span>
+     <span style="color: rgba(0, 0, 255, 1)">while</span> ((e = strchr(s,*sep)) !=<span style="color: rgba(0, 0, 0, 1)"> NULL) {
+</span>         lua_pushlstring(L,s,e - s);  <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">压入子字符串。
+</span>         <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">将刚刚压入的子字符串设置给table，同时赋值指定的索引值。</span>
+         lua_rawseti(L,-<span style="color: rgba(128, 0, 128, 1)">2</span>,i++<span style="color: rgba(0, 0, 0, 1)">);       
+</span>         s = e + <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">    }
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">压入最后一个子串</span>
+ <span style="color: rgba(0, 0, 0, 1)">    lua_pushstring(L,s);
+</span>     lua_rawseti(L,-<span style="color: rgba(128, 0, 128, 1)">2</span><span style="color: rgba(0, 0, 0, 1)">,i);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span>; <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">返回table。</span>
+ }</pre>
+
+<p>&nbsp;&nbsp;&nbsp; Lua API中提供了lua_concat函数，其功能类似于Lua中的".."操作符，用于连接(并弹出)栈顶的n个值，然后压入连接后的结果。其原型为：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;void&nbsp; lua_concat(lua_State *L, int n);</span><br>&nbsp;&nbsp; &nbsp;参数n表示栈中待连接的字符串数量。该函数会调用元方法。然而需要说明的是，如果连接的字符串数量较少，该函数可以很好的工作，反之，则会带来性能问题。为此，Lua API提供了另外一组函数专门解决由此而带来的性能问题，见如下代码示例：</p>
+
+<pre> #include &lt;stdio.h&gt;
+ #include &lt;<span style="color: rgba(0, 0, 255, 1)">string</span>.h&gt;
+ #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> strUpperFunc(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span> <span style="color: rgba(0, 0, 0, 1)">    size_t len;
+</span> <span style="color: rgba(0, 0, 0, 1)">    luaL_Buffer b;
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">检查参数第一个参数是否为字符串，同时返回字符串的指针及长度。</span>
+     <span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* s = luaL_checklstring(L,<span style="color: rgba(128, 0, 128, 1)">1</span>,&amp;<span style="color: rgba(0, 0, 0, 1)">len);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">初始化Lua的内部Buffer。</span>
+     luaL_buffinit(L,&amp;<span style="color: rgba(0, 0, 0, 1)">b);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">将处理后的字符依次(luaL_addchar)追加到Lua的内部Buffer中。</span>
+     <span style="color: rgba(0, 0, 255, 1)">for</span> (<span style="color: rgba(0, 0, 255, 1)">int</span> i = <span style="color: rgba(128, 0, 128, 1)">0</span>; i &lt; len; ++<span style="color: rgba(0, 0, 0, 1)">i)
+</span>         luaL_addchar(&amp;<span style="color: rgba(0, 0, 0, 1)">b,toupper(s[i]));
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">将该Buffer及其内容压入栈中。</span>
+     luaL_pushresult(&amp;<span style="color: rgba(0, 0, 0, 1)">b);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+<p>&nbsp;&nbsp;&nbsp; 使用缓冲机制的第一步是声明一个luaL_Buffer变量，并用luaL_buffinit来初始化它。初始化后，就可通过luaL_addchar将一个字符放入缓冲。除该函数之外，Lua的辅助库还提供了直接添加字符串的函数，如：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;void luaL_addlstring(luaL_Buffer* b, const char* s, size_t len);</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;void luaL_addstring(luaL_Buffer* b, const char* s);</span><br>&nbsp;&nbsp; &nbsp;最后luaL_pushresult会更新缓冲，并将最终的字符串留在栈顶。通过这些函数，就无须再关心缓冲的分配了。但是在追加的过程中，缓冲会将一些中间结果放到栈中。因此，在使用时要留意此细节，只要保证压入和弹出的次数相等既可。Lua API还提供一个比较常用的函数，用于将栈顶的字符串或数字也追加到缓冲区中，函数原型为：<br>&nbsp;&nbsp; &nbsp;<span style="color: rgba(0, 0, 255, 1)">void luaL_addvalue(luaL_Buffer* b);</span><br>&nbsp;&nbsp;&nbsp; <br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp; &nbsp;3. 在C函数中保存状态：</span><br>&nbsp;&nbsp; &nbsp;Lua API提供了三种方式来保存非局部变量，即注册表、环境和upvalue。<br>&nbsp;&nbsp; &nbsp;1). 注册表：<br>&nbsp;&nbsp; &nbsp;注册表是一个全局的table，只能被C代码访问。通常用于保存多个模块间的共享数据。我们可以通过<span style="color: rgba(0, 0, 255, 1)">LUA_REGISTRYINDEX</span>索引值来访问注册表。</p>
+
+<pre> #include &lt;stdio.h&gt;
+ #include &lt;<span style="color: rgba(0, 0, 255, 1)">string</span>.h&gt;
+ #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">void</span> registryTestFunc(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     lua_pushstring(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Hello</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_setfield(L,LUA_REGISTRYINDEX,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">key1</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_getfield(L,LUA_REGISTRYINDEX,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">key1</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">%s\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>,lua_tostring(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">));
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> main()
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     lua_State* L =<span style="color: rgba(0, 0, 0, 1)"> luaL_newstate();
+</span> <span style="color: rgba(0, 0, 0, 1)">    registryTestFunc(L);
+</span> <span style="color: rgba(0, 0, 0, 1)">    lua_close(L);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+<p>&nbsp;&nbsp;&nbsp; 2). 环境：<br>&nbsp;&nbsp; &nbsp;如果需要保存一个模块的私有数据，即模块内各函数需要共享的数据，应该使用环境。我们可以通过<span style="color: rgba(0, 0, 255, 1)">LUA_ENVIRONINDEX</span>索引值来访问环境。</p>
+
+<pre> #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">模块内设置环境数据的函数</span>
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> setValue(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     lua_pushstring(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Hello</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_setfield(L,LUA_ENVIRONINDEX,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">key1</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">模块内获取环境数据的函数</span>
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> getValue(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     lua_getfield(L,LUA_ENVIRONINDEX,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">key1</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     printf(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">%s\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>,lua_tostring(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">));
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">static</span> luaL_Reg myfuncs[] =<span style="color: rgba(0, 0, 0, 1)"> { 
+</span>     {<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">setValue</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, setValue},
+</span>     {<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">getValue</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, getValue},
+</span> <span style="color: rgba(0, 0, 0, 1)">    {NULL, NULL} 
+</span> <span style="color: rgba(0, 0, 0, 1)">}; 
+</span> 
+ 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)"> __declspec(dllexport)
+</span> <span style="color: rgba(0, 0, 255, 1)">int</span> luaopen_testenv(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     lua_newtable(L);  <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">创建一个新的表用于环境</span>
+     lua_replace(L,LUA_ENVIRONINDEX); <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">将刚刚创建并压入栈的新表替换为当前模块的环境表。</span>
+     luaL_register(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">testenv</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">,myfuncs);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+<p>&nbsp; &nbsp; Lua测试代码如下。</p>
+
+<pre> <span style="color: rgba(255, 0, 255, 1)">require</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">testenv</span><span style="color: rgba(128, 0, 0, 1)">"</span>
+ 
+ <span style="color: rgba(255, 0, 255, 1)">print</span><span style="color: rgba(0, 0, 0, 1)">(testenv.setValue())
+</span> <span style="color: rgba(255, 0, 255, 1)">print</span><span style="color: rgba(0, 0, 0, 1)">(testenv.getValue())
+</span> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出为：Hello</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 3). upvalue：<br>&nbsp;&nbsp; &nbsp;upvalue是和特定函数关联的，我们可以将其简单的理解为函数内的静态变量。&nbsp;</p>
+
+<pre> #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> counter(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">获取第一个upvalue的值。</span>
+     <span style="color: rgba(0, 0, 255, 1)">int</span> val = lua_tointeger(L,lua_upvalueindex(<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">));
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">将得到的结果压入栈中。</span>
+     lua_pushinteger(L,++<span style="color: rgba(0, 0, 0, 1)">val);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">赋值一份栈顶的数据，以便于后面的替换操作。</span>
+     lua_pushvalue(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">该函数将栈顶的数据替换到upvalue(1)中的值。同时将栈顶数据弹出。</span>
+     lua_replace(L,lua_upvalueindex(<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">));
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">lua_pushinteger(L,++value)中压入的数据仍然保留在栈中并返回给Lua。</span>
+     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> newCounter(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">压入一个upvalue的初始值0，该函数必须先于lua_pushcclosure之前调用。</span>
+     lua_pushinteger(L,<span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">压入闭包函数，参数1表示该闭包函数的upvalue数量。该函数返回值，闭包函数始终位于栈顶。</span>
+     lua_pushcclosure(L,counter,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">static</span> luaL_Reg myfuncs[] =<span style="color: rgba(0, 0, 0, 1)"> { 
+</span>     {<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">counter</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, counter},
+</span>     {<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">newCounter</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, newCounter},
+</span> <span style="color: rgba(0, 0, 0, 1)">    {NULL, NULL} 
+</span> <span style="color: rgba(0, 0, 0, 1)">}; 
+</span> 
+ 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)"> __declspec(dllexport)
+</span> <span style="color: rgba(0, 0, 255, 1)">int</span> luaopen_testupvalue(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     luaL_register(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">testupvalue</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">,myfuncs);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+<p>&nbsp;&nbsp;&nbsp; Lua测试代码如下。</p>
+
+<pre> <span style="color: rgba(255, 0, 255, 1)">require</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">testupvalue</span><span style="color: rgba(128, 0, 0, 1)">"</span>
+ 
+ func =<span style="color: rgba(0, 0, 0, 1)"> testupvalue.newCounter();
+</span> <span style="color: rgba(255, 0, 255, 1)">print</span><span style="color: rgba(0, 0, 0, 1)">(func());
+</span> <span style="color: rgba(255, 0, 255, 1)">print</span><span style="color: rgba(0, 0, 0, 1)">(func());
+</span> <span style="color: rgba(255, 0, 255, 1)">print</span><span style="color: rgba(0, 0, 0, 1)">(func());
+</span> 
+ func =<span style="color: rgba(0, 0, 0, 1)"> testupvalue.newCounter();
+</span> <span style="color: rgba(255, 0, 255, 1)">print</span><span style="color: rgba(0, 0, 0, 1)">(func());
+</span> <span style="color: rgba(255, 0, 255, 1)">print</span><span style="color: rgba(0, 0, 0, 1)">(func());
+</span> <span style="color: rgba(255, 0, 255, 1)">print</span><span style="color: rgba(0, 0, 0, 1)">(func());
+</span> 
+ <span style="color: rgba(0, 128, 0, 1)">--[[</span><span style="color: rgba(0, 128, 0, 1)"> 输出结果为：
+</span> <span style="color: rgba(0, 128, 0, 1)">1
+</span> <span style="color: rgba(0, 128, 0, 1)">2
+</span> <span style="color: rgba(0, 128, 0, 1)">3
+</span> <span style="color: rgba(0, 128, 0, 1)">1
+</span> <span style="color: rgba(0, 128, 0, 1)">2
+</span> <span style="color: rgba(0, 128, 0, 1)">3
+</span> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">]]</span>&nbsp;</pre>
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

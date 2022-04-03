@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Lua数据结构</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Lua数据结构</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+&nbsp;&nbsp;&nbsp; Lua中的table不是一种简单的数据结构，它可以作为其它数据结构的基础。如数组、记录、线性表、队列和集合等，在Lua中都可以通过table来表示。<span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <br>&nbsp;&nbsp;&nbsp; 1. 数组：</span><br>&nbsp;&nbsp; &nbsp;使用整数来索引table即可在Lua中实现数组。因此，Lua中的数组没有固定的大小，如：</p>
+
+<pre> a = {}<br> <span style="color: rgba(0, 0, 255, 1)">for</span> i = <span style="color: rgba(128, 0, 128, 1)">1</span>, <span style="color: rgba(128, 0, 128, 1)">1000</span> <span style="color: rgba(0, 0, 255, 1)">do</span><br>     a[i] = <span style="color: rgba(128, 0, 128, 1)">0</span><br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">The length of array 'a' is </span><span style="color: rgba(128, 0, 0, 1)">"</span> .. #a)<br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">The length of array 'a' is 1000</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 在Lua中，可以让任何数作为数组的起始索引，但通常而言，都会使用1作为其起始索引值。而且很多Lua的内置功能和函数都依赖这一特征，因此在没有充分理由的前提下，尽量保证这一规则。下面的方法是通过table的构造器来创建并初始化一个数组的，如：<br>&nbsp;&nbsp; &nbsp;<span style="color: rgba(0, 0, 255, 1)">squares = {1, 4, 9, 16, 25}</span><br><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 2. 二维数组：</span><br>&nbsp;&nbsp; &nbsp;在Lua中我们可以通过两种方式来利用table构造多维数组。其中，第一种方式通过“数组的数组”的方式来实现多维数组的，即在一维数组上的每个元素也同样为table对象，如：</p>
+
+<pre> mt = {}<br> <span style="color: rgba(0, 0, 255, 1)">for</span> i = <span style="color: rgba(128, 0, 128, 1)">1</span>, N <span style="color: rgba(0, 0, 255, 1)">do</span><br>     mt[i] = {}<br>     <span style="color: rgba(0, 0, 255, 1)">for</span> j = <span style="color: rgba(128, 0, 128, 1)">1</span>, M <span style="color: rgba(0, 0, 255, 1)">do</span><br>         mt[i][j] = i * j<br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 第二种方式是将二维数组的索引展开，并以固定的常量作为第二维度的步长，如：</p>
+
+<pre> mt = {}<br> <span style="color: rgba(0, 0, 255, 1)">for</span> i = <span style="color: rgba(128, 0, 128, 1)">1</span>, N <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(0, 0, 255, 1)">for</span> j = <span style="color: rgba(128, 0, 128, 1)">1</span>, M <span style="color: rgba(0, 0, 255, 1)">do</span><br>         mt[(i - <span style="color: rgba(128, 0, 128, 1)">1</span>) * M + j] = i * j<br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 3. 链表：</span><br>&nbsp;&nbsp; &nbsp;由于table是动态的实体，所以在Lua中实现链表是很方便的。其中，每个结点均以table来表示，一个“链接”只是结点中的一个字段，该字段包含对其它table的引用，如：</p>
+
+<pre> list = <span style="color: rgba(0, 0, 255, 1)">nil</span><br> <span style="color: rgba(0, 0, 255, 1)">for</span> i = <span style="color: rgba(128, 0, 128, 1)">1</span>, <span style="color: rgba(128, 0, 128, 1)">10</span> <span style="color: rgba(0, 0, 255, 1)">do</span><br>     list = { <span style="color: rgba(255, 0, 255, 1)">next</span> = list, value = i}<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <br> <span style="color: rgba(0, 0, 255, 1)">local</span> l = list<br> <span style="color: rgba(0, 0, 255, 1)">while</span> l <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(255, 0, 255, 1)">print</span>(l.value)<br>     l = l.<span style="color: rgba(255, 0, 255, 1)">next</span><br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 4. 队列与双向队列：</span><br>&nbsp;&nbsp; &nbsp;在Lua中实现队列的简单方法是使用table库函数insert和remove。但是由于这种方法会导致后续元素的移动，因此当队列的数据量较大时，不建议使用该方法。下面的代码是一种更高效的实现方式，如：</p>
+
+<pre> List = {}<br> <br> <span style="color: rgba(0, 0, 255, 1)">function</span> List.new()<br>     <span style="color: rgba(0, 0, 255, 1)">return</span> {first = <span style="color: rgba(128, 0, 128, 1)">0</span>, last = -<span style="color: rgba(128, 0, 128, 1)">1</span>}<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <br> <span style="color: rgba(0, 0, 255, 1)">function</span> List.pushFront(list, value)<br>     <span style="color: rgba(0, 0, 255, 1)">local</span> first = list.first - <span style="color: rgba(128, 0, 128, 1)">1</span><br>     list.first = first<br>     list[first] = value<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <br> <span style="color: rgba(0, 0, 255, 1)">function</span> List.pushBack(list, value)<br>     <span style="color: rgba(0, 0, 255, 1)">local</span> last = list.last + <span style="color: rgba(128, 0, 128, 1)">1</span><br>     list.last = last<br>     list[last] = value<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <br> <span style="color: rgba(0, 0, 255, 1)">function</span> List.popFront(list)<br>     <span style="color: rgba(0, 0, 255, 1)">local</span> first = list.first<br>     <span style="color: rgba(0, 0, 255, 1)">if</span> first &gt; list.last <span style="color: rgba(0, 0, 255, 1)">then</span><br>         <span style="color: rgba(255, 0, 255, 1)">error</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">List is empty</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br>     <span style="color: rgba(0, 0, 255, 1)">local</span> value = list[first]<br>     list[first] = <span style="color: rgba(0, 0, 255, 1)">nil</span><br>     list.first = first + <span style="color: rgba(128, 0, 128, 1)">1</span><br>     <span style="color: rgba(0, 0, 255, 1)">return</span> value<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <br> <span style="color: rgba(0, 0, 255, 1)">function</span> List.popBack(list)<br>     <span style="color: rgba(0, 0, 255, 1)">local</span> last = list.last<br>     <span style="color: rgba(0, 0, 255, 1)">if</span> list.first &gt; last <span style="color: rgba(0, 0, 255, 1)">then</span><br>         <span style="color: rgba(255, 0, 255, 1)">error</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">List is empty</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br>     <span style="color: rgba(0, 0, 255, 1)">local</span> value = list[last]<br>     list[last] = <span style="color: rgba(0, 0, 255, 1)">nil</span><br>     list.last = last - <span style="color: rgba(128, 0, 128, 1)">1</span><br>     <span style="color: rgba(0, 0, 255, 1)">return</span> value<br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 5. 集合和包(Bag)：</span><br>&nbsp;&nbsp; &nbsp;在Lua中用table实现集合是非常简单的，见如下代码：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;reserved = { ["while"] = true, ["end"] = true, ["function"] = true, }</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;if not reserved["while"] then</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;--do something</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;end</span><br>&nbsp;&nbsp; &nbsp;在Lua中我们可以将包(Bag)看成MultiSet，与普通集合不同的是该容器中允许key相同的元素在容器中多次出现。下面的代码通过为table中的元素添加计数器的方式来模拟实现该数据结构，如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">function</span> insert(bag, element)<br>     bag[element] = (bag[element] <span style="color: rgba(0, 0, 255, 1)">or</span> <span style="color: rgba(128, 0, 128, 1)">0</span>) + <span style="color: rgba(128, 0, 128, 1)">1</span><br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <br> <span style="color: rgba(0, 0, 255, 1)">function</span> remove(bag, element)<br>     <span style="color: rgba(0, 0, 255, 1)">local</span> count = bag[element]<br>     bag[element] = (count <span style="color: rgba(0, 0, 255, 1)">and</span> count &gt; <span style="color: rgba(128, 0, 128, 1)">1</span>) <span style="color: rgba(0, 0, 255, 1)">and</span> count - <span style="color: rgba(128, 0, 128, 1)">1</span> <span style="color: rgba(0, 0, 255, 1)">or</span> <span style="color: rgba(0, 0, 255, 1)">nil</span><br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 6. StringBuilder：</span><br>&nbsp;&nbsp; &nbsp;如果想在Lua中将多个字符串连接成为一个大字符串的话，可以通过如下方式实现，如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> buff = <span style="color: rgba(128, 0, 0, 1)">""</span><br> <span style="color: rgba(0, 0, 255, 1)">for</span> line <span style="color: rgba(0, 0, 255, 1)">in</span> <span style="color: rgba(255, 0, 255, 1)">io.lines</span>() <span style="color: rgba(0, 0, 255, 1)">do</span><br>     buff = buff .. line .. <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 上面的代码确实可以正常的完成工作，然而当行数较多时，这种方法将会导致大量的内存重新分配和内存间的数据拷贝，由此而带来的性能开销也是相当可观的。事实上，在很多编程语言中String都是不可变对象，如Java，因此如果通过该方式多次连接较大字符串时，均会导致同样的性能问题。为了解决该问题，Java中提供了StringBuilder类，而Lua中则可以利用table的concat方法来解决这一问题，见如下代码：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> t = {}<br> <span style="color: rgba(0, 0, 255, 1)">for</span> line <span style="color: rgba(0, 0, 255, 1)">in</span> <span style="color: rgba(255, 0, 255, 1)">io.lines</span>() <span style="color: rgba(0, 0, 255, 1)">do</span><br>     t[#t + <span style="color: rgba(128, 0, 128, 1)">1</span>] = line .. <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(0, 0, 255, 1)">local</span> s = <span style="color: rgba(255, 0, 255, 1)">table.concat</span>(t)<br> <br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">concat方法可以接受两个参数，因此上面的方式还可以改为：</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">local</span> t = {}<br> <span style="color: rgba(0, 0, 255, 1)">for</span> line <span style="color: rgba(0, 0, 255, 1)">in</span> <span style="color: rgba(255, 0, 255, 1)">io.lines</span>() <span style="color: rgba(0, 0, 255, 1)">do</span><br>     t[#t + <span style="color: rgba(128, 0, 128, 1)">1</span>] = line<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(0, 0, 255, 1)">local</span> s = <span style="color: rgba(255, 0, 255, 1)">table.concat</span>(t,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>)</pre>
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,129 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Lua字符串库</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Lua字符串库</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 1. 基础字符串函数：</span><br>&nbsp;&nbsp; &nbsp;字符串库中有一些函数非常简单，如：<br>&nbsp;&nbsp; &nbsp;1). <span style="color: rgba(0, 0, 0, 1)">string.len(s) 返回字符串s的长度；</span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;2). string.rep(s,n) 返回字符串s重复n次的结果；</span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;3). string.lower(s) 返回s的副本，其中所有的大写都被转换为了小写形式，其他字符不变；</span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;4). string.upper(s) 和lower相反，将小写转换为大写；</span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;5). string.sub(s,i,j) 提取字符串s的第i个到第j个字符。Lua中，第一个字符的索引值为1，最后一个为-1，以此类推，如：</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.sub("[hello world]",2,-2))&nbsp; &nbsp; &nbsp; <span style="color: rgba(0, 128, 0, 1)">--输出hello world</span></span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;6). string.format(s,...) 返回格式化后的字符串，其格式化规则等同于C语言中printf函数，如：</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.format("pi = %.4f",math.pi)) <span style="color: rgba(0, 128, 0, 1)">--输出pi = 3.1416</span></span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;7). string.char(...) 参数为0到多个整数，并将每个整数转换为对应的字符。然后返回一个由这些字符连接而成的字符串，如：</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.char(97,98,99))&nbsp;<span style="color: rgba(0, 128, 0, 1)">--输出abc</span></span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;8). string.byte(s,i) 返回字符串s的第i个字符的Ascii值，如果没有第二个参数，缺省返回第一个字符的Ascii值。</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.byte("abc"))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: rgba(0, 128, 0, 1)">--输出97</span></span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.byte("abc",-1))&nbsp; <span style="color: rgba(0, 128, 0, 1)">--输出99</span></span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp;&nbsp; 由于字符串类型的变量都是不可变类型的变量，因此在所有和string相关的函数中，都无法改变参数中的字符串值，而是生成一个新值返回。</span><br><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp; &nbsp;2. 模式匹配函数：</span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;Lua的字符串库提供了一组强大的模式匹配函数，如find、match、gsub和gmatch。</span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;1). string.find函数：</span><br><span style="color: rgba(0, 0, 0, 1)">&nbsp;&nbsp; &nbsp;在目标字符串中搜索一个模式，如果找到，则返回匹配的起始索引和结束索引，否则返回nil。如：</span></p>
+
+<pre> s = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello world</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> i, j = <span style="color: rgba(255, 0, 255, 1)">string.find</span>(s,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>)  <br> <span style="color: rgba(255, 0, 255, 1)">print</span>(i, j)        <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出1  5</span><span style="color: rgba(0, 128, 0, 1)"><br></span> i, j = <span style="color: rgba(255, 0, 255, 1)">string.find</span>(s,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">l</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br> <span style="color: rgba(255, 0, 255, 1)">print</span>(i, j)        <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出3  3</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(255, 0, 255, 1)">string.find</span>(s,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">lll</span><span style="color: rgba(128, 0, 0, 1)">"</span>))  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出nil</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; string.find函数还有一个可选参数，它是一个索引，用于告诉函数从目标字符串的哪个位置开始搜索。主要用于搜索目标字符串中所有匹配的子字符串，且每次搜索都从上一次找到的位置开始。如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> t = {}<br> <span style="color: rgba(0, 0, 255, 1)">local</span> i = <span style="color: rgba(128, 0, 128, 1)">0</span><br> <span style="color: rgba(0, 0, 255, 1)">while</span> <span style="color: rgba(0, 0, 255, 1)">true</span> <span style="color: rgba(0, 0, 255, 1)">do</span><br>     i = <span style="color: rgba(255, 0, 255, 1)">string.find</span>(s,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">\n</span><span style="color: rgba(128, 0, 0, 1)">"</span>,i+<span style="color: rgba(128, 0, 128, 1)">1</span>)<br>     <span style="color: rgba(0, 0, 255, 1)">if</span> i == <span style="color: rgba(0, 0, 255, 1)">nil</span> <span style="color: rgba(0, 0, 255, 1)">then</span><br>         <span style="color: rgba(0, 0, 255, 1)">break</span><br>     <span style="color: rgba(0, 0, 255, 1)">end</span><br>     t[#t + <span style="color: rgba(128, 0, 128, 1)">1</span>] = i<br> <span style="color: rgba(0, 0, 255, 1)">end</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 2). string.match函数：<br>&nbsp;&nbsp; &nbsp;该函数返回目标字符串中和模式字符串匹配的部分。如：</p>
+
+<pre> date = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Today is 2012-01-01</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> d = <span style="color: rgba(255, 0, 255, 1)">string.match</span>(date,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">%d+\-%d+\-%d+</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br> <span style="color: rgba(255, 0, 255, 1)">print</span>(d)  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出2012-01-01</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 3). string.gsub函数：<br>&nbsp;&nbsp; &nbsp;该函数有3个参数，目标字符串、模式和替换字符串。基本用法是将目标字符串中所有出现模式的地方替换为替换字符串。如：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.gsub("Lua is cute","cute","great"))&nbsp; <span style="color: rgba(0, 128, 0, 1)">--输出Lua is great</span></span><br>&nbsp;&nbsp; &nbsp;该函数还有可选的第4个参数，即实际替换的次数。<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.gsub("all lii","l","x",1))&nbsp;<span style="color: rgba(0, 128, 0, 1)"> --输出axl lii</span></span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.gsub("all lii","l","x",2))&nbsp; <span style="color: rgba(0, 128, 0, 1)">--输出axx lii</span></span><br>&nbsp;&nbsp; &nbsp;函数string.gsub还有另一个结果，即实际替换的次数。<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;count = select(2, string.gsub(str," "," "))</span>&nbsp;<span style="color: rgba(0, 128, 0, 1)"> --输出str中空格的数量</span><br><br>&nbsp;&nbsp;&nbsp; 4). string.gmatch函数：<br>&nbsp;&nbsp; &nbsp;返回一个函数，通过这个返回的函数可以遍历到一个字符串中所有出现指定模式的地方。如：</p>
+
+<pre> words = {}<br> s = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello world</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> <span style="color: rgba(0, 0, 255, 1)">for</span> w <span style="color: rgba(0, 0, 255, 1)">in</span> <span style="color: rgba(255, 0, 255, 1)">string.gmatch</span>(s,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">%a+</span><span style="color: rgba(128, 0, 0, 1)">"</span>) <span style="color: rgba(0, 0, 255, 1)">do</span><br>     <span style="color: rgba(255, 0, 255, 1)">print</span>(w)<br>     words[#words + <span style="color: rgba(128, 0, 128, 1)">1</span>] = w<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出结果为：</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">hello</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">world</span></pre>
+
+<p><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 3. 模式：</span><br>&nbsp;&nbsp; &nbsp;下面的列表给出了Lua目前支持的模式元字符；</p>
+<table style="width: 600px" border="0" align="center">
+<tbody>
+<tr>
+<td style="text-align: center"><span style="font-size: 12px"><strong><span style="color: rgba(0, 0, 255, 1)">模式元字符</span></strong></span></td>
+<td style="text-align: center"><span style="font-size: 12px"><strong><span style="color: rgba(0, 0, 255, 1)">描述</span></strong></span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">.</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">所有字符</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%a</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">字母</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%c</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">控制字符</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%d</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">数字</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%l</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">小写字母</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%p</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">标点符号</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%s</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">空白字符</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%u</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">大写字母</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%w</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">字母和数字字符</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%x</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">十六进制数字</span></td>
+
+</tr>
+<tr>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">%z</span></td>
+<td><span style="color: rgba(0, 0, 255, 1); font-size: 12px">内部表示为0的字符</span></td>
+
+</tr>
+
+</tbody>
+
+</table>
+<p>&nbsp;&nbsp;&nbsp; 这些元字符的大写形式表示它们的补集，如%A，表示所有非字母字符。<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.gsub("hello, up-down!","%S","."))&nbsp;&nbsp; <span style="color: rgba(0, 128, 0, 1)">--输出hello..up.down. 4</span></span><br>&nbsp;&nbsp; &nbsp;上例中的4表示替换的次数。<br>&nbsp;&nbsp; &nbsp;除了上述元字符之外，Lua还提供了另外几个关键字符。如<strong><span style="color: rgba(0, 0, 255, 1)">：( ) . % + - * ? [ ] ^ $</span></strong><br>&nbsp;&nbsp; &nbsp;其中<strong><span style="color: rgba(0, 0, 255, 1)">%</span></strong>表示转义字符，如%.表示点(.)，%%表示百分号(%)。<br>&nbsp;&nbsp; &nbsp;方括号<strong><span style="color: rgba(0, 0, 255, 1)">[]</span></strong>表示将不同的字符分类，即可创建出属于自己的字符分类，如[%w_]表示匹配字符、数字和下划线。<br>&nbsp;&nbsp; &nbsp;横线(<strong><span style="color: rgba(0, 0, 255, 1)">-</span></strong>)表示连接一个范围，比如[0-9A-Z]<br>&nbsp;&nbsp; &nbsp;如果<strong><span style="color: rgba(0, 0, 255, 1)">^</span></strong>字符在方括号内，如[^\n]，表示除\n之外的所有字符，即表示方括号中的分类的补集。如果^不在方括号内，则表示以后面的字符开头，<strong><span style="color: rgba(0, 0, 255, 1)">$</span></strong>和它正好相反，表示以前面的字符结束。如：^Hello%d$，匹配的字符串可能为Hello1、Hello2等。<br>&nbsp;&nbsp; &nbsp;在Lua中还提供了4种用来修饰模式中的重复部分，如：<span style="color: rgba(0, 0, 255, 1)">+(重复1次或多次)、*(重复0次或多次)、-(重复0次或多次)和?(出现0或1次)</span>。如：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.gsub("one, and two; and three","%a+","word")) <span style="color: rgba(0, 128, 0, 1)">--输出word, word word; word word</span></span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;print(string.match("the number 1298 is even","%d+")) <span style="color: rgba(0, 128, 0, 1)">--输出1298</span></span><br>&nbsp;&nbsp; &nbsp;星号(<strong><span style="color: rgba(0, 0, 255, 1)">*</span></strong>)和横线(<strong><span style="color: rgba(0, 0, 255, 1)">-</span></strong>)的主要差别是，星号总是试图匹配更多的字符，而横线则总是试图匹配最少的字符。<br><br>&nbsp;<span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp; 4. 捕获(capture)：</span><br>&nbsp;&nbsp; &nbsp;捕获功能可根据一个模式从目标字符串中抽出匹配于该模式的内容。在指定捕获是，应将模式中需要捕获的部分写到一对圆括号内。对于具有捕获的模式，函数string.match会将所有捕获到的值作为单独的结果返回。即它会将目标字符串切成多个捕获到的部分。如：</p>
+
+<pre> pair = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">name = Anna</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> key,value = <span style="color: rgba(255, 0, 255, 1)">string.match</span>(pair,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">(%a+)%s*=%s*(%a+)</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br> <span style="color: rgba(255, 0, 255, 1)">print</span>(key,value)  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出name anna</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <br> date = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Today is 2012-01-02</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> y,m,d = <span style="color: rgba(255, 0, 255, 1)">string.match</span>(date,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">(%d+)\-(%d+)\-(%d+)</span><span style="color: rgba(128, 0, 0, 1)">"</span>)<br> <span style="color: rgba(255, 0, 255, 1)">print</span>(y,m,d)      <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出2012    01      02</span></pre>
+
+<p>&nbsp;&nbsp;&nbsp; 还可以对模式本身使用捕获。即<strong><span style="color: rgba(0, 0, 255, 1)">%1</span></strong>表示第一个捕获，以此类推，<strong><span style="color: rgba(0, 0, 255, 1)">%0</span></strong>表示整个匹配，如：</p>
+
+<pre> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(255, 0, 255, 1)">string.gsub</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello Lua</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">(.)(.)</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">%2%1</span><span style="color: rgba(128, 0, 0, 1)">"</span>))  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">将相邻的两个字符对调，输出为ehll ouLa</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(255, 0, 255, 1)">print</span>(<span style="color: rgba(255, 0, 255, 1)">string.gsub</span>(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello Lua!</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">%a</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">%0-%0</span><span style="color: rgba(128, 0, 0, 1)">"</span>))    <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出为h-he-el-ll-lo-o L-Lu-ua-a!</span></pre>
+
+<p><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 5. 替换：</span><br>&nbsp;&nbsp; &nbsp;string.gsub函数的第三个参数不仅可以是字符串，也可以是函数或table，如果是函数，string.gsub会在每次找到匹配时调用该函数，调用时的参数就是捕获到的内容，而该函数的返回值则作为要替换的字符串。当用一个table来调用时，string.gsub会用每次捕获到的内容作为key，在table中查找，并将对应的value作为要替换的字符串。如果table中不包含这个key，那么string.gsub不改变这个匹配。如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">function</span> expand(s)<br>     <span style="color: rgba(0, 0, 255, 1)">return</span> (<span style="color: rgba(255, 0, 255, 1)">string.gsub</span>(s,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">$(%w+)</span><span style="color: rgba(128, 0, 0, 1)">"</span>,))<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <br> name = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Lua</span><span style="color: rgba(128, 0, 0, 1)">"</span>; status = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">great</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> <span style="color: rgba(255, 0, 255, 1)">print</span>(expand(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">$name is $status, isn't it?</span><span style="color: rgba(128, 0, 0, 1)">"</span>))  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出 Lua is great, isn't it?</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(255, 0, 255, 1)">print</span>(expand(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">$othername is $status, isn't it?</span><span style="color: rgba(128, 0, 0, 1)">"</span>))  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出 $othername is great, isn't it?</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <br> <span style="color: rgba(0, 0, 255, 1)">function</span> expand2(s)<br>     <span style="color: rgba(0, 0, 255, 1)">return</span> (<span style="color: rgba(255, 0, 255, 1)">string.gsub</span>(s,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">$(%w+)</span><span style="color: rgba(128, 0, 0, 1)">"</span>,<span style="color: rgba(0, 0, 255, 1)">function</span>(n) <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(255, 0, 255, 1)">tostring</span>([n]) <span style="color: rgba(0, 0, 255, 1)">end</span>))<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <br> <span style="color: rgba(255, 0, 255, 1)">print</span>(expand2(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">print = $print; a = $a</span><span style="color: rgba(128, 0, 0, 1)">"</span>)) <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">输出 print = function: 002B77C0; a = nil</span></pre>
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

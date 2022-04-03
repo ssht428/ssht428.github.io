@@ -1,0 +1,142 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>userdata</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">userdata</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p>&nbsp;&nbsp;&nbsp; 在Lua中可以通过自定义类型的方式与C语言代码更高效、更灵活的交互。这里我们通过一个简单完整的示例来学习一下Lua中userdata的使用方式。需要说明的是，该示例完全来自于Programming in Lua。其功能是用C程序实现一个Lua的布尔数组，以提供程序的执行效率。见下面的代码和关键性注释。&nbsp;&nbsp;&nbsp;</p>
+
+<pre> #include &lt;lua.hpp&gt;
+ #include &lt;lauxlib.h&gt;
+ #include &lt;lualib.h&gt;
+ #include &lt;limits.h&gt;
+ 
+ <span style="color: rgba(0, 0, 255, 1)">#define</span> BITS_PER_WORD (CHAR_BIT * sizeof(int))
+ <span style="color: rgba(0, 0, 255, 1)">#define</span> I_WORD(i)     ((unsigned int)(i))/BITS_PER_WORD
+ <span style="color: rgba(0, 0, 255, 1)">#define</span> I_BIT(i)      (1 &lt;&lt; ((unsigned int)(i)%BITS_PER_WORD))
+ 
+ typedef <span style="color: rgba(0, 0, 255, 1)">struct</span><span style="color: rgba(0, 0, 0, 1)"> NumArray {
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> size;
+</span>     unsigned <span style="color: rgba(0, 0, 255, 1)">int</span> values[<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">];
+</span> <span style="color: rgba(0, 0, 0, 1)">} NumArray;
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> newArray(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">1. 检查第一个参数是否为整型。以及该参数的值是否大于等于1.</span>
+     <span style="color: rgba(0, 0, 255, 1)">int</span> n = luaL_checkint(L,<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     luaL_argcheck(L, n &gt;= <span style="color: rgba(128, 0, 128, 1)">1</span>, <span style="color: rgba(128, 0, 128, 1)">1</span>, <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">invalid size.</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     size_t nbytes = <span style="color: rgba(0, 0, 255, 1)">sizeof</span>(NumArray) + I_WORD(n - <span style="color: rgba(128, 0, 128, 1)">1</span>) * <span style="color: rgba(0, 0, 255, 1)">sizeof</span>(<span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">2. 参数表示Lua为userdata分配的字节数。同时将分配后的userdata对象压入栈中。</span>
+     NumArray* a = (NumArray*<span style="color: rgba(0, 0, 0, 1)">)lua_newuserdata(L,nbytes);
+</span>     a-&gt;size =<span style="color: rgba(0, 0, 0, 1)"> n;
+</span>     <span style="color: rgba(0, 0, 255, 1)">for</span> (<span style="color: rgba(0, 0, 255, 1)">int</span> i = <span style="color: rgba(128, 0, 128, 1)">0</span>; i &lt; I_WORD(n - <span style="color: rgba(128, 0, 128, 1)">1</span>); ++<span style="color: rgba(0, 0, 0, 1)">i)
+</span>         a-&gt;values[i] = <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">获取注册表变量myarray，该key的值为metatable。</span>
+     luaL_getmetatable(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">myarray</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">将userdata的元表设置为和myarray关联的table。同时将栈顶元素弹出。</span>
+     lua_setmetatable(L,-<span style="color: rgba(128, 0, 128, 1)">2</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> setArray(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">1. Lua传给该函数的第一个参数必须是userdata，该对象的元表也必须是注册表中和myarray关联的table。
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">否则该函数报错并终止程序。</span>
+     NumArray* a = (NumArray*)luaL_checkudata(L,<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">myarray</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span> index = luaL_checkint(L,<span style="color: rgba(128, 0, 128, 1)">2</span>) - <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">2. 由于任何类型的数据都可以成为布尔值，因此这里使用any只是为了确保有3个参数。</span>
+     luaL_checkany(L,<span style="color: rgba(128, 0, 128, 1)">3</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     luaL_argcheck(L,a != NULL,<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">'array' expected.</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     luaL_argcheck(L,<span style="color: rgba(128, 0, 128, 1)">0</span> &lt;= index &amp;&amp; index &lt; a-&gt;size,<span style="color: rgba(128, 0, 128, 1)">2</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">index out of range.</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">if</span> (lua_toboolean(L,<span style="color: rgba(128, 0, 128, 1)">3</span><span style="color: rgba(0, 0, 0, 1)">))
+</span>         a-&gt;values[I_WORD(index)] |=<span style="color: rgba(0, 0, 0, 1)"> I_BIT(index);
+</span>     <span style="color: rgba(0, 0, 255, 1)">else</span>
+         a-&gt;values[I_WORD(index)] &amp;= ~<span style="color: rgba(0, 0, 0, 1)">I_BIT(index);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> getArray(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     NumArray* a = (NumArray*)luaL_checkudata(L,<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">myarray</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 0, 255, 1)">int</span> index = luaL_checkint(L,<span style="color: rgba(128, 0, 128, 1)">2</span>) - <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span>     luaL_argcheck(L, a != NULL, <span style="color: rgba(128, 0, 128, 1)">1</span>, <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">'array' expected.</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     luaL_argcheck(L, <span style="color: rgba(128, 0, 128, 1)">0</span> &lt;= index &amp;&amp; index &lt; a-&gt;size,<span style="color: rgba(128, 0, 128, 1)">2</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">index out of range</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pushboolean(L,a-&gt;values[I_WORD(index)] &amp;<span style="color: rgba(0, 0, 0, 1)"> I_BIT(index));
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> getSize(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     NumArray* a = (NumArray*)luaL_checkudata(L,<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">myarray</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     luaL_argcheck(L,a != NULL,<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">'array' expected.</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pushinteger(L,a-&gt;<span style="color: rgba(0, 0, 0, 1)">size);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(0, 0, 255, 1)">int</span> array2string(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     NumArray* a = (NumArray*)luaL_checkudata(L,<span style="color: rgba(128, 0, 128, 1)">1</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">myarray</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pushfstring(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">array(%d)</span><span style="color: rgba(128, 0, 0, 1)">"</span>,a-&gt;<span style="color: rgba(0, 0, 0, 1)">size);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> <span style="color: rgba(0, 0, 0, 1)">}
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">static</span> luaL_Reg arraylib_f [] =<span style="color: rgba(0, 0, 0, 1)"> { 
+</span>     {<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">new</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, newArray},
+</span> <span style="color: rgba(0, 0, 0, 1)">    {NULL, NULL} 
+</span> <span style="color: rgba(0, 0, 0, 1)">}; 
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">static</span> luaL_Reg arraylib_m [] =<span style="color: rgba(0, 0, 0, 1)"> {
+</span>     {<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">set</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, setArray},
+</span>     {<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">get</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, getArray},
+</span>     {<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">size</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, getSize},
+</span>     {<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">__tostring</span><span style="color: rgba(128, 0, 0, 1)">"</span>, array2string}, <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">print(a)时Lua会调用该元方法。</span>
+ <span style="color: rgba(0, 0, 0, 1)">    {NULL, NULL} 
+</span> <span style="color: rgba(0, 0, 0, 1)">};
+</span> 
+ <span style="color: rgba(0, 0, 255, 1)">extern</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">C</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)"> __declspec(dllexport)
+</span> <span style="color: rgba(0, 0, 255, 1)">int</span> luaopen_testuserdata(lua_State*<span style="color: rgba(0, 0, 0, 1)"> L)
+</span> <span style="color: rgba(0, 0, 0, 1)">{
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">1. 创建元表，并将该元表指定给newArray函数新创建的userdata。在Lua中userdata也是以table的身份表现的。
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">这样在调用对象函数时，可以通过验证其metatable的名称来确定参数userdata是否合法。</span>
+     luaL_newmetatable(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">myarray</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     lua_pushvalue(L,-<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">2. 为了实现面对对象的调用方式，需要将元表的__index字段指向自身，同时再将arraylib_m数组中的函数注册到
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">元表中，之后基于这些注册函数的调用就可以以面向对象的形式调用了。
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">lua_setfield在执行后会将栈顶的table弹出。</span>
+     lua_setfield(L,-<span style="color: rgba(128, 0, 128, 1)">2</span>,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">__index</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">将这些成员函数注册给元表，以保证Lua在寻找方法时可以定位。NULL参数表示将用栈顶的table代替第二个参数。</span>
+ <span style="color: rgba(0, 0, 0, 1)">    luaL_register(L,NULL,arraylib_m);
+</span>     <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">这里只注册的工厂方法。</span>
+     luaL_register(L,<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">testuserdata</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">,arraylib_f);
+</span>     <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+</span> }</pre>
+
+<p><span style="color: rgba(128, 0, 128, 1); font-size: 15px">　　轻量级userdata： </span><br>　　之前介绍的是full userdata，Lua还提供了另一种轻量级userdata(light userdata)。事实上，轻量级userdata仅仅表示的是C指针的值，即(void*)。由于它只是一个值，所以不用创建。如果需要将一个轻量级userdata放入栈中，调用lua_pushlightuserdata即可。full userdata和light userdata之间最大的区别来自于相等性判断，对于一个full userdata，它只是与自身相等，而light userdata则表示为一个C指针，因此，它与所有表示同一指针的light userdata相等。再有就是light userdata不会受到垃圾收集器的管理，使用时就像一个普通的整型数字一样。</p>
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

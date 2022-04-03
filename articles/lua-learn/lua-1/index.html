@@ -1,0 +1,125 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Lua开篇</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Lua开篇</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<span style="color: rgba(255, 0, 0, 1); font-size: 14pt">
+	<strong>
+		一、简介：
+	</strong>
+</span>
+<br>
+<br>
+　　Lua作为目前最为流行的、免费轻量级嵌入式脚本语言，在很多工业级的应用程序中被广泛应用，如Adobe's Photoshop，甚至是在一些著名的游戏程序中也被大量使用，如星际。不仅如此，由于Lua具备很多特殊的优点，如语法简单(基于过程)、高效稳定(基于字节码)、可以处理复杂的数据结构、动态类型、以及自动内存管理(基于垃圾收集)等，因此在很多嵌入式设备和智能移动设备中，为了提高程序的灵活性、扩展性和高可配置性，一般都会选择Lua作为它们的脚本引擎，以应对各种因设备不同而带来的差异。
+<br>
+<br>
+<span style="font-size: 14pt">
+	<strong>
+		<span style="color: rgba(255, 0, 0, 1)">
+			二、主要优势：
+		</span>
+	</strong>
+</span>
+<br>
+<br>
+<span style="color: rgba(128, 0, 128, 1); font-size: 15px">
+	　　1. 高效性：
+</span>
+<br>
+　　作为一种脚本语言，Lua的高效是众所周知的，因此在实际应用中，很多大型程序都会考虑将代码中易变的部分用Lua来编写。这不但没有明显降低系统的运行效率，反而使程序的稳定性和可扩展性得到了显著的提升。
+<br>
+<br>
+<span style="font-size: 15px; color: rgba(128, 0, 128, 1)">
+	　　2. 可移植性：
+</span>
+<br>
+　　在官方网站中提供了基于多种平台的发布包，如Linux/Unix、Windows、Symbian和Pocket PC等。
+<br>
+&nbsp;&nbsp; &nbsp;
+<br>
+<span style="font-size: 15px; color: rgba(128, 0, 128, 1)">
+	　　3. 可嵌入性：
+</span>
+<br>
+　　在语言设计之初，Lua就被准确的定位为嵌入式脚本语言，因此Lua的设计者们为Lua提供了与其他编程语言之间的良好交互体验，这特别体现在和C/C++之间的交互上。对于其他语言，如Java和C#，也可以将Lua作为其嵌入式脚本引擎，并在代码中进行直接的交互。
+<br>
+&nbsp;&nbsp; &nbsp;
+<br>
+<span style="color: rgba(128, 0, 128, 1); font-size: 15px">
+	　　4. 简单强大：
+</span>
+<br>
+　　尽管是过程化脚本语言，但由于Lua的设计者们为Lua提供了meta-mechanisms机制，这不仅使Lua具备了一些基本的面向对象特征，如对象和继承，而且仍然保持了过程化语言所具有的语法简单的特征。
+<br>
+&nbsp;&nbsp; &nbsp;
+<br>
+<span style="color: rgba(128, 0, 128, 1); font-size: 15px">
+	　　5. 小巧轻便：
+</span>
+<br>
+　　在最新版本(5.2.0)的Lua中，仅仅包含了大约20000行的C语言代码，编译后的库文件大小约为240K左右，因此这对于很多资源有限的平台有着极强的吸引力。
+<br>
+&nbsp;&nbsp; &nbsp;
+<br>
+<span style="color: rgba(128, 0, 128, 1); font-size: 15px">
+	　　6. 免费开源：
+</span>
+<br>
+　　MIT Licence可以让Lua被免费的用于各种商业程序中。
+<br>
+&nbsp;&nbsp;&nbsp;
+<br>
+<span style="font-size: 14pt">
+	<strong>
+		<span style="color: rgba(255, 0, 0, 1)">
+			三、应用场景：
+		</span>
+	</strong>
+</span>
+<br>
+<br>
+　　1. 在很多时候，我们可以将Lua直接嵌入到我们的应用程序中，如游戏、监控服务器等。这样的应用方式对于程序的最终用户而言是完全透明的，但是对于程序本身，其扩展性将会得到极大的增强。
+<br>
+&nbsp;&nbsp; &nbsp;
+<br>
+　　2. 将Lua视为一种独立的脚本语言，通过它来帮助我们完成一些软件产品的辅助性工具的开发。比如在我们之前的数据分析产品中，我们通过编写Lua脚本，将每个用户不同格式的数据重新格式化为我们的软件平台能够读取的格式，之后再将格式化的后的数据加载到数据库中，或者是写入我们的分析引擎可以识别的数据分析文件中。这其中Lua仅仅用于文件格式的规格化过程，至于此后的操作，都是通过Lua调用我们的C语言导出函数来完成的。
+<br>
+&nbsp;&nbsp; &nbsp;
+<br>
+　　3. 将Lua应用于应用程序的动态配置部分。比如移动智能设备或嵌入式设备，它们的显示分辨率在很多情况下都是非标准的，如果我们为每一款设备都维护一套相关的配置信息，这无疑会加大我们程序的维护开销，如果我们将这段动态配置逻辑交由Lua脚本完成，那么这对于程序配置的灵活性而言，将会得到很大的提高。甚至可以是这样，运行在移动终端设备上的应用程序，在启动主窗体之前先和服务器建立连接，在服务器确认设备的各种参数后，再将和该设备显示相关的Lua脚本发送给设备客户端，这样客户端在得到Lua脚本之后，就可以立刻执行它以得到最新的动态配置信息。
+<br>
+<br>
+　　最后需要特别指出的是，学习Lua对于我们知识的系统性和完整性而言将是非常重要的一环，特别是对那些致力于软件架构设计和软件解决方案分析的高级软件专业人员而言就更是如此。因为在很多时候，如果我们能够很充分的理解和驾驭Lua，它不仅可以为我们的软件产品增色很多，而且也可以为我们技术人员带来一些意想不到的收获。
+<br>
+　　这是Lua系列的第一篇博客，此后还会有十几篇相关的博客陆续发布，请有兴趣的网友持续保持关注。如有问题，欢迎及时指正。好了，那就让我们一起开始Lua的学习之旅吧。:)
+</p>
+<br><a href="">   </a>
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

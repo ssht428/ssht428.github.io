@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>四、C++获得Lua的变量和Table的值</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">四、C++获得Lua的变量和Table的值</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-pid="jWwJztEl">上两篇文章都已经把Lua和C++函数的调用讲完了，这篇开始讲变量和Table的调用。</p><p data-pid="2bxB53KU">这篇文章主要是讲C++怎么调用获得Lua中的变量和Table的值，并且把lua中的值打印出来。</p><h2>一、直接上代码：</h2><p data-pid="9T0fPkes"><b>1、在Test.lua文件内添加如下代码：</b></p><pre><p data-pid="C_hFhwvP">print &#34;Hello, Lua Demo4!&#34;<br/></p><p data-pid="OFBwCSPe">name=&#34;my name is lua&#34;<br/></p><p data-pid="OZZI7plH">nameTable={sex = &#34;male&#34;, age=18}</p><p class="ztext-empty-paragraph"><br/></p></pre><p data-pid="8Wuj452p"><b>2、在LuaTest.cpp文件内添加如下代码：</b></p><pre><p data-pid="xoy_m7iY">#include &lt;stdio.h&gt;<br/></p><p data-pid="tCQpYwNx">extern &#34;C&#34; {</p><p data-pid="7l6Ia4GS">#include &#34;lua.h&#34;</p><p data-pid="NPsTOYuN">#include &#34;lualib.h&#34;</p><p data-pid="noilIE9K">#include &#34;lauxlib.h&#34;</p><p data-pid="0wlXrRlL">}</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="ySsB7wd_">lua_State* L;<br/></p><p data-pid="YqMaEhD8">int main(int argc, char *argv[])</p><p data-pid="630J7ynb">{</p><p data-pid="xzv4oS5Z">	L = lua_open();<br/></p><p data-pid="mk3uuVR6">	luaL_openlibs(L);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="MFya1-BI">	luaL_dofile(L, &#34;Test.lua&#34;);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="ubVQV02o">	lua_settop(L, 0);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="UCHTspQ-">      //code1</p><p data-pid="jnh7XH0K">	lua_getglobal(L, &#34;name&#34;);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="qr-8Gr0A">	//code2</p><p data-pid="2lYEYBwN">	int isStr = lua_isstring(L, -1);</p><p data-pid="rYeVNSEt">	if (isStr == 0)</p><p data-pid="dcNiSCbM">	{</p><p data-pid="VRtbl8Qg">		printf(&#34;stack top is not string\n&#34;);</p><p data-pid="OsY33klC">	}</p><p data-pid="DRfbZ_g9">	else</p><p data-pid="Ob_ZsaX9">	{</p><p data-pid="QszYWmi1">		printf(&#34;stack top is string\n&#34;);</p><p data-pid="G3mkMY3o">	}</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="D8p0kBka">	//code3</p><p data-pid="U-L1-9Ff">	const char* strName = lua_tostring(L, -1);</p><p data-pid="oY_gDDbh">	printf(&#34;name: %s\n&#34;, strName);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="3TWMH-QI">	//code4</p><p data-pid="UaZjkwP-">	lua_getglobal(L, &#34;nameTable&#34;);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="i1kjBJFd">	//code5</p><p data-pid="AvObw859">	lua_pushstring(L, &#34;sex&#34;);</p><p data-pid="hONNlM2w">	lua_gettable(L, -2);<br/></p><p data-pid="k7tqPo-C">	lua_pushstring(L, &#34;age&#34;);</p><p data-pid="OuqZ-Atu">	lua_gettable(L, -3);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="hOo0UGLK">	//code6</p><p data-pid="j4Ox2pOV">	int iAge = (int)lua_tointeger(L, -1);</p><p data-pid="VKivgCmc">	const char* strSex = lua_tostring(L, -2);</p><p data-pid="r1cNdddk">	printf(&#34;age: %d\n&#34;, iAge);</p><p data-pid="DH7PiYhi">	printf(&#34;sex: %s\n&#34;, strSex);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="xCYjzShR">       lua_close(L);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="9ffEdsuo">	/* pause */</p><p data-pid="W97P32PY">	printf(&#34;Press enter to exit...&#34;);</p><p data-pid="rnp8mmUy">	getchar();</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="vnni6zpL">	return 0;</p></pre><p data-pid="JULMUNqL">}</p><h2>二、代码分析，曾经讲过的函数这里就不做分析了，不明白的，可以去看前面的文章。</h2><p data-pid="OqW7Xrke"><b>code1、</b>因为luaL_dofile(L, &#34;Test.lua&#34;)已经把lua文件加载到内存并行执行了pcall函数。lua_getglobal(L, &#34;name&#34;)就是从全局表中找到name字段对应的值，并把它放到栈顶。可以参考栈的运行图Log index 1</p><p data-pid="TMg1dUVl"><b>code2、</b>lua_isstring(L, -1)是用来判断栈顶是否是string类型，还有一些类似的函数，可以自行查看API。</p><p data-pid="1OsWt2nh"><b>code3、</b>lua_tostring(L, -1)从栈顶取出值，然后赋值给一个变量使用。数据还在栈没，没有弹出。</p><p data-pid="NdTEnAXh"><b>code4、</b>lua_getglobal(L, &#34;nameTable&#34;)从全局表中找到nameTable对应的数据，并把他放到栈顶。此时栈内有两条数据了，看栈的运行图Log index 2</p><p data-pid="X3uS5WtM"><b>code5、</b>lua_pushstring是向栈内压如一个值。lua_gettable是从table中取出刚才压入的数据对应的值，并且替换掉sex。从栈的运行图Log index 3中，可以清晰的看出，数据已经从table中取出放到栈上了</p><p data-pid="OeXg_Djx"><b>code6、</b>分别使用系统函数 lua_tointeger和lua_tostring取出栈上面的值。最终栈内是四个值，如栈的运行图Log index 4。如果此时调用lua_settop(L, 0) 那么会清空栈内所有的数据。</p><h2>三、运行结果如下图</h2><br><img src="v2-ace6a4cf9569dc9ea876a085d46447cb_720w.jpg" width="501" height="177" ><h2>四、程序运行时栈内的变化情况如下图：</h2><br><img src="v2-423c769cf19b85c251e8af170b490633_720w.jpg" width="706" height="519" ><blockquote data-pid="LTOC5lnC"><i>项目测试源码地址在第一篇文章末尾：<a href="https://zhuanlan.zhihu.com/p/96403566" class="internal">炉石不传说：一、搭建C++调用Lua环境</a></i><br/><b>如果你感觉这篇文章对你有用，请随手点赞或评论，你的点赞操作可以让更多想学习的人更容易找到这篇文章，谢谢！</b></blockquote>
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,160 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Lua学习记录</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Lua学习记录</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>学习Lua主要是使用越疆(Dobot)机器人编程使用的脚本语言是Lua；
+<br>学习如何集成Lua到系统是当前正在开发的医疗机器人控制器中需要“自定义函数”功能，所以参考越疆和UR机器人，选择了Lua做为脚本解释器进行实现。
+<br>
+<br>本文主要是转载，记录学习Lua做的各个实验，包括Lua编程、集成到Qt界面进行解析；
+<br>参考链接： 
+<br><a href="https://www.cnblogs.com/orangeform/category/360139.html">随笔分类 - Lua编程</a>
+<br><a href="https://www.cnblogs.com/orangeform/archive/2012/07/30/2487201.html"> Step By Step(Lua目录) </a>
+
+<br>  之前已经说了很多，我目前的观点还是那样， 在嵌入式脚本中，Lua是最优秀、最高效的，如果您有不同的观点，欢迎指正并讨论，切勿吐槽。这个系列完全来自于《Programming in Lua》，您可以将其视为本人的读书笔记。相比而言，如果您已经掌握了Lua，但仍然不是非常熟练，请相信这个系列一定会给您的查阅以及知识点回顾带来一定程度上的方便，至少我是这样的。然而对于Lua的初学者，还是建议直接看《Programming in Lua》。最近正在做一个项目的架构设计，打算使用Lua作为插件和框架之间的粘合剂，以及硬件协议的自描述脚本，从而可以动态扩展平台可以支持的硬件设备。好了，不说太多了，还是看看下面的目录吧。
+<br>
+<br>目录如下：
+<br>
+<br><a href="lua-1/index.html">Lua开篇 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/17/2403210.html ">http://www.cnblogs.com/stephen-liu74/archive/2012/03/17/2403210.html  </a>
+<br>一、简介
+<br>二、主要优势
+<br>三、应用场景
+<br>
+<br><a href="lua-2/index.html"> Lua基础知识</a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/20/2407507.html ">http://www.cnblogs.com/stephen-liu74/archive/2012/03/20/2407507.html  </a>
+<br>一、基础知识
+<br>二、类型与值
+<br>
+<br><a href="lua-3/index.html"> Lua表达式和语句</a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/21/2409324.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/03/21/2409324.html </a>
+<br>一、表达式
+<br>二、语句
+<br>
+<br><a href="lua-4/index.html">Lua函数 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/21/2410300.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/03/21/2410300.html </a>
+<br>一、函数
+<br>二、深入函数
+<br>
+<br><a href="lua-5/index.html">Lua迭代器和泛型for </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/23/2413799.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/03/23/2413799.html </a>
+<br>
+<br><a href="lua-6/index.html">Lua编译执行与错误 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/23/2414417.html ">http://www.cnblogs.com/stephen-liu74/archive/2012/03/23/2414417.html  </a>
+<br>一、编译
+<br>二、C代码
+<br>三、错误
+<br>四、错误处理与异常
+<br>五、错误消息与追溯
+<br>
+<br><a href="lua-7/index.html">Lua数据结构 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/26/2417894.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/03/26/2417894.html </a>
+<br>
+<br><a href="lua-8/index.html">Lua数据持久化 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/26/2418572.html ">  http://www.cnblogs.com/stephen-liu74/archive/2012/03/26/2418572.html</a>
+<br>
+<br><a href="lua-9/index.html">Lua元表与元方法 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/27/2419435.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/03/27/2419435.html </a>
+<br>一、算术类的元方法
+<br>二、关系类的元方法
+<br>三、库定义的元方法
+<br>四、table访问的元方法
+<br>
+<br><a href="lua-10/index.html">Lua环境 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/28/2420931.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/03/28/2420931.html </a>
+<br>一、全局变量声明
+<br>二、非全局的环境(函数变量)
+<br>
+<br><a href="lua-11/index.html">Lua模块与包 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/28/2421283.html ">  http://www.cnblogs.com/stephen-liu74/archive/2012/03/28/2421283.html</a>
+<br>
+<br><a href="lua-12/index.html">Lua面向对象 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/28/2421656.html ">http://www.cnblogs.com/stephen-liu74/archive/2012/03/28/2421656.html  </a>
+<br>一、类
+<br>二、继承
+<br>三、私密性
+<br>
+<br><a href="lua-13/index.html">Lua弱引用table </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/29/2423565.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/03/29/2423565.html </a>
+<br>
+<br><a href="lua-14/index.html">Lua字符串库 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/30/2425233.html ">http://www.cnblogs.com/stephen-liu74/archive/2012/03/30/2425233.html  </a>
+<br>一、基础字符串函数
+<br>二、模式匹配函数
+<br>三、模式
+<br>四、捕获(capture)
+<br>五、替换
+<br>
+<br><a href="lua-15/index.html">Lua输入输出库 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/03/30/2426131.html ">http://www.cnblogs.com/stephen-liu74/archive/2012/03/30/2426131.html  </a>
+<br>一、简单模型
+<br>二、完整I/O模型
+<br>
+<br><a href="lua-16/index.html">Lua系统库 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/04/05/2432762.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/04/05/2432762.html </a>
+<br>一、日期和时间
+<br>二、其他系统调用
+<br>
+<br><a href="lua-17/index.html">Lua-C API简介 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/04/05/2433428.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/04/05/2433428.html </a>
+<br>一、基础知识
+<br>二、栈
+<br>三、C API中的错误处理
+<br>
+<br><a href="lua-18/index.html">C调用Lua </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/04/20/2460634.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/04/20/2460634.html </a>
+<br>一、基础
+<br>二、table操作
+<br>三、调用Lua函数
+<br>
+<br><a href="lua-19/index.html">Lua调用C函数 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/04/25/2469902.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/04/25/2469902.html </a>
+<br>一、C函数作为应用程序的一部分
+<br>二、C函数库成为Lua的模块
+<br>
+<br><a href="lua-20/index.html">编写C函数的技巧 </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/04/25/2470025.html ">http://www.cnblogs.com/stephen-liu74/archive/2012/04/25/2470025.html  </a>
+<br>一、数组操作
+<br>二、字符串操作
+<br>三、在C函数中保存状态
+<br>
+<br><a href="lua-21/index.html">userdata </a>
+<br><a href="http://www.cnblogs.com/stephen-liu74/archive/2012/04/26/2471389.html "> http://www.cnblogs.com/stephen-liu74/archive/2012/04/26/2471389.html </a>
+<br>
+<br>如果您觉得这个系列的博客可以让您有所收获，请保持持续的关注。
+<br>如果您发现博客中有明显的纰漏，欢迎指正。
+<br>如果您有意进行技术上的交流，可以通过邮件共同探讨()。
+<br>如果您有更好的建议或更好的实现方式，敬请赐教。
+<br>
+<br><a href="lua-22/index.html"> </a>
+<br><a href=" ">  </a>
+<br>
+
+</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

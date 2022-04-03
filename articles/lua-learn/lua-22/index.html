@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Lua与其他宿主语言交互原理剖析</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Lua与其他宿主语言交互原理剖析</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<blockquote data-pid="dOykiZLM"><b>题外话：</b>今天周末，刚好在家有时间就把我这次项目组内部分享的文章贴出来，分享给大家，同时也方便以后自己翻阅。</blockquote><h2><b>一、</b> <b>Lua简介</b></h2><p data-pid="N2TuOFnl"><b>        目标：</b>Lua语言本身是用C语言来编写开发的。当初设计Lua的目标就是想让Lua成为一个很容易嵌入其它语言中使用的语言。现有很多应用程序使用Lua作为自己的嵌入式脚本语言，以此来实现可配置性、可扩展性。</p><p data-pid="2EEZHgop"><b>        特性：</b>Lua是一种轻量语言，它的官方版本只包括一个精简的核心和最基本的库。源码是开源的，把源码编译之后仅仅一百多K，可以很方便的嵌入别的程序里。Lua同时也易于扩展，由<a href="https://baike.baidu.com/item/%E5%AE%BF%E4%B8%BB%E8%AF%AD%E8%A8%80" class=" wrap external" target="_720wlank" rel="nofollow noreferrer">宿主语言</a>(通常是<a href="https://baike.baidu.com/item/c%E8%AF%AD%E8%A8%80/105958?fromtitle=c&fromid=7252092" class=" wrap external" target="_720wlank" rel="nofollow noreferrer">C</a>或<a href="https://baike.baidu.com/item/C++" class=" wrap external" target="_720wlank" rel="nofollow noreferrer">C++</a>)开发和提供一些功能，Lua可以很容易的使用它们。</p><h2><b>二、</b> <b>lua和其他宿主语言交互的桥梁-栈</b></h2><p data-pid="joGTrWww"><b>        1、</b>Lua与其他宿主语言的交互，其实是通过C语言实现的虚拟机栈来实现的交互的。Lua在C函数和脚本函数之间创建了一种虚拟栈的结构，栈的元素代表一个Lua的值(table, string, nil等等8种基本类型)。Lua提供了一系列C API用于操作栈，比如将元素入栈，出栈，删除等等。在调用这些API之前，通常都需要将必须的值压入栈，在API调用结束后，再把结果从栈中取出。</p><p data-pid="2u2biZ5i"><b>       2、</b>接下来我们看一下Lua的虚拟机栈大概是个什么样子的。下面是我用mspaint手绘的一张图：</p><img src="v2-76176f7a8ae92368a87acdf34924aef4_720w.jpg" width="596" height="680" ><p data-pid="Gidxc0Ea"><b>从这张图中我们可以看出：</b></p><p data-pid="cHh98m2v">        1、栈的特性，先进后出。</p><p data-pid="HtBcdUQf">        2、栈中的每个元素可以为任意的lua的8个基本数据类型中的一种。</p><p data-pid="4VefbkSZ">        3、假如lua虚拟机栈中有lua的8个基本数据类型。那么从栈顶到战底用正数索引表示就是8到1，栈顶是8，栈底是1。用负数索引表示就是-1到-8，栈顶是-1，栈底是-8。</p><p data-pid="NqdlUdtS">       4、正数索引的好处就是，栈底永远是1。</p><p data-pid="wSTFYiG2">       5、 负数索引的好处就是，栈顶永远是-1。</p><h2><b>三、</b> <b>常用接口函数讲解</b></h2><p data-pid="9w3M_jwQ">       下面一张是宿主程序和Lua虚拟机交互图，这张图大致演示了，宿主语言怎么和Lua语言进行交互的。</p><img src="v2-8f6383cf2e2b745d6c0cfc212f95be25_720w.jpg" width="963" height="503" ><p data-pid="684MZpf6"><b>1、luaL_dofile(L, fn)</b></p><p data-pid="ut-QFoL1">         luaL_dofile函数实际上是执行了lua_load函数来加载lua文件，加载成功之后会编译一个代码块作为一个匿名函数放置在栈顶。</p><p data-pid="1zZET6m5">         然后调用lua_pcall执行匿名代码块，最终C代码才能调用lua中的函数和变量等等。</p><p data-pid="v9YONafk"><b>2、lua_call(lua_State *L, int nargs, int nresults) 和 lua_pcall(lua_State *L, int nargs, int nresults, int errfunc)</b></p><p data-pid="JLTbqcAf">         lua_call在无保护模式下面运行的，出错直接抛出异常。而lua_pcall在保护模式模型下运行的，出错获捕获异常信息。这两个函数调用之后都会把栈顶的数据弹出栈。</p><p data-pid="GvyXusX3"><b>3、lua_getfield(lua_State *L, int idx, const char *k)</b></p><p data-pid="wk92HTzQ">         lua_getfield是用来取出lua中的一个值，一般都是先找到table所在的位置索引index，然后传入key，取出值。  </p><p data-pid="nvAEf-Mq"> 1、lua_getfield(L, LUA_GLOBALSINDEX, key) </p><p data-pid="mKot46vO">         等价于 lua_getglobal(L,key) </p><p data-pid="LTObILac">         含义：从全局表中取出key字段的值</p><p data-pid="-CmQaeEf"> 2、lua_getfield(L, index, key) </p><p data-pid="q4iYJLUQ">         等价于：lua_pushstring(L,key) lua_gettable(L,index)</p><p data-pid="jPhCxeEv">         含义：从栈中找到table所在的位置索引index，然后取出key字段的值，并把值压入栈中。</p><p data-pid="J76ooktf"><b>4、lua_setfield(lua_State *L, int idx, const char *k)</b></p><p data-pid="1E_QmmTN">         lua_setfield用来改变lua中的一个值，一般都要先把改变的vlaue通过Push压入栈等（lua_pushstring、lua_pushnumber等），然后在调用lua_setfield来进行取值赋值操作</p><p data-pid="8buYJ6A-">         1、lua_setfield(L, LUA_GLOBALSINDEX, key)</p><p data-pid="_X7A2iM2">         等价于：lua_setglobal(L,key) </p><p data-pid="XpBQJdgN">         含义：从全局表中找到key，然后用栈顶的值value，覆盖掉key原来的值。最后把栈顶的值弹出栈。</p><p data-pid="eFKUp9vP"> 2、lua_setfield(L, index, key)</p><p data-pid="JewLz6Gq">         等价于：</p><p data-pid="wTwINs9L">         lua_pushstring(L, key);</p><p data-pid="V18UNtuF">         lua_pushnumber(L, value);</p><p data-pid="0oq8qjtZ">         lua_settable(L, index);</p><p data-pid="TaLluG7N">         含义：从栈中找到key，然后取出他在table中的位置索引index的值，用栈顶的值覆盖掉key原来的值。最后把栈顶的值弹出栈</p><h2><b>四、示例</b></h2><p data-pid="b0-30da4">        这次演示采用的宿主语言是C++。</p><p data-pid="BPPGchhw">        我们看一下第一个例子：<b>C++如何调用Lua的函数。</b></p><p data-pid="DNEHKBS9"><b>Lua码如下：</b></p><img src="v2-6730af1e4d3b8366e1b8f7746be81827_720w.jpg" width="420" height="146" class="content_image" width="420"/></noscript><img src="data:image/svg+xml;utf8,&lt;svg xmlns=&#39;http://www.w3.org/2000/svg&#39; width=&#39;420&#39; height=&#39;146&#39;&gt;&lt;/svg&gt;" width="420" height="146" class="content_image lazy" width="420" data-actualsrc="v2-6730af1e4d3b8366e1b8f7746be81827_720w.jpg"/></figure><p data-pid="SuJuUH29"><b>C++代码如下</b></p><img src="v2-a018a932752cdafb2fcd6a23c3f50d9f_720w.jpg" width="494" height="438" ><p data-pid="9HDm_KWU">运行结果：</p><img src="v2-62a689dfe570ac51000921affd9e7f29_720w.jpg" width="539" height="201" ><p data-pid="Xzuoetp2">带栈信息的运行结果：</p><img src="v2-f5ca03dfcc14c3447ccdd36a161aa028_720w.jpg" width="795" height="376" ><p data-pid="CDI-0IkK">第二个例子：<b>Lua如何调用C++中的函数</b></p><p data-pid="FxGDi1m3">Lua代码如下：</p><img src="v2-8ed33fedce5b340288964f0e66ac53e1_720w.jpg" width="516" height="204" ><p data-pid="7sofbxPa">C++代码如下：</p><img src="v2-29ebb519dcce08b6364df3d85603c0d4_720w.jpg" width="508" height="512" ><p data-pid="Ib_PQTyD">运行结果：</p><img src="v2-40ea586e8404a146d59b4a54517a8731_720w.jpg" width="566" height="180" ><p data-pid="w93pBin6">带栈信息的运行结果：</p><img src="v2-566e0e0c2a34d80100a5eb32ef5e4078_720w.jpg" width="816" height="447" ><p data-pid="Pu_FBrGV">第三个例子：<b>C++如何获得Lua中的变量和Table的值，同时修改他们。</b></p><p data-pid="rB_PN247">Lua代码如下：</p><img src="v2-19f41f2b73a1b57a0bdd7302ae60af8d_720w.jpg" width="504" height="465" ><p data-pid="BZKfR0pM">C++代码如下：</p><img src="v2-ec479c334701f688ae276d713168cc57_720w.jpg" width="657" height="752" ><p data-pid="VxTi82kC">运行结果：</p><img src="v2-102dfbb51e38f8324aedefe8ff2fea5c_720w.jpg" width="635" height="420" ><p data-pid="WebkaiSp"><b>        从这三个例子里面我们可以看出，lua和宿主语言的交互主要是通过栈来完成的。时刻要留言栈内哪些元素进栈了，那些元素出栈了，栈内还有哪些元素。</b></p>
+
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

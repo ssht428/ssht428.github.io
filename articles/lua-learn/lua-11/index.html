@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Lua模块与包</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Lua模块与包</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+&nbsp;&nbsp;&nbsp; 从Lua 5.1开始，我们可以使用require和module函数来获取和创建Lua中的模块。从使用者的角度来看，一个模块就是一个程序库，可以通过require来加载，之后便得到一个类型为table的全局变量。此时的table就像名字空间一样，可以访问其中的函数和常量，如：</p>
+
+<pre> <span style="color: rgba(255, 0, 255, 1)">require</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">mod</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> mod.foo()<br> <span style="color: rgba(0, 0, 255, 1)">local</span> m2 = <span style="color: rgba(255, 0, 255, 1)">require</span> <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">mod2</span><span style="color: rgba(128, 0, 0, 1)">"</span><br> <span style="color: rgba(0, 0, 255, 1)">local</span> f = mod2.foo<br> f()&nbsp;&nbsp; </pre>
+
+<p><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 1. require函数：</span><br>&nbsp;&nbsp; &nbsp;require函数的调用形式为require "模块名"。该调用会返回一个由模块函数组成的table，并且还会定义一个包含该table的全局变量。在使用Lua中的标准库时可以不用显示的调用require，因为Lua已经预先加载了他们。<br>&nbsp;&nbsp; &nbsp;require函数在搜素加载模块时，有一套自定义的模式，如：<br>&nbsp;&nbsp; &nbsp;<span style="color: rgba(0, 0, 255, 1)">?;?.lua;c:/windows/?;/usr/local/lua/?/?.lua</span><br>&nbsp;&nbsp; &nbsp;在上面的模式中，只有问号<strong><span style="color: rgba(0, 0, 255, 1)">(?)</span></strong>和分号<strong><span style="color: rgba(0, 0, 255, 1)">(;)</span></strong>是模式字符，分别表示require函数的参数(模块名)和模式间的分隔符。如：调用require "sql"，将会打开以下的文件：<br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;sql</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;sql.lua</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;c:/windows/sql</span><br><span style="color: rgba(0, 0, 255, 1)">&nbsp;&nbsp; &nbsp;/usr/local/lua/sql/sql.lua</span><br>&nbsp;&nbsp; &nbsp;Lua将require搜索的模式字符串放在变量<span style="color: rgba(0, 0, 255, 1)">package.path</span>中。当Lua启动后，便以环境变量<span style="color: rgba(0, 0, 255, 1)">LUA_PATH</span>的值来初始化这个变量。如果没有找到该环境变量，则使用一个编译时定义的默认路径来初始化。如果require无法找到与模块名相符的Lua文件，就会找C程序库。C程序库的搜索模式存放在变量<span style="color: rgba(0, 0, 255, 1)">package.cpath</span>中。而这个变量则是通过环境变量<span style="color: rgba(0, 0, 255, 1)">LUA_CPATH</span>来初始化的。<br>&nbsp;&nbsp;&nbsp; <br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp; &nbsp;2. 编写模块的基本方法：</span><br>&nbsp;&nbsp; &nbsp;见如下代码和关键性注释：</p>
+
+<pre> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">将模块名设置为require的参数，这样今后重命名模块时，只需重命名文件名即可。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">local</span> modname = ...<br> <span style="color: rgba(0, 0, 255, 1)">local</span> M = {}<br> [modname] = M<br> <br> M.i = {r = <span style="color: rgba(128, 0, 128, 1)">0</span>, i = <span style="color: rgba(128, 0, 128, 1)">1</span>}  <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">定义一个模块内的常量。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">function</span> M.new(r,i) <span style="color: rgba(0, 0, 255, 1)">return</span> {r = r, i = i} <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(0, 0, 255, 1)">function</span> M.add(c1,c2) <br>     <span style="color: rgba(0, 0, 255, 1)">return</span> M.new(c1.r + c2.r,c1.i + c2.i)<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <br> <span style="color: rgba(0, 0, 255, 1)">function</span> M.sub(c1,c2)<br>     <span style="color: rgba(0, 0, 255, 1)">return</span> M.new(c1.r - c2.r,c1.i - c2.i)<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">返回和模块对应的table。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">return</span> M</pre>
+
+<p>&nbsp;&nbsp; <br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 3. 使用环境：</span><br>&nbsp;&nbsp; &nbsp;仔细阅读上例中的代码，我们可以发现一些细节上问题。比如模块内函数之间的调用仍然要保留模块名的限定符，如果是私有变量还需要加local关键字，同时不能加模块名限定符。如果需要将私有改为公有，或者反之，都需要一定的修改。那又该如何规避这些问题呢？我们可以通过Lua的函数“全局环境”来有效的解决这些问题。见如下修改的代码和关键性注释：</p>
+
+<pre> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">模块设置和初始化。这一点和上例一致。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">local</span> modname = ...<br> <span style="color: rgba(0, 0, 255, 1)">local</span> M = {}<br> [modname] = M<br> <br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">声明这个模块将会用到的全局函数，因为在setfenv之后将无法再访问他们，</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">因此需要在设置之前先用本地变量获取。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">local</span> sqrt = mat.sqrt<br> <span style="color: rgba(0, 0, 255, 1)">local</span> io = io<br> <br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">在这句话之后就不再需要外部访问了。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(255, 0, 255, 1)">setfenv</span>(<span style="color: rgba(128, 0, 128, 1)">1</span>,M)<br> <br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">后面的函数和常量定义都无需模块限定符了。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> i = {r = <span style="color: rgba(128, 0, 128, 1)">0</span>, i = <span style="color: rgba(128, 0, 128, 1)">1</span>}<br> <span style="color: rgba(0, 0, 255, 1)">function</span> new(r,i) <span style="color: rgba(0, 0, 255, 1)">return</span> {r = r, i = i} <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(0, 0, 255, 1)">function</span> add(c1,c2) <br>     <span style="color: rgba(0, 0, 255, 1)">return</span> new(c1.r + c2.r,c1.i + c2.i)<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br>  <br> <span style="color: rgba(0, 0, 255, 1)">function</span> sub(c1,c2)<br>     <span style="color: rgba(0, 0, 255, 1)">return</span> new(c1.r - c2.r,c1.i - c2.i)<br> <span style="color: rgba(0, 0, 255, 1)">end</span><br> <span style="color: rgba(0, 128, 0, 1)">--</span><span style="color: rgba(0, 128, 0, 1)">返回和模块对应的table。</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 0, 255, 1)">return</span> M</pre>
+
+<p><br><span style="color: rgba(128, 0, 128, 1); font-size: 15px">&nbsp;&nbsp;&nbsp; 4. module函数：</span><br>&nbsp;&nbsp; &nbsp;在Lua 5.1中，我们可以用module(...)函数来代替以下代码，如：</p>
+
+<pre> <span style="color: rgba(0, 0, 255, 1)">local</span> modname = ...<br> <span style="color: rgba(0, 0, 255, 1)">local</span> M = {}<br> [modname] = M<br> <span style="color: rgba(255, 0, 255, 1)">package.loaded</span>[modname] = M<br>     <span style="color: rgba(0, 128, 0, 1)">--[[</span><span style="color: rgba(0, 128, 0, 1)"><br></span> <span style="color: rgba(0, 128, 0, 1)">    和普通Lua程序块一样声明外部函数。<br></span> <span style="color: rgba(0, 128, 0, 1)">    --</span><span style="color: rgba(0, 128, 0, 1)">]]</span><br> <span style="color: rgba(255, 0, 255, 1)">setfenv</span>(<span style="color: rgba(128, 0, 128, 1)">1</span>,M)</pre>
+
+<p>&nbsp;&nbsp;&nbsp; 由于在默认情况下，module不提供外部访问，必须在调用它之前，为需要访问的外部函数或模块声明适当的局部变量。然后Lua提供了一种更为方便的实现方式，即在调用module函数时，多传入一个package.seeall的参数，如：<br>&nbsp;&nbsp; &nbsp;<span style="color: rgba(0, 0, 255, 1)">module(...,package.seeall)</span>
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>二、C++调用Lua函数</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">二、C++调用Lua函数</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-pid="uLpw8d5j">上一篇文章中我们已经把测试环境搭建完毕了，接下来就用上次的项目工程进行代码测试和分析。</p><p data-pid="LGkt2uJV">这篇文章主要讲在C++中怎么调用Lua中的函数add，并且把lua中函数计算结果返回给C++，然后在打印出来计算的结果。</p><h2>一、直接上代码：</h2><p data-pid="jrqxever">1、在Test.lua文件内添加如下代码：</p><pre><p data-pid="aIS5bu1y">print &#34;Hello, Lua Demo2!&#34;</p><p data-pid="My9wUJHI">function add(x,y)</p><p data-pid="FGAntBiC">	return x + y</p><p data-pid="qEUbE2Qn">end</p></pre><p data-pid="B7MCyumV">2、在LuaTest.cpp文件内添加如下代码：</p><pre><p data-pid="WvgtGSRt">#include &lt;stdio.h&gt;</p><p data-pid="MhB_0jq6">extern &#34;C&#34; {</p><p data-pid="2YnapxQr">#include &#34;lua.h&#34;</p><p data-pid="Y3CDXLWz">#include &#34;lualib.h&#34;</p><p data-pid="vMsm1ks7">#include &#34;lauxlib.h&#34;</p><p data-pid="ziZN4HR5">}</p><p data-pid="kHx6SFDA">lua_State* L;</p><p data-pid="8EvPdrOr">int LuaAdd(int x,int y)</p><p data-pid="OKOsLHWd">{</p><p data-pid="K6u7BeZU">	int sum;</p><p data-pid="k4WTJIKU">//code5</p><p data-pid="d_aYgDa9">	lua_getglobal(L, &#34;add&#34;);</p><p data-pid="621dqC-G">//code6</p><p data-pid="lcUoBDVy">	lua_pushnumber(L, x);</p><p data-pid="ZpqzB2Rs">//code7</p><p data-pid="V0lDlHLY">	lua_pushnumber(L, y);</p><p data-pid="syC8xh5v">//code8</p><p data-pid="0hYJInSb">	lua_call(L, 2, 1);</p><p data-pid="Qb512tlv">//code9</p><p data-pid="mRzcEbcS">	sum = (int)lua_tointeger(L, -1);</p><p data-pid="t3wTign-">//code10</p><p data-pid="af9FheRF">	lua_pop(L, 1);</p><p data-pid="ZmuMepWv">	return sum;</p><p data-pid="VNIZ9a2N">}</p><p data-pid="cIAHxc00">int main(int argc, char *argv[])</p><p data-pid="Rnsd9H7R">{</p><p data-pid="unWHuDLx">	int sum;</p><p data-pid="l5LqYeXR">//code1</p><p data-pid="9RuzO977">	L = lua_open();</p><p data-pid="_pFlISTd">//code2</p><p data-pid="SEqFNTcV">	luaL_openlibs(L);</p><p data-pid="CrPwx-pT">//code3</p><p data-pid="jFp5tgOD">	luaL_dofile(L, &#34;Test.lua&#34;);</p><p data-pid="913QmeKw">//code4</p><p data-pid="LSqGdwNE">	sum = LuaAdd(2014, 15);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="0b6wRYqE">	printf(&#34;The sum is: %d\n&#34;, sum);</p><p data-pid="2jv9_Hea">//code11</p><p data-pid="CKq_qSE1">	lua_close(L);</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="3MTxl4Xa">	printf(&#34;Press enter to exit...&#34;);</p><p data-pid="I4D9iRdd">	getchar();</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="KwSd_0Cf">	return 0;</p><p data-pid="wMNDclJ8">}</p></pre><h2>二、代码分析</h2><p data-pid="sCDZJ21n"><b>code1，</b>通过lua_open()函数来创建一个lua的虚拟机L。Tips：在5.2以及后续版本中已经被废弃，请使用新的函数luaL_newstate和lua_newstate。lua_newstate可自定义内存分配函数，luaL_newstate使用默认的内存分配方式。</p><p data-pid="u4LrvAqc"><b>code2，</b>打开Lua中的所有标准库，如io库、string库等。</p><p data-pid="5wseOfUs"><b>code3</b>，luaL_dofile来加载和执行Test.lua脚本。参数是lua脚本的路径，由于我的lua文件就在工程根目录，所有直接写脚本名字就可以了。l</p><p data-pid="Z-y3VbKl">uaL_dofile函数的宏定义如下：</p><img src="v2-3cceb7cc4e7138109d6e8d1778630cc3_720w.png" width="591" height="57" ><p data-pid="yuvVTX1B"><b>Tips：</b>luaL_dofile函数实际上是执行了lua_load函数来加载lua文件，加载成功之后会编译一个代码块作为一个匿名函数放置在栈顶。然后调用lua_pcall执行匿名代码块，最终C代码才能调用lua中的函数和变量等等。</p><p data-pid="PCEMpvmB"><b>code4，</b>是执行我们自己写的一个加法函数。里面封装里对lua的一些调用</p><p data-pid="gdcLn1Wf"><b>code5</b>，lua_getglobal是从全局表中找到add字段对应的数据并把它送入栈顶。</p><p data-pid="YbMbxaOR">我们看一下lua_getglobal的定义，其实就是一个宏。</p><p data-pid="EEqii30F">通过lua_getfield把字段s送入到栈中。可参考栈的运行图Log index 1</p><img src="v2-0cb3d3dc020d719a7f3d9bfde66bf822_720w.png" width="560" height="57" ><img src="v2-29c44f11d4d228a55e446f8e5a506da4_720w.jpg" width="395" height="135" class="content_image" width="395"/></noscript><img src="data:image/svg+xml;utf8,&lt;svg xmlns=&#39;http://www.w3.org/2000/svg&#39; width=&#39;395&#39; height=&#39;135&#39;&gt;&lt;/svg&gt;" width="395" height="135" class="content_image lazy" width="395" data-actualsrc="v2-29c44f11d4d228a55e446f8e5a506da4_720w.jpg"/></figure><p data-pid="OWZRwJdE"><b>code6，</b>lua_pushnumber把参数x的值压如栈中。</p><p data-pid="EvDzhySs"><b>code7</b>，lua_pushnumber把参数y的值压如栈中。此时栈内有三条数据了。最终站内的变化，可以参考栈的运行图Log index 2</p><p data-pid="UZzShA_7"><b>code8，</b>lua_call函数告诉lua虚拟机 L，它传入2个参数，需要返回1个值。这时候lua主程序开始把栈内的2个参数数据取出来，然后传入到函数add中。然后执行函数add，最后把计算出来的结果返回到栈顶。执行玩lua_call之后，栈内只剩下一个函数的返回值了。效果如栈的运行图Log index 3</p><p data-pid="yqGjjkPE"><b>code9，</b>lua_tointeger是去栈顶取出返回值，然后复制给sum</p><p data-pid="uYIt-lUz"><b>code10，</b>是一个宏，用于从虚拟栈中弹出指定数量的元素，这里的1表示仅弹出栈顶的元素。弹出一个元素之后，此时栈内没有数据了。参考栈的运行图Log index 4</p><p data-pid="k_JUgxbv"><b>code11，</b>lua_close关闭当前虚拟L，并释放L所占用的动态内存。</p><h2>三、运行结果如下图</h2><img src="v2-4c58fce34986a9018ff23a19c1ed5b46_720w.jpg" width="468" height="179" ><h2>四、程序运行时栈内的变化情况如下图：</h2><img src="v2-d551f81a68bf8e30609aa58c307c2e49_720w.jpg" width="757" height="443" ><blockquote data-pid="J4hP5qdz"><i>项目测试源码地址在第一篇文章末尾：<a href="https://zhuanlan.zhihu.com/p/96403566" class="internal">炉石不传说：一、搭建C++调用Lua环境</a></i><br/><b>如果你感觉这篇文章对你有用，请随手点赞或评论，你的点赞操作可以让更多想学习的人更容易找到这篇文章，谢谢！</b></blockquote>
+
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
