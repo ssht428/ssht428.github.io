@@ -1,0 +1,128 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：45：保留边缘滤波后分割热成像图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：45：保留边缘滤波后分割热成像图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 此示例显示了如何使用热图像，演示了简单的分割。从热像仪获得热图像，热像仪检测电磁光谱的红外范围内的辐射。热像图捕获所有绝对零以上的物体发出的红外辐射。
+<br><strong>   </strong>
+<br>将热图像读取到工作空间中，并用于whos了解有关图像数据的更多信息。
+<pre>
+ I = imread('hotcoffee.tif');
+ ​
+ whos I
+   Name        Size              Bytes  Class     Attributes
+ ​
+   I         240x320            307200  single        
+</pre>
+<br>计算数据所占据的动态范围，以查看图像所占据的温度范围。该图像中的像素值对应于摄氏温度的实际温度。
+<pre>
+ range = [min(I(:)) max(I(:))]
+ range = 1x2 single row vector
+ ​
+    22.4729   77.3727
+</pre>
+<br>显示热图像。由于热图像是动态范围在0到1之外的单精度图像，因此必须使用imshow的自动缩放功能来显示图像。
+<pre>
+ figure
+ imshow(I,[])
+ colormap(gca,hot)
+ title('Original image')
+</pre>
+<br> <img src="v2-bcffde959599c682fd58445c83d240cb_720w.jpg" >
+<br>对图像进行保留边缘的平滑处理以消除噪点，同时仍保留图像细节。这是分割之前的预处理步骤。使用imguidedfilter函数可在自引导下进行平滑处理。'DegreeOfSmoothing'参数控制平滑量，并且取决于图像的范围。调整'DegreeOfSmoothing'以适应热成像图像的范围。显示过滤后的图像。
+<pre>
+ smoothValue = 0.01*diff(range).^2;
+ J = imguidedfilter(I,'DegreeOfSmoothing',smoothValue);
+ ​
+ figure
+ imshow(J,[])
+ colormap(gca,hot)
+ title('Guided filtered image')
+</pre>
+<br> <img src="v2-b963ceeba0739061e5a18cd677f4e38c_720w.jpg" >
+<br>确定用于细分的阈值。图像具有3个不同的区域-人，热的物体和背景-在强度（温度）上似乎很好地分开了。使用multithresh来计算图像的2级阈值。使用Otsu方法将图像分成3个区域。
+<pre>
+ thresh = multithresh(J,2)
+ thresh = 1x2 single row vector
+ ​
+    27.0018   47.8220
+</pre>
+<br>使用multithresh返回的值对图像进行阈值处理。阈值为27和48摄氏度。第一阈值将背景强度与人分开，第二阈值将人与热物体分开。分割图像并填充孔。
+<pre>
+ L = imquantize(J,thresh);
+ L = imfill(L);
+ ​
+ figure
+ imshow(label2rgb(L))
+ title('Label matrix from 3-level Otsu')
+</pre>
+<br> <img src="v2-3f4472ebb4181624184989cc20b77f01_720w.jpg" >
+
+<br>在图像中的前景区域周围绘制一个边界框，并将该区域的平均温度值放入该框中。该示例假定最大的区域是背景。使用regionprops函数获取有关分割图像中区域的信息。
+<pre>
+ props = regionprops(L,I,{'Area','BoundingBox','MeanIntensity','Centroid'});
+ ​
+ % Find the index of the background region.
+ [~,idx] = max([props.Area]);
+ ​
+ figure
+ imshow(I,[])
+ colormap(gca,hot)
+ title('Segmented regions with mean temperature')
+ for n = 1:numel(props)
+     % If the region is not background
+     if n ~= idx
+         % Draw bounding box around region
+        rectangle('Position',props(n).BoundingBox,'EdgeColor','c')
+        
+        % Draw text displaying mean temperature in Celsius
+        T = [num2str(props(n).MeanIntensity,3) ' \circ C'];
+        text(props(n).Centroid(1),props(n).Centroid(2),T,...
+            'Color','c','FontSize',12)
+     end
+ end
+</pre>
+<br> <img src="v2-1b2722b3559c62925ae631cf1bedc194_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
