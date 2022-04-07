@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：54：使用形态学开操作提取大图像的特征</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：54：使用形态学开操作提取大图像的特征</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 您可以使用形态学开操作从图像中删除小对象，同时保留图像中较大对象的形状和大小。
+
+<br> 在此示例中，您使用电路板图像上的形态学开操作从图像中去除所有电路线。输出图像仅包含微芯片的矩形形状。
+<br><strong> 一步打开图像  </strong>
+<br>您可以使用imopen函数一步执行腐蚀和膨胀。
+
+<br>将图像读入工作区并显示。
+<pre>
+BW1 = imread('circbw.tif');
+figure
+imshow(BW1)
+</pre>
+<br> <img src="v2-cd886676c3b74b628d40e47a23407b7e_720w.jpg" >
+
+<br>创建一个结构元素。结构元素应该足够大以在腐蚀图像时除去线条，但又不应当大至足以除去矩形。它应该全部为1的元素组成，因此它会除去前景像素的大连续块以外的所有内容。
+<pre>
+SE = strel('rectangle',[40 30]);
+</pre>
+<br>对图像开操作。
+<pre>
+BW2 = imopen(BW1, SE);
+imshow(BW2);
+</pre>
+<br> <img src="v2-f319faf3405ce563ca8bcc8da474d2e1_720w.jpg" >
+<br><strong>  通过执行腐蚀然后膨胀来开操作图像 </strong>
+<br>您也可以顺序执行腐蚀和膨胀。
+
+<br>用结构元素腐蚀图像。这将删除所有线条，但也会缩小矩形。
+<pre>
+BW3 = imerode(BW1,SE);
+imshow(BW3)
+</pre>
+<br> <img src="v2-6192a932ab5ce07f4853f8a0469fb6d4_720w.jpg" >
+<br>要将矩形恢复为原始大小，请使用相同的结构元素SE来放大腐蚀的图像。
+<pre>
+BW4 = imdilate(BW3,SE);
+imshow(BW4)
+</pre>
+<br> <img src="v2-f319faf3405ce563ca8bcc8da474d2e1_720w.jpg" >
+<br>通过顺序执行操作，您可以灵活地更改结构元素。创建一个不同的结构元素，并使用新的结构元素来膨胀腐蚀的图像。
+<pre>
+SE = strel('diamond',15);
+BW5 = imdilate(BW3,SE);
+imshow(BW5)
+</pre>
+
+<br> <img src="v2-7a2117ff786505ce861935de3fcc9e9c_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
