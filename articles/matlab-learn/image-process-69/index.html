@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：69：绘制ROI后使用Wait函数</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：69：绘制ROI后使用Wait函数</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何定义一个自定义等待函数，该函数会阻止 MATLAB命令行，直到您完成矩形的定位。
+
+<br>显示图像。
+<pre>
+imshow('pears.png')
+</pre>
+<br>在图像的左上角绘制一个矩形 ROI。
+<pre>
+h = drawrectangle('Position',[1 1 100 100]);
+</pre>
+<br> <img src="v2-e84c1a5c30f90e092046d8b9e1aa21c2_720w.jpg" >
+<br>在您与矩形交互时，使用自定义等待函数阻止 MATLAB 命令行。这个例子指定了一个被调用的函数customWait（在例子的最后定义）。
+
+当命令行被阻止时，调整矩形的大小和位置，使其包含一个梨。双击矩形以恢复customWait函数的执行。该函数返回矩形的最终位置。
+<pre>
+pos = customWait(h)
+</pre>
+<br> <img src="v2-576189b8f051bffc12be800e8ad4c345_720w.jpg" >
+<pre>
+pos = 1×4
+​
+  262.0000   36.0000  144.0000  145.0000
+</pre>
+<br>这是在您单击 ROI 时阻止程序执行的自定义等待函数。当您完成与 ROI 的交互后，该函数会返回 ROI 的位置。
+<pre>
+function pos = customWait(hROI)
+​
+% Listen for mouse clicks on the ROI
+l = addlistener(hROI,'ROIClicked',@clickCallback);
+​
+% Block program execution
+uiwait;
+​
+% Remove listener
+delete(l);
+​
+% Return the current position
+pos = hROI.Position;
+​
+end
+</pre>
+<br>当您双击 ROI 时，此单击回调函数将恢复程序执行。请注意，事件数据作为images.roi.ROIClickedEventData对象传递给回调函数，这使您可以定义响应不同类型操作的回调函数。例如，当您在按住 Shift 键的同时单击 ROI 或单击 ROI 的特定部分（例如标签）时，您可以定义回调函数以恢复程序执行。
+<pre>
+function clickCallback(~,evt)
+​
+if strcmp(evt.SelectionType,'double')
+    uiresume;
+end
+​
+end
+</pre>
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
