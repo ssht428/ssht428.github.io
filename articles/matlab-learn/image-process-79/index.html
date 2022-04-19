@@ -1,0 +1,134 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：79：使用纹理过滤器的纹理分割</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：79：使用纹理过滤器的纹理分割</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例展示了如何根据纹理识别和分割区域。
+<br><strong> 读取图像  </strong>
+<br>读取并显示袋子上纹理图案的灰度图像。
+<pre>
+I = imread('bag.png');
+imshow(I)
+title('Original Image')
+</pre>
+<br> <img src="v2-6a7e2d0abe994e19be7e3590ce0df766_720w.jpg" >
+<br><strong> 创建纹理图像  </strong>
+<br>使用entropyfilt创建一个纹理图像。函数entropyfilt返回一个数组，其中每个输出像素包含输入图像I中相应像素周围 9×9 邻域的熵值。熵是随机性的统计量度。
+<br>还可以使用stdfilt和rangefilt来实现类似的分割结果。为了与局部熵的纹理图像进行比较，创建纹理图像S和R，分别显示局部标准偏差和局部范围。
+<pre>
+E = entropyfilt(I);
+S = stdfilt(I,ones(9));
+R = rangefilt(I,ones(9));
+</pre>
+<br>利用rescale重新缩放纹理图像E和S，使得像素值在范围[0，1]，成为预期的图像数据double类型。
+<pre>
+Eim = rescale(E);
+Sim = rescale(S);
+</pre>
+<br>在蒙太奇中显示三个纹理图像。
+<pre>
+montage({Eim,Sim,R},'Size',[1 3],'BackgroundColor','w',"BorderSize",20)
+title('Texture Images Showing Local Entropy, Local Standard Deviation, and Local Range')
+</pre>
+<br> <img src="v2-3c268185b9d49e4885e26742566a1b07_720w.jpg" >
+<br><strong> 为底部纹理创建蒙版  </strong>
+<br>这个例子继续处理熵纹理图像Eim。可以对其他两种纹理图像使用形态学函数重复类似的过程，以获得类似的分割结果。
+
+对重新缩放的图像Eim设置阈值以分割纹理。选择 0.8 的阈值，是因为它大致是沿纹理边界的像素强度值。
+<pre>
+BW1 = imbinarize(Eim,0.8);
+imshow(BW1)
+title('Thresholded Texture Image')
+</pre>
+<br> <img src="v2-0fe960dee8098826e79a26cd77805f1e_720w.jpg" >
+<br>二值图像BW1中的分割对象是白色的。如果比较BW1和I，可以注意到顶部纹理过度分割（多个白色物体），底部的纹理几乎整体分割了。使用bwareaopen删除顶部纹理中的对象。
+<pre>
+BWao = bwareaopen(BW1,2000);
+imshow(BWao)
+title('Area-Opened Texture Image')
+</pre>
+<br> <img src="v2-051ae89fd2da07bbb93cf024726c092e_720w.jpg" >
+<br>使用imclose平滑边缘，并在BWao的对象中关闭所有开放的洞。使用与entropyfilt一样的 9×9 邻域。
+<pre>
+nhood = ones(9);
+closeBWao = imclose(BWao,nhood);
+imshow(closeBWao)
+title('Closed Texture Image')
+</pre>
+<br> <img src="v2-8bf1d67fee87b372b54f9844c6ce8443_720w.jpg" >
+<br>使用imfill填充closeBWao上对象的空洞。底部纹理的蒙版并不完美，因为蒙版没有延伸到图像的底部。但是，可以使用蒙版来分割纹理。
+<pre>
+mask = imfill(closeBWao,'holes');
+imshow(mask);
+title('Mask of Bottom Texture')
+</pre>
+<br> <img src="v2-fea3e3b089d4fda873c09b794d7322d3_720w.jpg" >
+<br><strong> 使用蒙版分割纹理  </strong>
+<br>将纹理分成两个不同的图像。
+<pre>
+textureTop = I;
+textureTop(mask) = 0;
+textureBottom = I;
+textureBottom(~mask) = 0;
+montage({textureTop,textureBottom},'Size',[1 2],'BackgroundColor','w',"BorderSize",20)
+title('Segmented Top Texture (Left) and Segmented Bottom Texture (Right)')
+</pre>
+<br> <img src="v2-e40f8eb8851a43e2eb208bc0dab4b733_720w.jpg" >
+<br><strong> 显示分割结果  </strong>
+<br>创建一个标签矩阵，其中蒙版为false的标签为1，蒙版为 true的标签为2。在原始图像上叠加标签矩阵。
+<pre>
+L = mask+1;
+imshow(labeloverlay(I,L))
+title('Labeled Segmentation Regions')
+</pre>
+<br> <img src="v2-afb3f0f7ff955521016625c82069eaa3_720w.jpg" >
+<br>用青色勾勒出两个纹理之间的边界。
+<pre>
+boundary = bwperim(mask);
+imshow(labeloverlay(I,boundary,"Colormap",[0 1 1]))
+title('Boundary Between Textures')
+</pre>
+<br> <img src="v2-61dbb21a2c5bbeecc12f2c6c575962eb_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
