@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：80：在图像分割器中使用阈值分割图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：80：在图像分割器中使用阈值分割图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例显示如何使用阈值在Image Segmenter应用程序中分割图像。Image Segmenter的应用支持三种不同类型的阈值：全局，手动和适应性。
+
+<br> Image Segmenter应用程序支持多种不同的分割方法；使用该应用程序可以是一个迭代过程。可以尝试多种不同的方法，直到达到想要的结果。
+<br><strong>  将图像加载到图像分割器中 </strong>
+<br>打开Image Segmenter应用程序并加载要分割的图像。该应用程序可以打开任何可由imread读取的图像。
+
+<br>对于本示例，首先将图像读入工作区。此示例使用膝盖的 MRI 图像。目标是创建一个蒙版图像，从图像中的软组织中分割骨骼。
+<pre>
+I = dicomread('knee1');
+knee = mat2gray(I);
+</pre>
+<br>从 MATLAB® 工具条中，打开Image Segmenter应用程序。在应用程序选项卡上的图像处理和计算机视觉部分，单击Image Segmenter图标  <img src="v2-1771d00aa4742d98f7a67740f387809e_720w.jpg.png" >
+<br> 在应用程序工具条上，单击加载，然后选择从工作区加载图像。在从工作区导入对话框中，选择您读入工作区的图像。Image Segmenter会显示您所选择的图像。
+<br> <img src="v2-9e7783729aac026ee34dd9c049a5160e_720w.jpg" >
+<br>还可以使用imageSegmenter命令在Image Segmenter应用程序中打开图像：
+<pre>
+imageSegmenter(knee);
+</pre>
+<br>加载图像后，您可以选择加载现有的二进制蒙版。例如，您之前可能已经在Color Thresholder应用程序中创建了 RGB 图像的蒙版，并且想要优化分割。要加载现有蒙版，请单击加载蒙版。分割蒙版图像必须是与您要分割的图像大小相同的逻辑图像。
+<br><strong> 使用阈值分割图像  </strong>
+<br>单击Image Segmenter应用程序工具条的 Create Mask 部分中的Threshold。该应用程序在阈值选项卡中显示阈值图像。默认情况下，应用程序使用全局阈值。
+<br> <img src="v2-2fc2d66b723f6a90d1de437fb4da4916_720w.jpg" >
+<br>还可以选择手动或自适应阈值。每个阈值选项都支持可用于微调阈值的控件。例如，对于手动阈值，您可以使用滑块选择阈值。通过自适应阈值，您可以使用滑块选择灵敏度。尝试每个选项以查看哪种阈值方法执行最佳分割。
+
+<br>下图显示了使用手动阈值的结果。
+<br> <img src="v2-c06ae82b90d71e1b68d4ccb87f70e0a6_720w.jpg" >
+<br>膝部图像在前景和背景之间没有明确定义的像素强度差异，并且阈值处理似乎不是分割该图像的最佳选择。
+
+<br>要保存分段，请单击创建蒙版。如果您想在Image Segmenter应用程序中尝试另一种分割方法，请单击取消返回主分割应用程序窗口。
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
