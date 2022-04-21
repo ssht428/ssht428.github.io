@@ -1,0 +1,102 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：07：对图像序列执行操作</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：07：对图像序列执行操作</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何对图像序列执行操作。该示例创建一个图像数组，并将整个数组传递给stdfilt函数，以便对序列中的每个图像执行标准偏差过滤。
+
+<br> 创建一个文件名数组。
+<pre>
+ fileFolder = fullfile(matlabroot,'toolbox','images','imdata');
+ dirOutput = dir(fullfile(fileFolder,'AT3_1m4_*.tif'));
+ fileNames = {dirOutput.name}'
+ numFrames = numel(fileNames)
+ fileNames =
+ ​
+   10x1 cell array
+ ​
+     {'AT3_1m4_01.tif'}
+     {'AT3_1m4_02.tif'}
+     {'AT3_1m4_03.tif'}
+     {'AT3_1m4_04.tif'}
+     {'AT3_1m4_05.tif'}
+     {'AT3_1m4_06.tif'}
+     {'AT3_1m4_07.tif'}
+     {'AT3_1m4_08.tif'}
+     {'AT3_1m4_09.tif'}
+     {'AT3_1m4_10.tif'}
+ ​
+ ​
+ numFrames =
+ ​
+     10
+</pre>
+<br>预分配一个m × n × p数组并将图像读取到该数组中。
+<pre>
+ I = imread(fileNames{1});
+ sequence = zeros([size(I) numFrames],class(I));
+ sequence(:,:,1) = I;
+ ​
+ for p = 2:numFrames
+     sequence(:,:,p) = imread(fileNames{p});
+ end
+</pre>
+<br>处理序列中的每个图像，执行标准偏差过滤。请注意，如果要stdfilt函数与图像序列一起使用，必须指定nhood参数，传递一个二维邻域。
+<pre>
+ sequenceNew = stdfilt(sequence,ones(3));
+</pre>
+<br>查看每个输入图像及其处理后的图像。
+<pre>
+ figure;
+ for k = 1:numFrames
+       imshow(sequence(:,:,k));
+       title(sprintf('Original Image # %d',k));
+       pause(1);
+       imshow(sequenceNew(:,:,k),[]);
+       title(sprintf('Processed Image # %d',k));
+       pause(1);
+ end
+</pre>
+<br> <img src="v2-ba697fda03ab5375c3393666beff4ec9_720w.jpg" >
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

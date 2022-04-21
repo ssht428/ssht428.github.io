@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：09：在RGB和HSV颜色空间之间转换</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：09：在RGB和HSV颜色空间之间转换</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何通过将彩色图像转换为HSV颜色空间来调整其饱和度。该示例显示了合成图像的单独HSV颜色平面（色相，饱和度和值）。
+<br><strong> 将RGB图像转换为HSV图像  </strong>
+<br>将RGB图像读入工作区。显示图像。
+<pre>
+ RGB = imread('peppers.png');
+ imshow(RGB)
+</pre>
+<br> <img src="v2-46a219b9f95bfdc9c7206efc70a293d1_720w.jpg" >
+<br>将图像转换为HSV颜色空间。
+<pre>
+ HSV = rgb2hsv(RGB);
+</pre>
+<br>处理HSV图像。本示例通过将S通道乘以比例因子来增加图像的饱和度。
+<pre>
+ [h,s,v] = imsplit(HSV);
+ saturationFactor = 2;
+ s_sat = s*saturationFactor;
+ HSV_sat = cat(3,h,s_sat,v);
+</pre>
+<br>将已处理的HSV图像转换回RGB颜色空间。显示新的RGB图像。处理后的图像中的颜色更加鲜艳。
+<pre>
+ RGB_sat = hsv2rgb(HSV_sat);
+ imshow(RGB_sat)
+</pre>
+<br> <img src="v2-82cc85766394c4923cd6fdacd3155343_720w.jpg" >
+<br><strong> 仔细研究HSV色彩空间  </strong>
+<br>为了更仔细地检查HSV颜色空间，创建一个合成RGB图像。
+<pre>
+ RGB = reshape(ones(64,1)*reshape(jet(64),1,192),[64,64,3]);
+</pre>
+<br>将合成RGB图像转换为HSV色彩空间。
+<pre>
+ HSV = rgb2hsv(RGB);
+</pre>
+<br>将合成图像的HSV版本划分为其组成平面：色相，饱和度和值。
+<pre>
+ [h,s,v] = imsplit(HSV);
+</pre>
+<br>显示带有原始图像的各个HSV彩色平面。
+<pre>
+ montage({h,s,v,RGB},"BorderSize",10,"BackgroundColor",'w');
+</pre>
+<br> <img src="v2-1489b614019d50bd152eeefbc534aa9d_720w.jpg" >
+<br>如上图中的色相平面图像所示，色相值从高到低呈线性过渡。如果将色相平面图像与原始图像进行比较，则可以看到深蓝色阴影的值最高，而深红色阴影的值最低。（如前所述，在色相标度的两端都有红色值。为避免混淆，样本图像仅使用色相范围开始处的红色值。）
+
+<br>可以将饱和度视为颜色的纯度。如饱和度平面图像所示，具有最高饱和度的颜色具有最高值，并表示为白色。在饱和度图像的中央，请注意各种灰色阴影。这些对应于多种颜色；青色，绿色和黄色阴影是真实颜色的混合。值大致等于亮度，您会注意到值平面的最亮区域对应于原始图像中的最亮颜色。
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,130 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Matlab作图实例学习记录</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Matlab作图实例学习记录</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文主要是转载，记录学习matlab做的各个实验。
+<br>参考链接： 
+<br><a href="https://zhuanlan.zhihu.com/p/264796674">Matlab作图实例 - 吃小羊 - 知乎</a>
+<br>MATLAB图形函数包括二维和三维绘图函数，用于以可视化形式呈现数据和通信的结果。以交互方式或编程方式自定义绘图。
+<br><strong>二维图和三维图</strong>
+<br>绘制连续、离散、曲面以及三维体数据图
+<br><strong>格式和注释</strong>
+<br>添加标签、调整颜色、定义坐标轴范围、应用光照或透明度、设置照相机视图
+<br><strong>图像</strong>
+<br>读取、写入、显示和修改图像
+<br><strong>打印和保存</strong>
+<br>打印和导出为标准文件格式
+<br><strong>图形对象</strong>
+<br>通过设置底层对象的属性自定义图形
+<br><strong>图形性能</strong>
+<br>优化代码以改善性能
+<br>目录如下：
+<br>
+<br><a href="image-plot-1/index.html">吃小羊：MATLAB作图实例：1：二维折线图</a></a>
+<br><a href="image-plot-2/index.html">吃小羊：MATLAB作图实例：2：添加图表的标题和轴标签</a>
+<br><a href="image-plot-3/index.html">吃小羊：MATLAB作图实例：3：多图合并</a>
+<br><a href="image-plot-4/index.html">吃小羊：MATLAB作图实例：4：指定轴边界</a>
+<br><a href="image-plot-5/index.html">吃小羊：MATLAB作图实例：5：双轴图</a>
+<br><a href="image-plot-6/index.html">吃小羊：MATLAB作图实例：6：指定轴刻度值和标签</a>
+<br><a href="image-plot-7/index.html">吃小羊：MATLAB作图实例：7：按高度上色的3-D条形图</a>
+<br><a href="image-plot-8/index.html">吃小羊：MATLAB作图实例：8：突出显示特定等高线级别</a>
+<br><a href="image-plot-9/index.html">吃小羊：MATLAB作图实例：9：常规二维图</a>
+<br><a href="image-plot-10/index.html">吃小羊：MATLAB作图实例：10：套叠条形图</a>
+<br><a href="image-plot-11/index.html">吃小羊：MATLAB作图实例：11：组合等高线图和梯度图</a>
+<br><a href="image-plot-12/index.html">吃小羊：MATLAB作图实例：12：带有置信区间的折线图</a>
+<br><a href="image-plot-13/index.html">吃小羊：MATLAB作图实例：13：折线图和条形图的双轴图</a>
+<br><a href="image-plot-14/index.html">吃小羊：MATLAB作图实例：14：绘制虚数和复数图</a>
+<br><a href="image-plot-15/index.html">吃小羊：MATLAB作图实例：15：用面积图比较数据集</a>
+<br><a href="image-plot-16/index.html">吃小羊：MATLAB作图实例：16：为饼图添加图例</a>
+<br><a href="image-plot-17/index.html">吃小羊：MATLAB作图实例：17：区分最大比例的饼图</a>
+<br><a href="image-plot-18/index.html">吃小羊：MATLAB作图实例：18：为饼图添加文本标签和百分比</a>
+<br><a href="image-plot-19/index.html">吃小羊：MATLAB作图实例：19：用二元直方图分析图片颜色</a>
+<br><a href="image-plot-20/index.html">吃小羊：MATLAB作图实例：20：控制分类直方图显示</a>
+<br><a href="image-plot-21/index.html">吃小羊：MATLAB作图实例：21：从表格数据创建热图</a>
+<br><a href="image-plot-22/index.html">吃小羊：MATLAB作图实例：22：由字符串数组创建词云</a>
+<br><a href="image-plot-23/index.html">吃小羊：MATLAB作图实例：23：使用平行坐标图探索表格数据</a>
+<br><a href="image-plot-24/index.html">吃小羊：MATLAB作图实例：24：条形图</a>
+<br><a href="image-plot-25/index.html">吃小羊：MATLAB作图实例：25：修改条形图的基线</a>
+<br><a href="image-plot-26/index.html">吃小羊：MATLAB作图实例：26：带误差条的条形图</a>
+<br><a href="image-plot-27/index.html">吃小羊：MATLAB作图实例：27：合并折线图和茎图</a>
+<br><a href="image-plot-28/index.html">吃小羊：MATLAB作图实例：28：叠加阶梯图和折线图</a>
+<br><a href="image-plot-29/index.html">吃小羊：MATLAB作图实例：29：地图</a>
+<br><a href="image-plot-30/index.html">吃小羊：MATLAB作图实例：30：自定义地图轴的布局</a>
+<br><a href="image-plot-31/index.html">吃小羊：MATLAB作图实例：31：从表格数据创建地理气泡图</a>
+<br><a href="image-plot-32/index.html">吃小羊：MATLAB作图实例：32：在地理密度图中查看气旋跟踪数据</a>
+<br><a href="image-plot-33/index.html">吃小羊：MATLAB作图实例：33：查看蜂窝塔放置的密度</a>
+<br><a href="image-plot-34/index.html">吃小羊：MATLAB作图实例：34：极坐标绘图</a>
+<br><a href="image-plot-35/index.html">吃小羊：MATLAB作图实例：35：设置极坐标轴</a>
+<br><a href="image-plot-36/index.html">吃小羊：MATLAB作图实例：36：极坐标轴上的标签</a>
+<br><a href="image-plot-37/index.html">吃小羊：MATLAB作图实例：37：为等高线图级别添加标签</a>
+<br><a href="image-plot-38/index.html">吃小羊：MATLAB作图实例：38：具有主要和次要网格线的等高线图</a>
+<br><a href="image-plot-39/index.html">吃小羊：MATLAB作图实例：39：更改等高线图的填充颜色</a>
+<br><a href="image-plot-40/index.html">吃小羊：MATLAB作图实例：40：显示地形数据</a>
+<br><a href="image-plot-41/index.html">吃小羊：MATLAB作图实例：41：创建MATLAB徽标</a>
+<br><a href="image-plot-42/index.html">吃小羊：MATLAB作图实例：42：创建3D图</a>
+<br><a href="image-plot-43/index.html">吃小羊：MATLAB作图实例：43：改变曲面特性</a>
+<br><a href="image-plot-44/index.html">吃小羊：MATLAB作图实例：44：可视化体积数据</a>
+<br><a href="image-plot-45/index.html">吃小羊：MATLAB作图实例：45：可视化四维数据</a>
+<br><a href="image-plot-46/index.html">吃小羊：MATLAB作图实例：46：显示复杂的三维对象</a>
+<br><a href="image-plot-47/index.html">吃小羊：MATLAB作图实例：47：沿线跟踪标记点</a>
+<br><a href="image-plot-48/index.html">吃小羊：MATLAB作图实例：48：线动画</a>
+<br><a href="image-plot-49/index.html">吃小羊：MATLAB作图实例：49：沿线移动对象组</a>
+<br><a href="image-plot-50/index.html">吃小羊：MATLAB作图实例：50：图形对象动画</a>
+<br><a href="image-plot-51/index.html">吃小羊：MATLAB作图实例：51：表面动画</a>
+<br><a href="image-plot-52/index.html">吃小羊：MATLAB作图实例：52：添加网格线并编辑位置</a>
+<br><a href="image-plot-53/index.html">吃小羊：MATLAB作图实例：53：使用颜色模板更改配色方案</a>
+<br><a href="image-plot-54/index.html">吃小羊：MATLAB作图实例：54：将图例添加到图形</a>
+<br><a href="image-plot-55/index.html">吃小羊：MATLAB作图实例：55：向图表添加文本</a>
+<br><a href="image-plot-56/index.html">吃小羊：MATLAB作图实例：56：向图表添加文本</a>
+<br><a href="image-plot-57/index.html">吃小羊：MATLAB作图实例：57：使用图形平滑</a>
+<br><a href="image-plot-58/index.html">吃小羊：MATLAB作图实例：58：创建具有多个x轴和y轴的图表</a>
+<br><a href="image-plot-59/index.html">吃小羊：MATLAB作图实例：59：裁剪图</a>
+<br><a href="image-plot-60/index.html">吃小羊：MATLAB作图实例：60：创建色标</a>
+<br><a href="image-plot-61/index.html">吃小羊：MATLAB作图实例：61：更改图像、贴片或表面的透明度</a>
+<br><a href="image-plot-62/index.html">吃小羊：MATLAB作图实例：62：显示图像数据</a>
+<br><a href="image-plot-63/index.html">吃小羊：MATLAB作图实例：63：修改图形对象</a>
+<br><a href="image-plot-64/index.html">吃小羊：MATLAB作图实例：64：线条数可变的图表类</a>
+<br><a href="image-plot-65/index.html">吃小羊：MATLAB作图实例：65：显示可变大小平铺的图表类</a>
+<br><a href="image-plot-66/index.html">吃小羊：MATLAB作图实例：66：包含两个交互式图解的图表类</a>
+<br><a href="image-plot-67/index.html">吃小羊：MATLAB作图实例：67：具有自定义属性显示的图表类"</a>
+
+
+
+
+
+
+
+
+
+
+
+
+</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

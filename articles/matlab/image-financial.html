@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Matlab金融工具箱学习记录</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Matlab金融工具箱学习记录</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文主要是转载，记录学习matlab做的各个实验。
+<br>参考链接： 
+<br><a href="https://zhuanlan.zhihu.com/p/264794728">Matlab金融工具箱 - 吃小羊 - 知乎</a>
+<br>Financial Toolbox™ 提供了众多用于对金融数据进行数学建模和统计分析的函数。您可以考虑周转率、交易成本、半连续约束以及最小或最大资产数量来执行投资组合优化。该工具箱可用于评估风险、对信用评分卡建模、分析收益率曲线、对固定收益工具和欧式期权定价并衡量投资业绩。使用时序分析功能可以在缺失数据的情况下执行转换或回归，并在不同交易日程表和天数计算约定之间进行转换。
+<br><strong>数据预处理</strong>
+<br>转换日期和时间格式，包括工作日约定、天数计算约定、自定义交易日历和利息支付日期。使用 MATLAB 中的时间表功能删除缺少数据和包含异常值的条目，然后重新采样、汇总和同步与时间相关的数据。
+<br><strong>技术指标和金融图表</strong>
+计算技术指标（包括移动平均线、动量、振荡指标、成交量指标和变化率）并创建金融图表（包括K线图、股票图和布林带图表）。
+<br><strong>投资业绩指标</strong>
+<br>使用用于计算各项指标的内置函数评估投资业绩，这些指标包括计算夏普比率、信息比率、跟踪误差、风险调整后的回报、样本下偏矩、预期下偏矩、最大回撤和预期最大回撤等。
+<br><strong>投资组合优化方法</strong>
+<br>使用 Financial Toolbox 执行均值方差、平均绝对偏差 (MAD) 和条件风险值 (CVaR) 投资组合优化。
+<br><strong>有效投资组合和有效边界</strong>
+<br>评估有效投资组合及其权重，以最大化夏普比率、实现有效边界的可视化和计算投资组合风险（包括投资组合标准差、MAD、VaR 和 CVaR）。
+<br><strong>投资组合约束和交易成本</strong>
+<br>应用投资组合优化约束，包括跟踪误差、线性不等式、线性等式、边界、预算、分组、分组比率、平均周转率、单向周转率、最小和最大资产数量。将比例或固定交易成本纳入总投资组合回报或净投资组合回报优化。
+<br><strong>现金流分析</strong>
+<br>使用 Financial Toolbox 计算当前价值和将来的价值；确定名义值、有效值和修正后的内部回报率；计算摊销和折旧；以及确定贷款或年金的定期利率。
+<br><strong>固定收益分析和期权定价</strong>
+<br>计算固定收益证券的价格、到期收益率、持续时间和凸性。对债券的完整现金流日期、现金流金额和时间-现金流映射等进行计算分析。使用 Black 和 Black-Scholes 公式计算期权价格和敏感度指标。您可以使用 Financial Instruments Toolbox™ 对复杂的金融工具进行设计、定价和对冲。
+<br><strong>Monte Carlo 模拟</strong>
+<br>基于各种随机微分方程 (SDE) 模型生成 Monte Carlo 模拟的随机变量，这些模型包括布朗运动 (Brownian Motion)、几何布朗运动 (Geometric Brownian Motion)、方差恒定弹性 (Constant Elasticity of Variance)、Cox-Ingersoll-Ross、赫尔怀特/瓦西塞克 (Hull-White/Vasicek) 和赫斯顿 (Heston) 模型。
+<br>目录如下：
+<br>
+<br><a href="image-financial-1/index.html">吃小羊：MATLAB金融工具箱：01：使用时间表   </a>
+<br><a href="image-financial-2/index.html">吃小羊：MATLAB金融工具箱：02：布林带指标图   </a>
+<br><a href="image-financial-3/index.html">吃小羊：MATLAB金融工具箱：03：有缺失数据的投资组合   </a>
+<br><a href="image-financial-4/index.html">吃小羊：MATLAB金融工具箱：04：缺失数据的资本资产定价模型   </a>
+<br><a href="image-financial-5/index.html">吃小羊：MATLAB金融工具箱：05：用于统计套利的机器学习1：数据管理和可视化   </a>
+<br><a href="image-financial-6/index.html">吃小羊：MATLAB金融工具箱：06：统计套利的机器学习2：特征工程和模型开发   </a>
+<br><a href="image-financial-7/index.html">吃小羊：MATLAB金融工具箱：07：统计套利的机器学习3：训练、调优和预测   </a>
+<br><a href="image-financial-8/index.html">吃小羊：MATLAB金融工具箱：08：寿命表分析案例研究   </a>
+<br><a href="image-financial-9/index.html">吃小羊：MATLAB金融工具箱：09：资产配置案例研究   </a>
+<br><a href="image-financial-10/index.html">吃小羊：MATLAB金融工具箱：10： 投资组合优化案例  </a>
+<br><a href="image-financial-11/index.html">吃小羊：MATLAB金融工具箱：11：根据基准优化投资组合   </a>
+
+
+
+
+
+
+
+
+
+
+
+
+</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
