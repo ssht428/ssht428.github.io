@@ -1,0 +1,93 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：21：构建用于浏览大图像的应用</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：21：构建用于浏览大图像的应用</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 此示例显示了如何使用模块化工具构建应用程序，该工具可通过导航工具（包括滚动条，总览窗口和放大框）显示图像。
+<br>首先，定义一个构建应用程序的函数。本示例定义函数my_large_image_display，在本示例末尾 。
+<br>在定义了构建应用程序的函数之后，请测试该应用程序。将图像读入工作区。
+<pre>
+ I = imread('car1.jpg');
+</pre>
+<br>在应用程序中显示带有导航帮助的图像。
+<pre>
+  my_large_image_display(I)
+</pre>
+<br> <img src="v2-9e94e277dd0f9ee0b8b727bbce2bcbd7_720w.jpg" >
+<br> <img src="v2-133e6368ef9a5305d394383d2ca0fecd_720w.jpg" >
+<br><strong> 应用创建函数  </strong>
+<br>my_large_image_display函数接受图像作为参数，并在带有滚动条，概述工具和放大框的图形窗口中显示图像。请注意，该函数会抑制图形窗口中的工具栏和菜单栏，因为可滚动导航与标准的MATLAB™图形窗口导航工具不兼容。
+<pre>
+ function my_large_image_display(im)
+ ​
+ % Create a figure without toolbar and menubar
+ hfig = figure('Toolbar','none', ...
+               'Menubar','none', ...
+               'Name','My Large Image Display Tool', ...
+               'NumberTitle','off', ...
+               'IntegerHandle','off');
+ ​
+ % Display the image in a figure with imshow
+ himage = imshow(im);
+ ​
+ % Add the scroll panel
+ hpanel = imscrollpanel(hfig,himage);
+ ​
+ % Position the scroll panel to accommodate the other tools
+ set(hpanel,'Units','normalized','Position',[0 .1 1 .9]);
+ ​
+ % Add the magnification box
+ hMagBox = immagbox(hfig,himage);
+ ​
+ % Position the magnification box
+ pos = get(hMagBox,'Position');
+ set(hMagBox,'Position',[0 0 pos(3) pos(4)]);
+ ​
+ % Add the Overview tool
+ hovervw = imoverview(himage);
+ ​
+ end
+</pre>
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

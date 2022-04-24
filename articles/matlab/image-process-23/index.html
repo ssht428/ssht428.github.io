@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：23：使用缩放函数调整图像大小</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：23：使用缩放函数调整图像大小</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何使用imresize函数调整图像大小。
+<br><strong> 指定放大倍数  </strong>
+<br>将图像读入工作区。
+<pre>
+ I = imread('circuit.tif');
+</pre>
+<br>使用imresize功能调整图像尺寸。在此示例中，您指定放大倍数。要放大图像，请指定大于1的放大倍数。
+<pre>
+ J = imresize(I,1.25);
+</pre>
+<br>在放大的版本旁边显示原始图像。
+<pre>
+  figure
+ imshowpair(I,J,'montage')
+ axis off
+</pre>
+<br> <img src="v2-0ff1adf8d9a609a9362b247a2dec600b_720w.jpg" >
+<br><strong> 指定输出图像的尺寸  </strong>
+<br>再次调整图像大小，这次指定输出图像的所需大小，而不是放大值。传递给imresize函数一个包含输出图像中的行数和列数的向量。如果指定的尺寸不能产生与输入图像相同的纵横比，则输出图像将失真。如果将向量中的元素之一指定为NaN，imresize则将计算该尺寸的值以保留图像的纵横比。要执行多分辨率处理所需的调整大小操作，请使用impyramid。
+<pre>
+ K = imresize(I,[100 150]);
+ figure, imshow(K)
+</pre>
+<br> <img src="v2-da1083a447ba77997446fc72364342d9_720w.jpg" >
+<br><strong>  指定插值方法 </strong>
+<br>再次调整图像大小，这次指定插值方法。放大图像时，输出图像比原始图像包含更多的像素。imresize使用插值法确定这些像素的值，计算像素位置附近某组像素的加权平均值。imresize权重基于每个像素距该点的距离。默认情况下，imresize使用双三次插值，但是您可以指定其他插值方法或插值内核。有关imresize完整列表，请参见参考页。您还可以指定自己的自定义插值内核。本示例使用双线性插值。
+<pre>
+ L = imresize(I,1.5,'bilinear');
+ figure, imshow(L)
+</pre>
+<br> <img src="v2-fe005144bd8003fd97dd81facb284edb_720w.jpg" >
+<br><strong> 缩小图像时防止混叠  </strong>
+<br>再次调整图像大小，这次缩小图像。减小图像尺寸时，会丢失一些原始像素，因为输出图像中的像素较少。这可能会引入缺陷，例如混叠。由于尺寸减小而发生的混叠通常显示为阶梯图案（特别是在高对比度图像中），或者在输出图像中显示为莫尔（波纹效果）图案。默认情况下，imresize对于所有插值类型（最近邻除外），都使用抗混叠来限制锯齿对输出图像的影响。要关闭抗混叠功能，请指定“抗混叠”参数并将其值设置为false。即使启用了抗混叠功能，调整大小也会引入伪影，因为当您减小图像尺寸时，信息总是会丢失。
+<pre>
+ M = imresize(I,.75,'Antialiasing',false);
+ figure, imshow(M)
+</pre>
+<br> <img src="v2-89f6ab7bfacc25121a69702585132fe2_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
