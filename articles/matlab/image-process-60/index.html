@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：60：使用ROI创建图像比较工具</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：60：使用ROI创建图像比较工具</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何使用新的ROI功能创建交互式图像比较工具。在处理图像时，我们经常需要从视觉上评估功能对图像的影响。有些效果很明显，例如边缘滤镜。但是某些影响更加微妙，需要仔细检查。
+<br><strong>  将样本图像读入工作区 </strong>
+<br>将样本图像读取到工作区中，然后创建该图像的灰度版本。使用imshowpair函数查看两个图像。montage选项并排显示图像。
+<pre>
+im = imread('peppers.png');
+imgray = rgb2gray(im);
+figure;
+imshowpair(im,imgray,'montage')
+</pre>
+<br> <img src="v2-74dab8f031db49096468d202bd68ca7b_720w.jpg" >
+<br>使用ROI设置两个图像的Alpha层（透明度），以便一个图像仅在ROI内部显示。该选择性视图遵循ROI，因此可以交互移动。创建一个新图形和一个轴。
+<pre>
+hFigure = figure();
+hAxes = axes('Parent', hFigure);
+</pre>
+<br> <img src="v2-a6308cddf540c93da72131e379791df3_720w.jpg" >
+<br>将两个图像堆叠在同一轴上。
+<pre>
+hImage1 = imshow(im, 'Parent', hAxes);
+drawnow; % Ensure the image gets drawn.
+hold on;
+hImage2 = imshow(imgray, 'Parent', hAxes);
+hold off;
+</pre>
+<br> <img src="v2-b71148f86810111c393433f954514fa1_720w.jpg" >
+<br>在轴上创建圆形的ROI。
+<pre>
+centerLocation = [220, 100];
+radius = 60;
+hC = images.roi.Circle(...
+    'Parent', hAxes,...
+    'FaceAlpha',0,...
+    'Center',centerLocation,...
+    'Radius', radius);
+</pre>
+<br> <img src="v2-565256726a667bb009b7c0f66537ec35_720w.jpg" >
+<br>创建一个侦听器，以侦听在ROI（圆圈）位置上的变化。在此示例的末尾定义了updateAlpha函数。
+<pre>
+addlistener(hC,'MovingROI', @updateAlpha);
+</pre>
+<br>第一次手动执行回调。
+<pre>
+updateAlpha(hC)
+</pre>
+<br> <img src="v2-6d29772824bab71bdcb56284fe3c23c0_720w.jpg" >
+<br>模拟放大一个区域。
+<pre>
+hC.Parent.XLim = [75 370];
+hC.Parent.YLim = [0 205];
+</pre>
+<br> <img src="v2-7d189bcb8ee7810ee442006008d7cf44_720w.jpg" >
+<br>该文件包含实现此图像比较工具的功能的源代码。此代码侦听两个附加事件。当用户输入“ t / T”键以切换哪个图像在顶部时。该代码还侦听鼠标滚轮以增加或减小ROI的半径。
+<pre>
+edit helperImageComparer
+</pre>
+<br><strong>  使用中的工具的动画 </strong>
+<br> <img src="v2-953d664ea9161f332e66c0d192456a10_720w.jpg" >
+<br><strong>回调函数以更新Alpha层   </strong>
+<br>回调函数可在移动ROI对象时更新Alpha层。
+<pre>
+function updateAlpha(hC, ~)
+hImages = findobj(hC.Parent,'Type','image');
+% Create a BW mask from the Circle ROI
+mask = hC.createMask(hImages(1).CData);
+% Set the alpha data so that the underlying image shows through
+% only inside the circle
+set(hImages(1),'AlphaData', ~mask);
+end
+</pre>
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

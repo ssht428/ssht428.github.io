@@ -1,0 +1,146 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：56：使用正则过滤器对图像进行去模糊</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：56：使用正则过滤器对图像进行去模糊</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明了如何使用正则化去卷积对图像进行去模糊处理。当已知关于加性噪声的有限信息并且对恢复的图像应用了约束（例如平滑度）时，可以有效地使用正则反卷积。通过使用正则化滤波器的约束最小二乘恢复算法可以恢复模糊且嘈杂的图像。
+<br><strong> 模拟高斯模糊和高斯噪声  </strong>
+<br>读取并显示没有模糊或噪点的原始图像。
+<pre>
+I = im2double(imread('tissue.png'));
+imshow(I);
+title('Original Image');
+text(size(I,2),size(I,1)+15, ...
+    'Image courtesy of Alan Partin, Johns Hopkins University', ...
+    'FontSize',7,'HorizontalAlignment','right');
+</pre>
+<br> <img src="v2-2f5fd233268fb6ac6c00029e4cdef8e7_720w.jpg" >
+<br>模拟可能因镜头失焦而导致的图像模糊。首先，使用fspecial函数并指定大小为11×11且标准偏差为5的高斯滤波器，来创建点扩展函数PSF。然后，使用imfilter，将PSF函数与图像进行卷积。
+<pre>
+PSF = fspecial('gaussian',11,5);
+blurred = imfilter(I,PSF,'conv');
+</pre>
+<br>通过使用imnoise函数，将零均值高斯噪声添加到模糊图像。
+<pre>
+noise_mean = 0;
+noise_var = 0.02;
+blurred_noisy = imnoise(blurred,'gaussian',noise_mean,noise_var);
+</pre>
+<br>显示模糊的噪点图像。
+<pre>
+imshow(blurred_noisy)
+title('Blurred and Noisy Image')
+</pre>
+<br> <img src="v2-8c3786ba9df3b23f32b4c25bed3ab262_720w.jpg" >
+<br><strong>  使用估计的噪声能量还原图像 </strong>
+<br>通过使用deconvreg函数恢复噪声图像，将噪声能量（NP）作为第三个输入参数。为了说明该算法对噪声能量值的敏感程度，此示例执行了三个还原。
+
+<br>对于第一次恢复，使用真实的NP。请注意，示例在此处输出两个参数。第一个返回值reg1是还原的图像。第二个返回值lagra是标量拉格朗日乘数，正则化反卷积已收敛在该标量拉格朗日乘数上。该值将在后面的示例中使用。
+<pre>
+NP = noise_var*numel(I);
+[reg1,lagra] = deconvreg(blurred_noisy,PSF,NP);
+imshow(reg1)
+title('Restored with True NP')
+</pre>
+<br> <img src="v2-6983d76976123bd4c1370a2adf128449_720w.jpg" >
+<br>对于第二次还原，使用稍微高估的噪声功率。修复效果差。
+<pre>
+reg2 = deconvreg(blurred_noisy,PSF,NP*1.3);
+imshow(reg2)
+title('Restored with Larger NP')
+</pre>
+<br> <img src="v2-9da6f4511be39530ef5c30c084cbf968_720w.jpg" >
+
+<br>第三次还原，使用稍微低估的噪声功率。修复过程中产生了压倒性的噪声放大并从图像边界增强。
+<pre>
+reg3 = deconvreg(blurred_noisy,PSF,NP/1.3);
+imshow(reg3)
+title('Restored with Smaller NP')
+</pre>
+<br> <img src="v2-a5eb180ebd95a3638a29e6d9afbccc80_720w.jpg" >
+<br><strong> 减少噪声放大和振铃效应  </strong>
+<br>通过edgetaper在反卷积之前调用该函数，可以减少噪声放大和沿图像边界的振铃效应。图像恢复对噪声功率参数的敏感性降低。
+<pre>
+Edged = edgetaper(blurred_noisy,PSF);
+reg4 = deconvreg(Edged,PSF,NP/1.3);
+imshow(reg4)
+title('Restored with Smaller NP and Edge Tapering')
+</pre>
+<br> <img src="v2-928d022e0d1704e255da0a11b111893a_720w.jpg" >
+<br><strong> 使用拉格朗日乘数  </strong>
+<br>假定已经找到最佳解并且已知相应的拉格朗日乘数，则可以恢复模糊且嘈杂的图像。在这种情况下，传递给噪声功率NP的任何值都将被忽略。
+
+<br>为了说明该算法对拉格朗日乘数的敏感程度，此示例执行了三个还原。第一次还原使用先前执行reg1还原输出的lagra。
+<pre>
+reg5 = deconvreg(Edged,PSF,[],lagra);
+imshow(reg5)
+title('Restored with LAGRA')
+</pre>
+<br> <img src="v2-c466b8436dd07f4cdbd76a23cfa1f635_720w.jpg" >
+<br>第二个还原使用100 * lagra，这增加了约束的显著性。默认情况下，这会导致图像过度平滑。
+<pre>
+reg6 = deconvreg(Edged,PSF,[],lagra*100);
+imshow(reg6)
+title('Restored with Large LAGRA')
+</pre>
+<br> <img src="v2-a69a965e572fea601ceb9778f937f760_720w.jpg" >
+<br>第三次还原使用lagra/ 100，这会弱化约束（为图像设置的平滑度要求）。它会放大噪音。对于拉格朗日乘数等于0的极端情况，重构是纯逆滤波。
+<pre>
+reg7 = deconvreg(Edged,PSF,[],lagra/100);
+imshow(reg7)
+title('Restored with Small LAGRA')
+</pre>
+<br> <img src="v2-db8b04b4103806e84be9b2a0d43aeb8a_720w.jpg" >
+
+<br><strong> 使用不同的平滑度约束  </strong>
+<br>对正则化运算符使用不同的约束来还原模糊和嘈杂的图像。不必在图像平滑度上使用默认的拉普拉斯约束，而是仅在一维（1-D Laplacian）中约束图像平滑度。
+<pre>
+regop = [-1 2 -1];
+reg8 = deconvreg(blurred_noisy,PSF,[],lagra,regop);
+imshow(reg8)
+title('Constrained by 1-D Laplacian')
+</pre>
+
+<br> <img src="v2-f8c5a91ccd1f7b7735346299760847bf_720w.jpg" >
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
