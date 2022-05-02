@@ -1,0 +1,78 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：63：锐化图像中的感兴趣区域</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：63：锐化图像中的感兴趣区域</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>将灰度图像读入工作区。
+<pre>
+I = imread('pout.tif');
+imshow(I)
+</pre>
+<br> <img src="v2-efba8b7965e6d5323e9d45401650993a_720w.jpg" >
+<br>在图像上绘制一个感兴趣的区域以指定要过滤的区域。使用函数drawcircle创建感兴趣区域，指定圆心和圆半径。或者，如果您想以交互方式绘制圆，则不要指定圆的中心或半径。
+<pre>
+hax = drawcircle(gca,'Center',[115 69],'Radius', 60);
+</pre>
+<br> <img src="v2-074915803e204da9d6f6063cc69047f4_720w.jpg" >
+<br>使用createMask函数创建蒙版并指定 ROI。
+<pre>
+mask = createMask(hax);
+</pre>
+<br>定义要用作过滤器的函数。这个名f的函数，将输入图像传递x给imsharpen函数，并使用'Amount'名称-值对参数指定锐化效果的强度。
+<pre>
+f = @(x)imsharpen(x,'Amount',3)
+f = function_handle with value:
+    @(x)imsharpen(x,'Amount',3)
+</pre>
+<br>使用roifilt2函数过滤 ROI，并指定图像、蒙版和过滤函数。
+<pre>
+J = roifilt2(I,mask,f);
+</pre>
+<br>显示结果。
+<pre>
+imshow(J)
+</pre>
+<br> <img src="v2-c8166c57a69870362dd8fd8f0986e130_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

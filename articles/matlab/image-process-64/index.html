@@ -1,0 +1,78 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：64：将自定义过滤器应用于图像中的感兴趣区域</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：64：将自定义过滤器应用于图像中的感兴趣区域</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 此示例显示如何使用roifilt2函数指定过滤器，来过滤感兴趣区域 (ROI) 。roifilt2使您能够指定自己的函数以对 ROI 进行操作。本示例使用imadjust函数使图像的某些部分变亮。
+<br>将图像读入工作区并显示。
+<pre>
+I = imread('cameraman.tif');
+figure
+imshow(I)
+</pre>
+<br> <img src="v2-2970c6d3065556f5b282421a28a6dc8a_720w.jpg" >
+<br>创建蒙版图像。本示例使用文本的二进制图像作为掩蒙版图像。所有像素值1定义了感兴趣的区域。该示例首先要裁剪图像，因为蒙版图像必须与要过滤的图像大小相同。
+<pre>
+BW = imread('text.png');
+mask = BW(1:256,1:256);
+figure
+imshow(mask)
+</pre>
+<br> <img src="v2-6351e9b6207376a48e75621f0d763b8b_720w.jpg" >
+<br>创建要用作过滤器的函数。
+<pre>
+f = @(x) imadjust(x,[],[],0.3);
+</pre>
+<br>过滤 ROI，指定要过滤的图像、定义 ROI 的蒙版以及要使用的过滤器。
+<pre>
+I2 = roifilt2(I,mask,f);
+</pre>
+<br>显示结果。
+<pre>
+figure
+imshow(I2)
+</pre>
+<br> <img src="v2-cbb893b11f87cc96c805932032f45619_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
