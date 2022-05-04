@@ -1,0 +1,130 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：74：测量灰度图像中的区域</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：74：测量灰度图像中的区域</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何测量灰度图像中对象的属性。为此，首先对灰度图像进行分割以获得对象的二值图像。然后，使用 regionprops 分析二值图像中每个对象对应的原始灰度像素值。
+<br><strong>  步骤 1：创建合成图像 </strong>
+<br>使用辅助函数propsSynthesizeImage来创建包含五个不同区域的灰度图像。
+<pre>
+I = propsSynthesizeImage;
+imshow(I)
+title('Synthetic Image')
+</pre>
+<br> <img src="v2-b61c7d2d21c7907ab7ced9c75331eff2_720w.jpg" >
+<br><strong> 第 2 步：创建二进制图像  </strong>
+<br>通过创建包含图像中对象的二值图像来分割灰度图像。
+<pre>
+BW = I > 0;
+imshow(BW)
+title('Binary Image')
+</pre>
+<br> <img src="v2-cb82c8887a7dfe0a6dc79f5f43b97515_720w.jpg" >
+<br><strong> 步骤 3：使用灰度图像的像素值计算对象属性  </strong>
+<br>regionprops函数支持多个可用于灰度图像的属性，包括“WeightedCentroid”、“MeanIntensity”、“MinIntensity”和“MaxIntensity”。这些属性使用对象的原始像素值进行计算。
+
+<br>例如，您可以使用regionprops计算图像中对象的质心和加权质心。请注意如何将包含对象的二进制图像 (BW) 和原始灰度图像 ( I) 作为参数传入regionprops.
+<pre>
+s = regionprops(BW,I,{'Centroid','WeightedCentroid'});
+</pre>
+<br>要将加权质心位置与未加权质心位置进行比较，请显示原始图像，然后使用hold和plot函数将质心叠加在图像上。
+<pre>
+imshow(I)
+title('Weighted (red) and Unweighted (blue) Centroids'); 
+hold on
+numObj = numel(s);
+for k = 1 : numObj
+    plot(s(k).WeightedCentroid(1), s(k).WeightedCentroid(2), 'r*')
+    plot(s(k).Centroid(1), s(k).Centroid(2), 'bo')
+end
+hold off
+</pre>
+<br> <img src="v2-b0db55d7a2442537fc6d8d594fcd4b59_720w.jpg" >
+<br><strong> 步骤 4：计算基于自定义像素值的属性  </strong>
+<br>您可以使用 'PixelValues' 属性根据原始灰度图像的像素值进行自定义计算。'PixelValues' 属性返回一个向量，其中包含区域中像素的灰度值。
+
+<br>例如，计算每个区域的标准偏差。
+<pre>
+s = regionprops(BW,I,{'Centroid','PixelValues','BoundingBox'});
+imshow(I)
+title('Standard Deviation of Regions')
+hold on
+for k = 1 : numObj
+    s(k).StandardDeviation = std(double(s(k).PixelValues));
+    text(s(k).Centroid(1),s(k).Centroid(2), ...
+        sprintf('%2.1f', s(k).StandardDeviation), ...
+        'EdgeColor','b','Color','r');
+end
+hold off
+</pre>
+<br> <img src="v2-36424d3d8f51f7df00b41ee419f17772_720w.jpg" >
+<br>该图显示了叠加在图像中每个对象上的标准偏差测量。您还可以通过其他方式查看结果，例如作为按标签编号显示标准偏差的条形图。
+<pre>
+figure
+bar(1:numObj,[s.StandardDeviation])
+xlabel('Region Label Number')
+ylabel('Standard Deviation')
+</pre>
+<br> <img src="v2-0a43aeeb6e8f6ea1c5e9eefd4b260ce6_720w.jpg" >
+<br><strong>   </strong>
+<br>您可以使用该图来确定如何对数据进行分区。例如，以下代码标识标准偏差低于 50 的对象。
+<pre>
+sStd = [s.StandardDeviation];
+lowStd = find(sStd &lt; 50);
+​
+imshow(I)
+title('Objects Having Standard Deviation &lt; 50')
+hold on
+for k = 1 : length(lowStd)
+    rectangle('Position',s(lowStd(k)).BoundingBox,'EdgeColor','y');
+end
+hold off
+</pre>
+<br>
+<pre>
+
+</pre>
+<br> <img src="v2-1ebf285123a27144c8d790d130c16a02_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
