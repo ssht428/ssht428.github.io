@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：84：使用图像分割器中的查找圆圈分割图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：84：使用图像分割器中的查找圆圈分割图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例展示了如何使用Image Segmenter 应用程序中的Find Circles选项来分割图像。Find Circles 选项是一种自动分割技术，可用于将图像分割为前景和背景元素。Find Circles 选项不需要初始化。
+<br><strong> 将图像加载到图像分割器应用程序中  </strong>
+<br>将图像读入工作区。
+<pre>
+coins = imread('coins.png');
+</pre>
+<br>从 MATLAB® 工具条中，打开Image Segmenter应用程序。在应用程序选项卡上的图像处理和计算机视觉部分，单击Image Segmenter图标 <img src="v2-1771d00aa4742d98f7a67740f387809e_720w.jpg.png" >
+<br> <img src="v2-4f38ba5a791cf83799c636f7292dc9ea_720w.jpg" >
+<br> 在应用程序工具条上，单击加载图像，然后选择从工作区加载图像。在从工作区导入对话框中，选择您读入工作区的图像。该Image Segmenter应用显示您所选择的图像。
+<br> <img src="v2-59e67f93f083a0202442756d8c1bc331_720w.jpg" >
+<br>您还可以使用以下imageSegmenter命令打开应用程序，指定图像：
+<pre>
+imageSegmenter(coins);
+</pre>
+<br><strong> 使用 Find Circles 分割图像  </strong>
+<br>在Image Segmenter应用程序工具条上，展开 Create Mask 部分并选择Find Circles。
+<br> <img src="v2-490b1834c15a61b10ee5f3e0b4e9d37e_720w.jpg" >
+<br>该Image Segmenter应用程序将打开一个新标签的查找圆细分选项。
+
+<br>在 Find Circles 选项卡中，首先单击标尺并测量图像中一些代表性圆的直径以确定大小范围。要查找圆，您必须指定直径的下限和上限。设置Min. Diameter 和 Max. Diameter字段为您认为包括所有对象的值：50 和 150。
+<br> <img src="v2-6ac1469209cea50bdd88f076c06284ce_720w.jpg" >
+<br>在“查找圆”选项卡上，单击“查找圆”。该Image Segmenter应用填充它找到的圆圈。但是， find circles 不会找到其中的两个圆圈。更仔细地检查图像，您会发现这些硬币的直径略小于指定的最小直径。
+<br> <img src="v2-441b839bffcf55e368ca2e3706df80f3_720w.jpg" >
+<br>更改最小值以适应未分割对象的大小，然后再次运行查找圆分割操作。这一次，Find Circles 分割了图像中的所有对象。
+<br> <img src="v2-1a2db976bfeb3fe40a32cfa35689a717_720w.jpg" >
+<br><strong> 将蒙版图像保存到工作区</strong> 
+
+<br> 当你对分割满意时，点击创建蒙板上查找圆标签工具条和创建蒙版图像。该Image Segmenter应用程序关闭查找圆标签，并返回到分割标签。分段圆圈的颜色变为黄色。要查看蒙版图像，请单击Show Binary。
+
+<br> 完成图像分割后，使用“导出”选项保存蒙版图像。您还可以获得用于分段的代码。
+<br> <img src="v2-07e6af4845c00390769b6ad7cde9d1e6_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

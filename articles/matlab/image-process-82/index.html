@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：82：在图像分割器中使用活动轮廓分割图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：82：在图像分割器中使用活动轮廓分割图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例显示如何使用活动轮廓（也称为snake）在Image Segmenter应用程序中分割图像。活动轮廓是一种自动的迭代方法，您可以通过绘制区域（称为种子蒙版）来标记图像中的位置。活动轮廓增长（或缩小）这些种子形状以填充图像中区域的边界。此初始种子蒙版的准确性会影响最终结果。您还可以将“包括纹理特征”选项与活动轮廓一起使用。
+
+<br> 所述图像分段应用程序提供了许多不同的分割方法和使用该应用程序可以是一个迭代过程。您可能会尝试多种不同的方法，直到达到您想要的结果。
+<br><strong>  在图像分割器中加载图像 </strong>
+<br>打开Image Segmenter应用程序并加载要分割的图像。该应用程序可以打开任何可由imread读取的图像。
+
+<br>对于本示例，首先将图像读入工作区。此示例使用膝盖的 MRI 图像。目标是创建一个蒙版图像，从图像中的软组织中分割骨骼。
+<pre>
+I = dicomread('knee1');
+knee = mat2gray(I);
+</pre>
+<br>从 MATLAB® 工具条中，打开Image Segmenter应用程序。在应用程序选项卡上的图像处理和计算机视觉部分，单击Image Segmenter图标 <img src="v2-1771d00aa4742d98f7a67740f387809e_720w.jpg.png" >
+<br>在应用程序工具条上，单击加载，然后选择从工作区加载图像。在从工作区导入对话框中，选择您读入工作区的图像。Image Segmenter会显示您所选择的图像。
+<br> <img src="v2-9e7783729aac026ee34dd9c049a5160e_720w.jpg" >
+<br>您还可以使用imageSegmenter命令在 Image Segmenter 应用程序中打开图像：
+<pre>
+imageSegmenter(knee);
+</pre>
+<br>加载图像后，您可以选择加载现有的二进制掩码。例如，您之前可能已经在Color Thresholder应用程序中创建了 RGB 图像的蒙版，并且想要优化分割。要加载现有蒙版，请单击加载蒙版。分割掩码图像必须是与您要分割的图像大小相同的逻辑图像。
+<br><strong> 使用活动轮廓分割图像  </strong>
+<br>要使用活动轮廓分割图像，您必须首先创建分割的粗略估计。例如，您可以使用 ROI 工具创建图像的粗略分割（请参阅相关文章）。您还可以加载现有的二进制蒙版图像。
+
+<br>对于此示例，使用 ROI 工具在要分割的区域中创建种子形状。绘制完区域后，单击应用，然后单击关闭 ROI返回到分割选项卡。
+<br> <img src="v2-57bd3eba87a9d31961fe93eac1defdca_720w.jpg" >
+<br>在 Segmentation 选项卡上，在工具条的 Refine Mask 部分中，单击Active Contours。Image Segmenter应用打开活动轮廓选项卡。
+
+要使用活动轮廓，请单击Evolve。该应用程序开始执行迭代以增加种子蒙版以将对象填充到其边界。最初，使用默认的活动轮廓方法（基于区域）和默认的迭代次数 (100)。图像分割器在右下角显示处理进度。查看结果，您可以看到这种方法对三个对象中的两个效果很好，但分割会渗入其中一个对象的背景中。对象边界在该区域中没有那么明确。
+<br> <img src="v2-dce816b7c12a37975f15463eabff8479_720w.jpg" >
+<br>获得更好分割的一种方法是重复活动轮廓，减少迭代次数。在迭代框中更改迭代次数，指定 35，然后再次单击Evolve。这一次，分割不会渗入背景。
+<br> <img src="v2-92cd929d922c337a359ebb73bc691805_720w.jpg" >
+<br>要保存分割，请单击应用。要返回分割选项卡，单击关闭活动轮廓。
+
+<br>要查看蒙版图像，请单击Segmentation 选项卡上的Show Binary。您可以使用Image Segmenter 应用程序中的其他工具来优化蒙版图像，例如清除边框或填充孔。要将蒙版图像保存到工作区，请单击导出。
+<br> <img src="v2-94b3b56a13ac8cd835af99566e697146_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>

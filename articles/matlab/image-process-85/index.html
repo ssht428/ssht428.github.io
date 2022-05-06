@@ -1,0 +1,72 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：85：在图像分割器中使用自动聚类分割图像</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：85：在图像分割器中使用自动聚类分割图像</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例展示了如何使用Image Segmenter应用程序中的Auto Cluster选项来分割图像。该自动聚类选项是自动分割技术，该技术可以使用到段图像分成前景和背景元素。该自动聚类选项不需要初始化。
+<br><strong> 将图像加载到图像分割器应用程序中  </strong>
+<pre>
+coins = imread('coins.png');
+</pre>
+<br>从 MATLAB® 工具条中，打开Image Segmenter应用程序。在应用程序选项卡上的图像处理和计算机视觉部分，单击Image Segmenter图标 <img src="v2-1771d00aa4742d98f7a67740f387809e_720w.jpg.png" >
+<br> <img src="v2-4f38ba5a791cf83799c636f7292dc9ea_720w.jpg" >
+<br> 在应用程序工具条上，单击加载图像，然后选择从工作区加载图像。在从工作区导入对话框中，选择您读入工作区的图像。该Image Segmenter应用显示您所选择的图像。
+<br> <img src="v2-d3696b56c60bd23b322331fad4274ca0_720w.jpg" >
+<br>您还可以使用以下imageSegmenter命令打开应用程序，指定图像：
+<pre>
+imageSegmenter(coins);
+</pre>
+<br><strong> 使用 Auto Cluster 分割图像  </strong>
+<br>在Image Segmenter应用程序工具条上，展开 Create Mask 部分并选择Auto Cluster。
+<br> <img src="v2-6d47ae4ab3b6ff6016dfc90a8cf1bc09_720w.jpg" >
+<br>图像分割器应用程序自动分割图像，显示结果。Auto Cluster 选项已正确分割所有圆。但是，有些圆圈有孔。
+<br> <img src="v2-9ab124e9bb857eedc9fa3e2a11534db3_720w.jpg" >
+<br>使用Refine Mask 工具条组中的Fill Holes选项清理分割图像中的孔。
+<br> <img src="v2-f0b33f4b2f4bf9810320aa87505ff9ad_720w.jpg" >
+<br><strong> 将蒙版图像保存到工作区</strong> 
+
+<br> 当您对分割满意时，单击Show Binary查看蒙版图像。要保存二进制蒙版，请使用导出选项。您还可以获得用于分割的代码。
+<br> <img src="v2-33d71823772c075f4edd7f353cdff324_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
