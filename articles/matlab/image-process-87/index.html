@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：87：在Color Thresholder应用程序中使用点云进行图像分割</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：87：在Color Thresholder应用程序中使用点云进行图像分割</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例展示了如何使用 Color Thresholder 应用程序中的点云控件分割图像。该示例从背景中分割出人脸。
+<br><strong> 将图像加载到颜色阈值应用程序中  </strong>
+<br>将图像读入工作区。对于此示例，将示例图像读mandi.tif入工作区。该图像是拜耳模式编码的图像。要处理Color Thresholder中的图像，您必须使用demosaic函数将图像转换为 RGB 图像。转换图像后，用imshow函数显示。
+<pre>
+X = imread('mandi.tif');
+rgb = demosaic(X,'bggr');
+imshow(rgb)
+</pre>
+<br> <img src="v2-d35de606e4b0df80d0b9d9211ed1084f_720w.jpg" >
+<br><strong> 在Color Thresholder中打开图像  </strong>
+<br>从 MATLAB® 工具条中，打开应用程序选项卡，然后在图像处理和计算机视觉下，单击颜色阈值图标 <img src="v2-9522ebd46c78cfd2756bbf7f0ce33efe_720w.jpg.png" >
+<br> ，打开Color Thresholder。
+<br> <img src="v2-66ce599017ece89683efc5c88b6626c1_720w.jpg" >
+<br>要将图像载入 Color Thresholder 应用程序，请单击加载图像。因为图像已经在工作区中，所以选择从工作区加载图像选项。在从工作区导入对话框中，选择您创建的变量并单击确定。 您还可以通过指定其文件名来加载图像。
+<br> <img src="v2-4dd8e4b3c8c0b262706a910bcf46e3f8_720w.jpg" >
+<br>您还可以使用colorThresholder命令打开应用程序，指定要打开的图像的名称：colorThresholder(rgb)。
+<br><strong> 选择色彩空间  </strong>
+<br>当它打开时，颜色阈值应用程序会显示选择颜色空间选项卡。此选项卡以几种流行的颜色空间显示图像和图像的点云表示：RGB、HSV、YCbCr 和Lab。
+
+<br>探索每个颜色空间中图像的点云表示。旋转每个颜色空间中的 3-D 描述，以查看颜色的区分程度。您可以从此 3-D 显示中选择要分割的颜色，因此选择一种允许您选择要分割区域的颜色的表示非常重要。对于此示例，选择Lab颜色空间。
+<br> <img src="v2-7980d7b0fae3f8c371c07fb6f382a24c_720w.jpg" >
+<br><strong> 使用颜色云分割图像  </strong>
+<br>当您选择颜色空间时，应用程序会打开一个新选项卡，显示图像以及您选择的颜色空间的每个颜色分量的一组控件。对于Lab颜色空间，颜色阈值显示三个直方图，代表颜色空间中的三个分量。该选项卡还包括颜色空间中图像颜色的 3-D 点云表示。其他色彩空间使用不同类型的控件。
+<br> <img src="v2-9b0655840994958a5f61d95cfd06a2cf_720w.jpg" >
+<br><strong>   </strong>
+<br>要浏览图像，请将光标移到图像上并使用平移和缩放控件。
+<br> <img src="v2-e2ba7871582f7d851fe63ea7c4626e9a_720w.jpg" >
+<br>要分割图像，请使用鼠标旋转 3-D 色彩云，以找到隔离要分割的颜色的色云视图。要选择图像中的颜色，请单击点云左上角的绘图工具。然后，使用鼠标在要分割的颜色周围绘制一个多边形。当您关闭多边形时，颜色阈值应用程序会根据您选择的颜色执行分割。您可以使用直方图来优化您的分割。
+<br> <img src="v2-ba044b4be216893807cc81da25c0ee52_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
