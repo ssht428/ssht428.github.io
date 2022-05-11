@@ -10,6 +10,13 @@
 
 ../../../connection.png
   
+  
+#STRONG针对部分技术要求，还请各位贵司先看下：#-STRONG
+1. 自动化控制： 虽然过去做过近10年的相关项目，但是绝大多数是基于B&R PLC的，偶而会用Beckhoff/WAGO的IO模块，这些都是一般公司不用的，其他厂家PLC我没有使用过。
+2. 视觉检测： 目前主要做的是2D物体检测，包括不限于"有无"/"颜色"/"尺寸"/"缺陷"/"OCR"/"定位"等等，但是3D、点云、SLAM等目前还没涉及。
+3. 机器人： 虽然调试过多个厂家的机器人，但仅限于功能Demo，其次就是用其做视觉项目(手眼标定)的执行机构，像常用的堆垛/焊接等应用还没有接触。对于其控制器的开发，也仅仅参与部分功能OPC UA/ModbusTCP/Lua函数集成等等小功能，底层系统/驱动/路径规划等核心未接触。
+4. 嵌入式： 目前MCU主要使用STM32，相关的PCB设计/硬件调试/软件编程等也会，偶而项目中会用到。但仅是个人爱好，涉及相关软件(Eagle/LTspice/Keil)也是比较小众的。 
+
     #STRONG工作经历#-STRONG  
 interval.png
 
@@ -20,7 +27,7 @@ interval.png
 	采用Qt+OpenCV+Basler进行工业视觉开发，分析客户需求确定图像处理流程和相机、光源选型方案，同时集成其他PLC/PC/IO外围模块。
 	(KUKA/UR/三菱/李群/越疆/达野等)机器人应用编程，与PC、工业相机(Basler)通信及手眼标定，实现工厂柔性控制生产线。
 	科研展示产品(#HREF../ARM嵌入式软硬件开发/four-wheels/index.html#-HREF1全向移动农业植保四轮车#-HREF2、#HREF../ARM嵌入式软硬件开发/four-leg-dog/index.html#-HREF1四足机械大狗#-HREF2、#HREF../机器人应用编程及视觉结合/force-polish/index.html#-HREF1力控打磨机器人#-HREF2)的软硬件设计。
-	目前负责#HREF../机器人应用编程及视觉结合/force-torque-sensor/index.html#-HREF1医疗机器人#-HREF2(质子/CT治疗定位用) 和 AGV视觉复合机器人的项目，但是由于还在开发阶段，不便展示。
+	目前负责#HREF../机器人应用编程及视觉结合/force-torque-sensor/index.html#-HREF1医疗机器人#-HREF2(质子/CT治疗定位用) 和 AGV视觉复合机器人的项目。
 #STRONG2015年3月 ～	2019年12月&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 上海xx机电设备有限公司  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;   项目工程师#-STRONG　 
 
 同合作伙伴承接各种非标项目，负责设计技术方案、电气选型及PLC/PC软件编程、电子产品软硬件设计开发。
