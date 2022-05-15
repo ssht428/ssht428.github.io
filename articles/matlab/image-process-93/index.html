@@ -1,0 +1,148 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：93：识别圆形物体</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：93：识别圆形物体</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何使用边界跟踪例程bwboundaries，根据对象的圆度对对象进行分类。
+<br><strong> 第 1 步：读取图像  </strong>
+<br>读入pills_etc.png。
+<pre>
+RGB = imread('pillsetc.png');
+imshow(RGB)
+</pre>
+<br> <img src="v2-b5103b0dfba2f3a9cec14c480188dae2_720w.jpg" >
+<br><strong>  步骤 2：设置图像阈值 </strong>
+<br>将图像转换为黑白，以准备使用bwboundaries跟踪边界.
+<pre>
+I = rgb2gray(RGB);
+bw = imbinarize(I);
+imshow(bw)
+</pre>
+<br> <img src="v2-28b8d29c39ec7257012125583c018e0a_720w.jpg" >
+<br><strong> 第 3 步：消除噪音  </strong>
+<br>使用形态学函数，删除不属于感兴趣对象的像素。
+
+<br>删除包含少于 30 像素的所有对象。
+<pre>
+bw = bwareaopen(bw,30);
+imshow(bw)
+</pre>
+<br> <img src="v2-1361f292e6c0f1fe271dacda748db45e_720w.jpg" >
+<br>填补笔帽的空隙。
+<pre>
+se = strel('disk',2);
+bw = imclose(bw,se);
+imshow(bw)
+</pre>
+<br> <img src="v2-005ab7ff4fd85880d7b385bfe6b14316_720w.jpg" >
+<br>填充任何的空洞，以便可以使用 regionprops 来估计每个边界所包围的面积：
+<pre>
+bw = imfill(bw,'holes');
+imshow(bw)
+</pre>
+<br> <img src="v2-dd18199529aa511cda73e59925714094_720w.jpg" >
+<br><strong> 第 4 步：找到边界  </strong>
+<br>只关注外部边界。选项“noholes”将通过防止bwboundaries搜索内部轮廓来加速处理。
+<pre>
+[B,L] = bwboundaries(bw,'noholes');
+</pre>
+<br>显示标签矩阵并绘制每个边界。
+<pre>
+imshow(label2rgb(L,@jet,[.5 .5 .5]))
+hold on
+for k = 1:length(B)
+  boundary = B{k};
+  plot(boundary(:,2),boundary(:,1),'w','LineWidth',2)
+end
+</pre>
+<br> <img src="v2-f20e07c18fba483dea9ff51f61a84e17_720w.jpg" >
+<br><strong> 步骤 5：确定哪些对象是圆形的  </strong>
+<br>估计每个对象的面积和周长。使用这些结果形成一个简单的指标来表示物体的圆度：
+
+<br>metric = 4 * pi * area/perimeter/perimeter
+
+<br>该度量仅对于圆形等于 1，对于任何其他形状都小于 1。判别过程可以通过设置适当的阈值来控制。在此示例中，使用 0.94 的阈值，以便仅将药丸归类为圆形。
+
+<br>使用regionprops以获得所有对象的区域的估计。请注意， bwboundaries返回的标签矩阵可以被regionprops重用。
+<pre>
+stats = regionprops(L,'Area','Centroid');
+​
+threshold = 0.94;
+​
+% loop over the boundaries
+for k = 1:length(B)
+​
+  % obtain (X,Y) boundary coordinates corresponding to label 'k'
+  boundary = B{k};
+​
+  % compute a simple estimate of the object's perimeter
+  delta_sq = diff(boundary).^2;    
+  perimeter = sum(sqrt(sum(delta_sq,2)));
+  
+  % obtain the area calculation corresponding to label 'k'
+  area = stats(k).Area;
+  
+  % compute the roundness metric
+  metric = 4*pi*area/perimeter^2;
+  
+  % display the results
+  metric_string = sprintf('%2.2f',metric);
+​
+  % mark objects above the threshold with a black circle
+  if metric > threshold
+    centroid = stats(k).Centroid;
+    plot(centroid(1),centroid(2),'ko');
+  end
+  
+  text(boundary(1,2)-35,boundary(1,1)+13,metric_string,'Color','y',...
+       'FontSize',14,'FontWeight','bold')
+  
+end
+​
+title(['Metrics closer to 1 indicate that ',...
+       'the object is approximately round'])
+</pre>
+<br> <img src="v2-c359c6a3d712f7188da029fdf2b982cf_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
