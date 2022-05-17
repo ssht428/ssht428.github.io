@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：95：测量一卷胶带的半径</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：95：测量一卷胶带的半径</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例显示如何测量被胶带分配器部分遮挡的胶带卷的半径。利用imfindcircles来完成这项任务。
+<br><strong> 第 1 步：读取图像  </strong>
+<br>读入tape.png。
+<pre>
+RGB = imread('tape.png');
+imshow(RGB);
+​
+hTxt = text(15,15,'Estimate radius of the roll of tape',...
+     'FontWeight','bold','Color','y');
+</pre>
+<br> <img src="v2-2b1731803c726e5a66cbeb71c32811b5_720w.jpg" >
+<br><strong>  第 2 步：找到圆圈 </strong>
+<br>使用imfindcircles函数找到图像中圆的中心和半径。
+<pre>
+Rmin = 60; 
+Rmax = 100;
+[center, radius] = imfindcircles(RGB,[Rmin Rmax],'Sensitivity',0.9)
+center = 1×2
+​
+  236.9291  172.4747
+radius = 79.5305
+</pre>
+<br><strong> 第 3 步：突出显示圆形轮廓和中心  </strong>
+<pre>
+% Display the circle
+viscircles(center,radius);
+​
+% Display the calculated center
+hold on;
+plot(center(:,1),center(:,2),'yx','LineWidth',2);
+hold off;
+​
+delete(hTxt);
+message = sprintf('The estimated radius is %2.1f pixels', radius);
+text(15,15,message,'Color','y','FontWeight','bold');
+</pre>
+<br> <img src="v2-8be9e4322db4bbe5633722bd38651ae2_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
