@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：96：使用 Radon 变换检测线条</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：96：使用 Radon 变换检测线条</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何使用 Radon 变换来检测图像中的线条。Radon 变换与称为 Hough 变换的常见计算机视觉操作密切相关。您可以使用radon函数来实现一种用于检测直线的Hough变换形式。
+<br><strong> 计算图像的 Radon 变换  </strong>
+<br>将图像读入工作区。将其转换为灰度图像。
+<pre>
+I = fitsread('solarspectra.fts');
+I = rescale(I);
+</pre>
+<br>显示原始图像。
+<pre>
+figure
+imshow(I)
+title('Original Image')
+</pre>
+<br> <img src="v2-a80a322484d414b5f6756c2d799a44cf_720w.jpg" >
+<br>使用edge函数计算二值边缘图像。显示edge函数返回的二进制图像
+<pre>
+BW = edge(I);
+figure
+imshow(BW)
+title('Edges of Original Image')
+</pre>
+<br> <img src="v2-4fcd4dd35bdf5831b008b51131099f67_720w.jpg" >
+<br><strong>   </strong>
+<br>使用radon函数计算图像的radon变换，并显示变换。变换中峰值的位置对应于原始图像中直线的位置。
+<pre>
+theta = 0:179;
+[R,xp] = radon(BW,theta);
+</pre>
+<br>显示radon变换的结果。
+<pre>
+figure
+imagesc(theta, xp, R); colormap(hot);
+xlabel('\theta (degrees)');
+ylabel('x^{\prime} (pixels from center)');
+title('R_{\theta} (x^{\prime})');
+colorbar
+</pre>
+<br> <img src="v2-7d04361d9742dae12499a26ca2032ede_720w.jpg" >
+<br> R中最强的峰值对应于 θ=1度 ，x' = -80 像素，距中心。
+<br><strong> 解释Radon 变换的峰值  </strong>
+<br>要在原始图中可视化此峰值，请找到图像的中心，由覆盖在下图中的蓝色十字表示。红色虚线是以θ=1度穿过中心的径向线。如果您沿着这条线从中心（向左）-80 像素移动，则径向线与红色实线垂直相交。这条红色实线是Radon变换中信号最强的直线。
+<br> <img src="v2-548dd488343952366cc556670676cd69_720w.jpg" >
+<br>要进一步解释 Radon 变换，请在R中检查接下来的四个最强峰。
+
+<br>在θ=1度，距离中心 -84 和 -87 像素的偏移量处，发现了两个强烈的峰值。这些峰值对应于最强线左侧的两条红线，叠加在下图上。
+
+<br>在R的中心附近发现了另外两个强峰。这些峰值位于θ=91度，与中心的偏移量为 -8 和 -44 像素。下图中的绿色虚线是以 91 度角穿过中心的径向线。如果您沿径向线移动距离中心 -8 像素和 -44 像素的距离，则径向线与绿色实线垂直相交。这些绿色实线对应于R中的强峰。
+<br><strong>   </strong>
+<br>图像中较暗的线条与R中较弱的峰有关。
+<br> <img src="v2-d13a6d7ba1c53b0ced6ec1191dfe4674_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
