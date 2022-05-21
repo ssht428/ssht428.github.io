@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：99：创建图像直方图</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：99：创建图像直方图</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何使用imhist函数为图像创建直方图。图像直方图是显示索引或灰度图像中强度分布的图。imhist函数通过定义n 个等距的 bin 来创建直方图，每个 bin 代表一个数据值范围，然后计算每个范围内的像素数。您可以使用直方图中的信息来选择适当的增强操作。例如，如果图像直方图显示强度值的范围很小，您可以使用强度调整函数将值扩展到更宽的范围。
+<br><strong>   </strong>
+<br>将图像读入工作区并显示。
+<pre>
+I = imread('rice.png');
+imshow(I)
+</pre>
+<br> <img src="v2-cb74da355f302cec30e2070216629c0c_720w.jpg" >
+<br>创建直方图。对于显示米粒的示例图像，imhist创建了一个包含 64 个 bin 的直方图。imhist函数默认显示直方图。直方图在 100 附近显示一个峰值，对应于图像中的深灰色背景。
+<pre>
+figure;
+imhist(I);
+</pre>
+<br> <img src="v2-0f9efe9b090bd18f8b3e5b54385dc38e_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
