@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：100：从GLCM和绘图相关性导出统计数据</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：100：从GLCM和绘图相关性导出统计数据</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例显示如何创建一组 GLCM 并从中获取统计信息。该示例还说明了 graycoprops 返回的统计数据如何与原始输入图像有直接关系。
+
+<br>将图像读入工作区并显示。该示例将真彩色图像转换为灰度图像，然后在本示例中将其旋转 90 度。
+<pre>
+circuitBoard = rot90(rgb2gray(imread('board.tif')));
+imshow(circuitBoard)
+</pre>
+<br> <img src="v2-ac978dc9fcbdb8dc14564f47acc2e11c_720w.jpg" >
+<br>定义不同方向和距离的偏移。由于图像包含在水平和垂直方向排列的各种形状和大小的物体，因此该示例指定了一组仅在距离上不同的水平偏移量。
+<pre>
+offsets0 = [zeros(40,1) (1:40)'];
+</pre>
+<br>创建 GLCM。调用graycomatrix函数，指定偏移量。
+<pre>
+glcms = graycomatrix(circuitBoard,'Offset',offsets0);
+</pre>
+<br>使用graycoprops函数从 GLCM 导出统计数据。该示例计算对比度和相关性。
+<pre>
+stats = graycoprops(glcms,'Contrast Correlation');
+</pre>
+<br>将相关性绘制为偏移量的函数。
+<pre>
+figure, plot([stats.Correlation]);
+title('Texture Correlation as a function of offset');
+xlabel('Horizontal Offset')
+ylabel('Correlation')
+</pre>
+<br> <img src="v2-ccbf488ea8ba05bf162b98350ec957d5_720w.jpg" >
+<br>该图包含偏移量 7、15、23 和 30 处的峰值。如果仔细检查输入图像，您会发现图像中的某些垂直元素具有每七个像素重复一次的周期性图案。
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
