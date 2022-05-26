@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：104：获得局部结构相似指数</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：104：获得局部结构相似指数</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 获得局部结构相似指数Obtain Local Structural Similarity Index
+<br>本示例说明如何在与参考图像进行比较时测量图像区域的质量。ssim函数根据图像中每个像素与 11×11 邻域中其他像素的关系计算其结构相似性指数。该函数在与要测量质量的图像大小相同的图像中返回此信息。这种局部的、逐像素的质量指数可以被视为具有适当缩放比例的图像。
+<br>读取图像以用作参考图像。
+<pre>
+ref = imread('pout.tif');
+</pre>
+<br>通过制作参考图像的副本并添加噪声来创建质量需要测量的图像。为了说明局部相似性，将噪声隔离到图像的一半。并排显示参考图像和噪声图像。
+<pre>
+A = ref;
+​
+A(:,ceil(end/2):end) = imnoise(ref(:,ceil(end/2):end),'salt & pepper', 0.1);
+​
+figure, imshowpair(A,ref,'montage')
+</pre>
+<br> <img src="v2-6be4db2f0f7e83540e9ff30578c522de_720w.jpg" >
+<br>与参考图像 (ref) 相比，计算修改后的图像 (A) 的局部结构相似性指数。可视化局部结构相似性索引。请注意与参考图像相同的图像左侧如何显示为白色，因为所有局部结构相似性值为 1。
+<pre>
+[global_sim local_sim] = ssim(A,ref);
+​
+figure, imshow(local_sim,[])
+</pre>
+<br> <img src="v2-3e29e9ff8b085738fbf98431c254c85a_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
