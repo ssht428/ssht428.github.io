@@ -1,0 +1,72 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：105：比较不同压缩级别的图像质量</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：105：比较不同压缩级别的图像质量</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例显示如何使用ssim测试图片质量。示例以各种压缩级别创建图像，然后绘制质量指标。要运行此示例，您必须对当前文件夹具有写入权限。
+<br>将图像读入工作区。
+<pre>
+I = imread('cameraman.tif');
+</pre>
+<br>使用各种质量值将图像写入文件。JPEG 格式支持该'quality'参数。使用ssim函数检查每个写入图像的质量。
+<pre>
+ssimValues = zeros(1,10);
+qualityFactor = 10:10:100;
+for i = 1:10
+​
+    imwrite(I,'compressedImage.jpg','jpg','quality',qualityFactor(i));
+    
+    ssimValues(i) = ssim(imread('compressedImage.jpg'),I);
+end
+</pre>
+<br>绘制结果。请注意，当您通过imwrite增加指定的质量值时，图像质量分数如何提高。
+<pre>
+plot(qualityFactor,ssimValues,'b-o');
+​
+xlabel('Compression Quality Factor');
+ylabel('SSIM Value');
+</pre>
+<br> <img src="v2-38d0b891f0a55db1122cdaf8c9ef19b0_720w.jpg" >
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
