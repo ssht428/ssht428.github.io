@@ -1,0 +1,174 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB图像处理：106：评估 eSFR 测试图表上的质量指标</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB图像处理：106：评估 eSFR 测试图表上的质量指标</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br> 本示例说明如何在Imatest ® 边缘空间频率响应 (eSFR) 测试图上执行标准质量测量。测量的属性包括锐度、色差、噪声、照度和颜色准确度。
+<br><strong> 创建测试图表对象  </strong>
+<br> eSFR 图表的图像读入工作区。显示图表。
+<pre>
+I = imread('eSFRTestImage.jpg');
+figure
+imshow(I)
+title('Captured Image of eSFR Chart')
+text(size(I,2),size(I,1)+15, ...
+    ['Chart courtesy of Imatest',char(174)],'FontSize',10,'HorizontalAlignment','right');
+</pre>
+<br> <img src="v2-b2a811904ff84cc997c44cbbda504f90_720w.jpg" >
+
+<br>创建一个 eSFR 测试图表对象，根据检测到的注册标记自动定义感兴趣区域 (ROI)。
+<pre>
+chart = esfrChart(I);
+</pre>
+<br>突出显示并标记检测到的 ROI，以直观地确认 ROI 适合测量。
+<pre>
+displayChart(chart)
+</pre>
+<br> <img src="v2-a1f980bd9701d33028c35c0e4d39f20f_720w.jpg" >
+<br> 所有 60 个倾斜边缘 ROI（以绿色标记）都是可见的，并以适当的边缘为中心。此外，20 个灰色补丁 ROI（以红色标记）和 16 个彩色补丁 ROI（以白色标记）是可见的，并且包含在每个补丁的边界内。图表已正确导入。
+<br><strong>  测量边缘锐度 </strong>
+<br>测量所有 60 个倾斜边缘 ROI 的清晰度。还要测量这些 ROI 的平均水平和垂直清晰度。
+<pre>
+[sharpnessTable,aggregateSharpnessTable] = measureSharpness(chart);
+</pre>
+<br>显示前四个 ROI 的 SFR 图。
+<pre>
+plotSFR(sharpnessTable,'ROIIndex',1:4,'displayLegend',false,'displayTitle',true)
+</pre>
+<br> <img src="v2-e9c27b5ae4c69bba6dca30844cc52920_720w.jpg" >
+<br> <img src="v2-e871fbe969ded363bec39b848d4e21e5_720w.jpg" >
+<br> <img src="v2-47844c212625a24241cf97cd012a4159_720w.jpg" >
+<br> <img src="v2-2a860f2fb83c83cb8b567162c45ab42c_720w.jpg" >
+<br><strong>   </strong>
+<br>
+<pre>
+
+</pre>
+<br>显示平均后的垂直和水平边缘的平均 SFR。平均的垂直 SFR 比平均水平 SFR 下降得更快。因此，平均垂直边缘不如平均水平边缘锐利。
+<pre>
+plotSFR(aggregateSharpnessTable)
+</pre>
+<br> <img src="v2-60f255775a4cdf7149f64e068afe0bb8_720w.jpg" >
+<br> <img src="v2-006f5201b5bca4b59b70aa4f56284e18_720w.jpg" >
+<br><strong> 测量色差  </strong>
+<br>测量所有倾斜边缘 ROI 的色差。
+<pre>
+chTable = measureChromaticAberration(chart);
+</pre>
+<br>绘制第一个 ROI 中三个颜色通道的归一化强度分布图。为清楚起见，将归一化的边缘轮廓存储在单独的变量edgeProfile中。
+<pre>
+roi_index = 1;
+edgeProfile = chTable.normalizedEdgeProfile{roi_index};
+​
+figure
+p = length(edgeProfile.normalizedEdgeProfile_R);
+plot(1:p,edgeProfile.normalizedEdgeProfile_R,'r', ...
+     1:p,edgeProfile.normalizedEdgeProfile_G,'g', ...
+     1:p,edgeProfile.normalizedEdgeProfile_B,'b')
+xlabel('Pixel')
+ylabel('Normalized Intensity')
+title(['ROI ' num2str(1) ' with Aberration ' num2str(chTable.aberration(1))])
+</pre>
+<br> <img src="v2-c8cf789a56d2f0310ea2cdbd05047db9_720w.jpg" >
+<br> 颜色通道具有相似的归一化强度分布，并且沿边缘看不到太多色边。
+<br><strong> 测量噪声  </strong>
+<br>使用 20 个灰色补丁 ROI 来测量噪声。
+<pre>
+noiseTable = measureNoise(chart);
+</pre>
+<br>绘制每个灰度 ROI 中的平均原始信号和信噪比 (SNR)。
+<pre>
+figure
+​
+subplot(1,2,1)
+plot(noiseTable.ROI,noiseTable.MeanIntensity_R,'r', ...
+    noiseTable.ROI,noiseTable.MeanIntensity_G,'g', ...
+    noiseTable.ROI,noiseTable.MeanIntensity_B,'b')
+title('Signal')
+ylabel('Intensity')
+xlabel('Gray ROI Number')
+grid on
+​
+subplot(1,2,2)
+plot(noiseTable.ROI,noiseTable.SNR_R,'r', ...
+    noiseTable.ROI,noiseTable.SNR_G,'g', ...
+    noiseTable.ROI,noiseTable.SNR_B,'b')
+title('SNR')
+ylabel('dB')
+xlabel('Gray ROI Number')
+grid on
+</pre>
+<br> <img src="v2-a05ffaeb4eed348ec30254d335f39999_720w.jpg" >
+<br><strong> 估计光源  </strong>
+<br>使用 20 个灰色补丁 ROI 估计场景照明。光源具有较强的蓝色成分和较弱的红色成分，这与测试图图像的蓝色色调一致。
+<pre>
+illum = measureIlluminant(chart)
+illum = 1×3
+​
+  110.9147  116.0008  123.2339
+</pre>
+<br>
+
+<br><strong> 测量颜色准确度  </strong>
+<br>使用 16 个色块 ROI 测量颜色准确度。
+<pre>
+[colorTable,ccm] = measureColor(chart);
+</pre>
+<br>显示 ROI 的平均测量颜色和预期颜色。显示色彩准确度测量值，Delta_E。该Delta_E值越接近1，色差越不易察觉。Delta_E打印的典型值范围从 3 到 6，在其他商业应用中高达 20。
+<pre>
+figure
+displayColorPatch(colorTable)
+</pre>
+<br> <img src="v2-e04e049e8982548d71a5f1979772f238_720w.jpg" >
+<br>在色度图上绘制 CIE 1976 Lab颜色空间中的测量颜色和参考颜色。红色圆圈表示参考颜色。绿色圆圈表示每个色块的测量颜色。
+<pre>
+figure
+plotChromaticity(colorTable)
+</pre>
+<br> <img src="v2-aea640841f6b17428d34e91a8d88f3b9_720w.jpg" >
+您可以使用颜色校正矩阵ccm，对测试图表图像进行颜色校正。
+<br><strong> 参考文献  </strong>
+<br>[1] Imatest®. "Esfr". https://www.imatest.com/mathworks/esfr/.
+
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+<br>注：本文根据MATLAB官网内容修改而成。
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
