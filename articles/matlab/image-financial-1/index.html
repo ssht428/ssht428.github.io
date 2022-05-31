@@ -1,0 +1,176 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB金融工具箱：01：使用时间表</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB金融工具箱：01：使用时间表</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="qDD1YJau">此示例显示如何使用时间表从模拟的每日股票数据中可视化和计算每周统计信息。</p><p data-pid="gqoB8d4t"><b>步骤1.加载数据。</b></p><p data-pid="7r8o0ysU">此示例的数据在MAT文件中<code>SimulatedStock.mat</code>，该文件加载以下内容：</p><ul><li data-pid="znLVtwAK">与收盘价相对应的日期， <code>TMW_DATES</code></li><li data-pid="_wc6XHH0">开盘价 <code>TMW_OPEN</code></li><li data-pid="-r0CNgHg">股票价格的日高 <code>TMW_HIGH</code></li><li data-pid="XvDIGf49">股票价格的日低 <code>TMW_LOW</code></li><li data-pid="ro2J8VyK">收盘价， <code>TMW_CLOSE, TMW_CLOSE_MISSING</code></li><li data-pid="z1IaQEGZ">每日交易量 <code>TMW_VOLUME</code></li><li data-pid="UWv7gD4i">表格中的数据 <code>TMW_TB</code></li></ul><div class="highlight"><pre><code class="language-matlab"> <span class="n">load</span> <span class="n">SimulatedStock</span><span class="p">.</span><span class="n">mat</span> <span class="n">TMW_</span><span class="o">*</span></code></pre></div><p data-pid="_rY75Lst"><b>步骤2.创建时间表。</b></p><p data-pid="bmoDcD6m">在时间表中，您可以使用财务时间序列而不是向量。使用<code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/matlab/ref/timetable.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">timetable</a></code>时，您可以轻松地跟踪日期。您可以根据日期来操作数据序列，因为<code>timetable</code>对象会跟踪时间序列的管理。</p><p data-pid="rJ2u9buR">使用MATLAB? <code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/matlab/ref/timetable.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">timetable</a></code>函数创建一个<code>timetable</code>对象。另外，您可以使用MATLAB转换功能<code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/matlab/ref/table2timetable.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">table2timetable</a></code>将表转换为时间表。在此示例中，时间表<code>TMW_TT</code>是根据表格构建的，仅用于说明目的。创建<code>timetable</code>对象后，可以使用<code>timetable</code>对象的<code>Description</code>字段存储有关时间表的元信息。</p><div class="highlight"><pre><code class="language-matlab"> <span class="c">% Create a timetable from vector input</span>
+ <span class="n">TMW</span> <span class="p">=</span> <span class="n">timetable</span><span class="p">(</span><span class="n">TMW_OPEN</span><span class="p">,</span><span class="n">TMW_HIGH</span><span class="p">,</span><span class="n">TMW_LOW</span><span class="p">,</span><span class="n">TMW_CLOSE_MISSING</span><span class="p">,</span><span class="n">TMW_VOLUME</span><span class="p">,</span> <span class="c">... </span>
+     <span class="s">&#39;VariableNames&#39;</span><span class="p">,{</span><span class="s">&#39;Open&#39;</span><span class="p">,</span><span class="s">&#39;High&#39;</span><span class="p">,</span><span class="s">&#39;Low&#39;</span><span class="p">,</span><span class="s">&#39;Close&#39;</span><span class="p">,</span><span class="s">&#39;Volume&#39;</span><span class="p">},</span><span class="s">&#39;RowTimes&#39;</span><span class="p">,</span><span class="n">TMW_DATES</span><span class="p">);</span>
+ ?
+ <span class="c">% Convert from a table to a timetable</span>
+ <span class="n">TMW_TT</span> <span class="p">=</span> <span class="n">table2timetable</span><span class="p">(</span><span class="n">TMW_TB</span><span class="p">,</span><span class="s">&#39;RowTimes&#39;</span><span class="p">,</span><span class="n">TMW_DATES</span><span class="p">);</span>
+ ?
+ <span class="n">TMW</span><span class="p">.</span><span class="n">Properties</span><span class="p">.</span><span class="n">Description</span> <span class="p">=</span> <span class="s">&#39;Simulated stock data.&#39;</span><span class="p">;</span>
+ ?
+ <span class="n">TMW</span><span class="p">.</span><span class="n">Properties</span>
+ <span class="nb">ans</span> <span class="p">=</span> 
+   <span class="n">TimetableProperties</span> <span class="n">with</span> <span class="k">properties</span><span class="p">:</span>
+ ?
+              <span class="n">Description</span><span class="p">:</span> <span class="s">&#39;Simulated stock data.&#39;</span>
+                 <span class="n">UserData</span><span class="p">:</span> <span class="p">[]</span>
+           <span class="n">DimensionNames</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;Time&#39;</span>  <span class="s">&#39;Variables&#39;</span><span class="p">}</span>
+            <span class="n">VariableNames</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;Open&#39;</span>  <span class="s">&#39;High&#39;</span>  <span class="s">&#39;Low&#39;</span>  <span class="s">&#39;Close&#39;</span>  <span class="s">&#39;Volume&#39;</span><span class="p">}</span>
+     <span class="n">VariableDescriptions</span><span class="p">:</span> <span class="p">{}</span>
+            <span class="n">VariableUnits</span><span class="p">:</span> <span class="p">{}</span>
+       <span class="n">VariableContinuity</span><span class="p">:</span> <span class="p">[]</span>
+                 <span class="n">RowTimes</span><span class="p">:</span> <span class="p">[</span><span class="mi">1000</span><span class="n">x1</span> <span class="n">datetime</span><span class="p">]</span>
+                <span class="n">StartTime</span><span class="p">:</span> <span class="mi">04</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>
+               <span class="n">SampleRate</span><span class="p">:</span> <span class="n">NaN</span>
+                 <span class="n">TimeStep</span><span class="p">:</span> <span class="n">NaN</span>
+         <span class="n">CustomProperties</span><span class="p">:</span> <span class="n">No</span> <span class="n">custom</span> <span class="k">properties</span> <span class="n">are</span> <span class="n">set</span><span class="p">.</span>
+       <span class="n">Use</span> <span class="n">addprop</span> <span class="n">and</span> <span class="n">rmprop</span> <span class="n">to</span> <span class="n">modify</span> <span class="n">CustomProperties</span><span class="p">.</span></code></pre></div><p data-pid="SpYY02m3"><b>步骤3.计算基本数据统计信息，并填写缺失的数据。</b></p><p data-pid="CEb_0mj3">使用MATLAB <code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/matlab/ref/table.summary.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">summary</a></code>函数查看<code>timetable</code>数据的基本统计信息。通过查看每个变量的摘要，可以识别缺失值。然后，您可以使用MATLAB <code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/matlab/ref/fillmissing.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">fillmissing</a></code>函数通过指定填充方法来填充时间表中的缺失数据。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">summaryTMW</span> <span class="p">=</span> <span class="n">summary</span><span class="p">(</span><span class="n">TMW</span><span class="p">);</span>
+ <span class="n">summaryTMW</span><span class="p">.</span><span class="n">Close</span>
+ <span class="nb">ans</span> <span class="p">=</span> <span class="n">struct</span> <span class="n">with</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">Size</span><span class="p">:</span> <span class="p">[</span><span class="mi">1000</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">Type</span><span class="p">:</span> <span class="s">&#39;double&#39;</span>
+     <span class="n">Description</span><span class="p">:</span> <span class="s">&#39;&#39;</span>
+           <span class="n">Units</span><span class="p">:</span> <span class="s">&#39;&#39;</span>
+      <span class="n">Continuity</span><span class="p">:</span> <span class="p">[]</span>
+             <span class="n">Min</span><span class="p">:</span> <span class="mf">83.4200</span>
+          <span class="n">Median</span><span class="p">:</span> <span class="mf">116.7500</span>
+             <span class="n">Max</span><span class="p">:</span> <span class="mf">162.1100</span>
+      <span class="n">NumMissing</span><span class="p">:</span> <span class="mi">3</span>
+ <span class="n">TMW</span> <span class="p">=</span> <span class="n">fillmissing</span><span class="p">(</span><span class="n">TMW</span><span class="p">,</span><span class="s">&#39;linear&#39;</span><span class="p">);</span>
+ <span class="n">summaryTMW</span> <span class="p">=</span> <span class="n">summary</span><span class="p">(</span><span class="n">TMW</span><span class="p">);</span>
+ <span class="n">summaryTMW</span><span class="p">.</span><span class="n">Close</span>
+ <span class="nb">ans</span> <span class="p">=</span> <span class="n">struct</span> <span class="n">with</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">Size</span><span class="p">:</span> <span class="p">[</span><span class="mi">1000</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">Type</span><span class="p">:</span> <span class="s">&#39;double&#39;</span>
+     <span class="n">Description</span><span class="p">:</span> <span class="s">&#39;&#39;</span>
+           <span class="n">Units</span><span class="p">:</span> <span class="s">&#39;&#39;</span>
+      <span class="n">Continuity</span><span class="p">:</span> <span class="p">[]</span>
+             <span class="n">Min</span><span class="p">:</span> <span class="mf">83.4200</span>
+          <span class="n">Median</span><span class="p">:</span> <span class="mf">116.7050</span>
+             <span class="n">Max</span><span class="p">:</span> <span class="mf">162.1100</span>
+      <span class="n">NumMissing</span><span class="p">:</span> <span class="mi">0</span>
+ <span class="n">summaryTMW</span><span class="p">.</span><span class="n">Time</span>
+ <span class="nb">ans</span> <span class="p">=</span> <span class="n">struct</span> <span class="n">with</span> <span class="n">fields</span><span class="p">:</span>
+           <span class="n">Size</span><span class="p">:</span> <span class="p">[</span><span class="mi">1000</span> <span class="mi">1</span><span class="p">]</span>
+           <span class="n">Type</span><span class="p">:</span> <span class="s">&#39;datetime&#39;</span>
+            <span class="n">Min</span><span class="p">:</span> <span class="mi">04</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>
+         <span class="n">Median</span><span class="p">:</span> <span class="mi">31</span><span class="o">-</span><span class="n">Aug</span><span class="o">-</span><span class="mi">2014</span>
+            <span class="n">Max</span><span class="p">:</span> <span class="mi">24</span><span class="o">-</span><span class="n">Aug</span><span class="o">-</span><span class="mi">2016</span>
+     <span class="n">NumMissing</span><span class="p">:</span> <span class="mi">0</span>
+       <span class="n">TimeStep</span><span class="p">:</span> <span class="n">NaN</span></code></pre></div><p data-pid="3nB7e9ef"><b>步骤4.数据可视化。</b></p><p data-pid="_K8A5Mj0">要可视化时间表数据，请使用诸如<code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/finance/highlow.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">highlow</a></code>或<code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/finance/movavg.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">movavg</a></code>的财务图表函数。对于此示例，<code>highlow</code>移动平均信息绘制在同一张图表上，以提供完整的可视化效果。要获取2014年的股票表现，请使用MATLAB <code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/matlab/ref/timerange.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">timerange</a></code>函数选择<code>timetable</code>的行。要可视化诸如移动平均收敛散度（MACD）之类的技术指标，请将<code>timetable</code>对象传递到<code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/finance/macd.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">macd</a></code>函数中进行分析。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">index</span> <span class="p">=</span> <span class="n">timerange</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="s">&#39;01-Jan-2014&#39;</span><span class="p">,</span><span class="s">&#39;Locale&#39;</span><span class="p">,</span><span class="s">&#39;en_US&#39;</span><span class="p">),</span><span class="n">datetime</span><span class="p">(</span><span class="s">&#39;31-Dec-2014&#39;</span><span class="p">,</span><span class="s">&#39;Locale&#39;</span><span class="p">,</span><span class="s">&#39;en_US&#39;</span><span class="p">),</span><span class="s">&#39;closed&#39;</span><span class="p">);</span>
+ ?
+ <span class="n">highlow</span><span class="p">(</span><span class="n">TMW</span><span class="p">(</span><span class="n">index</span><span class="p">,:));</span>
+ <span class="n">hold</span> <span class="n">on</span>
+ ?
+ <span class="n">ema15</span> <span class="p">=</span> <span class="n">movavg</span><span class="p">(</span><span class="n">TMW</span><span class="p">(:,</span><span class="s">&#39;Close&#39;</span><span class="p">),</span><span class="s">&#39;exponential&#39;</span><span class="p">,</span><span class="mi">15</span><span class="p">);</span>
+ <span class="n">ema25</span> <span class="p">=</span> <span class="n">movavg</span><span class="p">(</span><span class="n">TMW</span><span class="p">(:,</span><span class="s">&#39;Close&#39;</span><span class="p">),</span><span class="s">&#39;exponential&#39;</span><span class="p">,</span><span class="mi">25</span><span class="p">);</span>
+ ?
+ <span class="n">ema15</span> <span class="p">=</span> <span class="n">ema15</span><span class="p">(</span><span class="n">index</span><span class="p">,:);</span>
+ <span class="n">ema25</span> <span class="p">=</span> <span class="n">ema25</span><span class="p">(</span><span class="n">index</span><span class="p">,:);</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">ema15</span><span class="p">.</span><span class="n">Time</span><span class="p">,</span><span class="n">ema15</span><span class="p">.</span><span class="n">Close</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">);</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">ema25</span><span class="p">.</span><span class="n">Time</span><span class="p">,</span><span class="n">ema25</span><span class="p">.</span><span class="n">Close</span><span class="p">,</span><span class="s">&#39;g&#39;</span><span class="p">);</span>
+ <span class="n">hold</span> <span class="n">off</span>
+ ?
+ <span class="n">legend</span><span class="p">(</span><span class="s">&#39;Price&#39;</span><span class="p">,</span><span class="s">&#39;15-Day EMA&#39;</span><span class="p">,</span><span class="s">&#39;25-Day EMA&#39;</span><span class="p">)</span>
+ <span class="n">title</span><span class="p">(</span><span class="s">&#39;Highlow Plot for TMW&#39;</span><span class="p">)</span></code></pre></div><br><img src="https://pic2.zhimg.com/v2-d480e9ac0782c53511b8f8685debf7ad_b.jpg"><div class="highlight"><pre><code class="language-matlab"> <span class="p">[</span><span class="n">macdLine</span><span class="p">,</span> <span class="n">signalLine</span><span class="p">]</span> <span class="p">=</span> <span class="n">macd</span><span class="p">(</span><span class="n">TMW</span><span class="p">(:,</span><span class="s">&#39;Close&#39;</span><span class="p">));</span>
+ ?
+ <span class="n">plot</span><span class="p">(</span><span class="n">macdLine</span><span class="p">.</span><span class="n">Time</span><span class="p">,</span><span class="n">macdLine</span><span class="p">.</span><span class="n">Close</span><span class="p">);</span>
+ <span class="n">hold</span> <span class="n">on</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">signalLine</span><span class="p">.</span><span class="n">Time</span><span class="p">,</span><span class="n">signalLine</span><span class="p">.</span><span class="n">Close</span><span class="p">);</span>
+ <span class="n">hold</span> <span class="n">off</span>
+ ?
+ <span class="n">title</span><span class="p">(</span><span class="s">&#39;MACD for TMW&#39;</span><span class="p">)</span>
+ <span class="n">legend</span><span class="p">(</span><span class="s">&#39;MACD Line&#39;</span><span class="p">,</span> <span class="s">&#39;Signal Line&#39;</span><span class="p">)</span></code></pre></div><br><img src="v2-c83c3675258c39741475611fe5fdce7a_720w.jpg"><p data-pid="GpB11QNo"><b>步骤5.创建每周收益率和波动率序列。</b></p><p data-pid="wC08xmvq">要从每日股票价格计算每周收益，必须从每天到每周重新采样数据频率。使用时间表时，请使用MATLAB函数<code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/matlab/ref/timetable.retime.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">retime</a></code>或<code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/matlab/ref/timetable.synchronize.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">synchronize</a></code>的各种聚合方法来计算每周统计信息。要将时间表数据调整为时间向量，请使用<code>retime</code>函数，使用<code>synchronize</code>协调多个时间表。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">weeklyOpen</span> <span class="p">=</span> <span class="n">retime</span><span class="p">(</span><span class="n">TMW</span><span class="p">(:,</span><span class="s">&#39;Open&#39;</span><span class="p">),</span><span class="s">&#39;weekly&#39;</span><span class="p">,</span><span class="s">&#39;firstvalue&#39;</span><span class="p">);</span>
+ <span class="n">weeklyHigh</span> <span class="p">=</span> <span class="n">retime</span><span class="p">(</span><span class="n">TMW</span><span class="p">(:,</span><span class="s">&#39;High&#39;</span><span class="p">),</span><span class="s">&#39;weekly&#39;</span><span class="p">,</span><span class="s">&#39;max&#39;</span><span class="p">);</span>
+ <span class="n">weeklyLow</span> <span class="p">=</span> <span class="n">retime</span><span class="p">(</span><span class="n">TMW</span><span class="p">(:,</span><span class="s">&#39;Low&#39;</span><span class="p">),</span><span class="s">&#39;weekly&#39;</span><span class="p">,</span><span class="s">&#39;min&#39;</span><span class="p">);</span>
+ <span class="n">weeklyClose</span> <span class="p">=</span> <span class="n">retime</span><span class="p">(</span><span class="n">TMW</span><span class="p">(:,</span><span class="s">&#39;Close&#39;</span><span class="p">),</span><span class="s">&#39;weekly&#39;</span><span class="p">,</span><span class="s">&#39;lastvalue&#39;</span><span class="p">);</span>
+ <span class="n">weeklyTMW</span> <span class="p">=</span> <span class="p">[</span><span class="n">weeklyOpen</span><span class="p">,</span><span class="n">weeklyHigh</span><span class="p">,</span><span class="n">weeklyLow</span><span class="p">,</span><span class="n">weeklyClose</span><span class="p">];</span>
+ ?
+ <span class="n">weeklyTMW</span> <span class="p">=</span> <span class="n">synchronize</span><span class="p">(</span><span class="n">weeklyTMW</span><span class="p">,</span><span class="n">TMW</span><span class="p">(:,</span><span class="s">&#39;Volume&#39;</span><span class="p">),</span><span class="s">&#39;weekly&#39;</span><span class="p">,</span><span class="s">&#39;sum&#39;</span><span class="p">);</span>
+ <span class="n">head</span><span class="p">(</span><span class="n">weeklyTMW</span><span class="p">)</span>
+ <span class="nb">ans</span><span class="p">=</span><span class="mi">8</span>×<span class="mi">5</span> <span class="n">timetable</span>
+        <span class="n">Time</span>         <span class="n">Open</span>      <span class="n">High</span>      <span class="n">Low</span>      <span class="n">Close</span>       <span class="n">Volume</span>  
+     <span class="n">___________</span>    <span class="n">______</span>    <span class="n">______</span>    <span class="n">______</span>    <span class="n">______</span>    <span class="n">__________</span>
+ ?
+     <span class="mi">02</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>       <span class="mi">100</span>    <span class="mf">102.38</span>     <span class="mf">98.45</span>     <span class="mf">99.51</span>    <span class="mf">2.7279e+07</span>
+     <span class="mi">09</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>     <span class="mf">99.72</span>    <span class="mf">101.55</span>     <span class="mf">96.52</span>     <span class="mf">97.52</span>    <span class="mf">2.8518e+07</span>
+     <span class="mi">16</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>     <span class="mf">97.35</span>     <span class="mf">97.52</span>      <span class="mf">92.6</span>     <span class="mf">93.73</span>    <span class="mf">2.9151e+07</span>
+     <span class="mi">23</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>     <span class="mf">93.55</span>     <span class="mf">98.03</span>     <span class="mf">92.25</span>     <span class="mf">97.35</span>     <span class="mf">3.179e+07</span>
+     <span class="mi">30</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>      <span class="mf">97.3</span>    <span class="mf">103.15</span>     <span class="mf">96.68</span>     <span class="mf">99.66</span>    <span class="mf">3.3761e+07</span>
+     <span class="mi">07</span><span class="o">-</span><span class="n">Oct</span><span class="o">-</span><span class="mi">2012</span>     <span class="mf">99.76</span>    <span class="mf">106.61</span>      <span class="mf">98.7</span>    <span class="mf">104.23</span>    <span class="mf">3.1299e+07</span>
+     <span class="mi">14</span><span class="o">-</span><span class="n">Oct</span><span class="o">-</span><span class="mi">2012</span>    <span class="mf">104.54</span>    <span class="mf">109.75</span>    <span class="mf">100.55</span>    <span class="mf">103.77</span>    <span class="mf">3.1534e+07</span>
+     <span class="mi">21</span><span class="o">-</span><span class="n">Oct</span><span class="o">-</span><span class="mi">2012</span>    <span class="mf">103.84</span>    <span class="mf">104.32</span>     <span class="mf">96.95</span>     <span class="mf">97.41</span>    <span class="mf">3.1706e+07</span></code></pre></div><p data-pid="s7URGMYp">要对<code>timetable</code>中的条目执行计算，请使用MATLAB <code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/matlab/ref/rowfun.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">rowfun</a></code>函数，将函数应用于每周频率时间表的每一行。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">returnFunc</span> <span class="p">=</span> <span class="p">@(</span><span class="n">open</span><span class="p">,</span><span class="n">high</span><span class="p">,</span><span class="n">low</span><span class="p">,</span><span class="n">close</span><span class="p">,</span><span class="n">volume</span><span class="p">)</span> <span class="nb">log</span><span class="p">(</span><span class="n">close</span><span class="p">)</span> <span class="o">-</span> <span class="nb">log</span><span class="p">(</span><span class="n">open</span><span class="p">);</span>
+ <span class="n">weeklyReturn</span> <span class="p">=</span> <span class="n">rowfun</span><span class="p">(</span><span class="n">returnFunc</span><span class="p">,</span><span class="n">weeklyTMW</span><span class="p">,</span><span class="s">&#39;OutputVariableNames&#39;</span><span class="p">,{</span><span class="s">&#39;Return&#39;</span><span class="p">});</span>
+ ?
+ <span class="n">weeklyStd</span> <span class="p">=</span> <span class="n">retime</span><span class="p">(</span><span class="n">TMW</span><span class="p">(:,</span><span class="s">&#39;Close&#39;</span><span class="p">),</span><span class="s">&#39;weekly&#39;</span><span class="p">,@</span><span class="n">std</span><span class="p">);</span>
+ <span class="n">weeklyStd</span><span class="p">.</span><span class="n">Properties</span><span class="p">.</span><span class="n">VariableNames</span><span class="p">{</span><span class="s">&#39;Close&#39;</span><span class="p">}</span> <span class="p">=</span> <span class="s">&#39;Volatility&#39;</span><span class="p">;</span>
+ ?
+ <span class="n">weeklyTMW</span> <span class="p">=</span> <span class="p">[</span><span class="n">weeklyReturn</span><span class="p">,</span><span class="n">weeklyStd</span><span class="p">,</span><span class="n">weeklyTMW</span><span class="p">]</span>  
+ <span class="n">weeklyTMW</span><span class="p">=</span><span class="mi">208</span>×<span class="mi">7</span> <span class="n">timetable</span>
+        <span class="n">Time</span>          <span class="n">Return</span>       <span class="n">Volatility</span>     <span class="n">Open</span>      <span class="n">High</span>      <span class="n">Low</span>      <span class="n">Close</span>       <span class="n">Volume</span>  
+     <span class="n">___________</span>    <span class="n">___________</span>    <span class="n">__________</span>    <span class="n">______</span>    <span class="n">______</span>    <span class="n">______</span>    <span class="n">______</span>    <span class="n">__________</span>
+ ?
+     <span class="mi">02</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>      <span class="o">-</span><span class="mf">0.004912</span>     <span class="mf">0.59386</span>         <span class="mi">100</span>    <span class="mf">102.38</span>     <span class="mf">98.45</span>     <span class="mf">99.51</span>    <span class="mf">2.7279e+07</span>
+     <span class="mi">09</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>      <span class="o">-</span><span class="mf">0.022309</span>     <span class="mf">0.63563</span>       <span class="mf">99.72</span>    <span class="mf">101.55</span>     <span class="mf">96.52</span>     <span class="mf">97.52</span>    <span class="mf">2.8518e+07</span>
+     <span class="mi">16</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>      <span class="o">-</span><span class="mf">0.037894</span>     <span class="mf">0.93927</span>       <span class="mf">97.35</span>     <span class="mf">97.52</span>      <span class="mf">92.6</span>     <span class="mf">93.73</span>    <span class="mf">2.9151e+07</span>
+     <span class="mi">23</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>       <span class="mf">0.039817</span>      <span class="mf">2.0156</span>       <span class="mf">93.55</span>     <span class="mf">98.03</span>     <span class="mf">92.25</span>     <span class="mf">97.35</span>     <span class="mf">3.179e+07</span>
+     <span class="mi">30</span><span class="o">-</span><span class="n">Sep</span><span class="o">-</span><span class="mi">2012</span>       <span class="mf">0.023965</span>      <span class="mf">1.1014</span>        <span class="mf">97.3</span>    <span class="mf">103.15</span>     <span class="mf">96.68</span>     <span class="mf">99.66</span>    <span class="mf">3.3761e+07</span>
+     <span class="mi">07</span><span class="o">-</span><span class="n">Oct</span><span class="o">-</span><span class="mi">2012</span>       <span class="mf">0.043833</span>      <span class="mf">1.3114</span>       <span class="mf">99.76</span>    <span class="mf">106.61</span>      <span class="mf">98.7</span>    <span class="mf">104.23</span>    <span class="mf">3.1299e+07</span>
+     <span class="mi">14</span><span class="o">-</span><span class="n">Oct</span><span class="o">-</span><span class="mi">2012</span>     <span class="o">-</span><span class="mf">0.0073929</span>      <span class="mf">1.8097</span>      <span class="mf">104.54</span>    <span class="mf">109.75</span>    <span class="mf">100.55</span>    <span class="mf">103.77</span>    <span class="mf">3.1534e+07</span>
+     <span class="mi">21</span><span class="o">-</span><span class="n">Oct</span><span class="o">-</span><span class="mi">2012</span>      <span class="o">-</span><span class="mf">0.063922</span>      <span class="mf">2.1603</span>      <span class="mf">103.84</span>    <span class="mf">104.32</span>     <span class="mf">96.95</span>     <span class="mf">97.41</span>    <span class="mf">3.1706e+07</span>
+     <span class="mi">28</span><span class="o">-</span><span class="n">Oct</span><span class="o">-</span><span class="mi">2012</span>      <span class="o">-</span><span class="mf">0.028309</span>      <span class="mf">0.9815</span>       <span class="mf">97.45</span>      <span class="mf">99.1</span>     <span class="mf">92.58</span>     <span class="mf">94.73</span>    <span class="mf">1.9866e+07</span>
+     <span class="mi">04</span><span class="o">-</span><span class="n">Nov</span><span class="o">-</span><span class="mi">2012</span>    <span class="o">-</span><span class="mf">0.00010566</span>       <span class="mf">1.224</span>       <span class="mf">94.65</span>      <span class="mf">96.1</span>     <span class="mf">90.82</span>     <span class="mf">94.64</span>    <span class="mf">3.5043e+07</span>
+     <span class="mi">11</span><span class="o">-</span><span class="n">Nov</span><span class="o">-</span><span class="mi">2012</span>       <span class="mf">0.077244</span>      <span class="mf">2.4854</span>       <span class="mf">94.39</span>    <span class="mf">103.98</span>     <span class="mf">93.84</span>    <span class="mf">101.97</span>    <span class="mf">3.0624e+07</span>
+     <span class="mi">18</span><span class="o">-</span><span class="n">Nov</span><span class="o">-</span><span class="mi">2012</span>       <span class="mf">0.022823</span>     <span class="mf">0.55896</span>      <span class="mf">102.23</span>    <span class="mf">105.27</span>    <span class="mf">101.24</span>    <span class="mf">104.59</span>    <span class="mf">2.5803e+07</span>
+     <span class="mi">25</span><span class="o">-</span><span class="n">Nov</span><span class="o">-</span><span class="mi">2012</span>      <span class="o">-</span><span class="mf">0.012789</span>       <span class="mf">1.337</span>      <span class="mf">104.66</span>    <span class="mf">106.02</span>    <span class="mf">100.85</span>    <span class="mf">103.33</span>    <span class="mf">3.1402e+07</span>
+     <span class="mi">02</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2012</span>      <span class="o">-</span><span class="mf">0.043801</span>      <span class="mf">0.2783</span>      <span class="mf">103.37</span>    <span class="mf">103.37</span>     <span class="mf">97.69</span>     <span class="mf">98.94</span>    <span class="mf">3.2136e+07</span>
+     <span class="mi">09</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2012</span>      <span class="o">-</span><span class="mf">0.063475</span>      <span class="mf">1.9826</span>       <span class="mf">99.02</span>     <span class="mf">99.09</span>     <span class="mf">91.34</span>     <span class="mf">92.93</span>    <span class="mf">3.4447e+07</span>
+     <span class="mi">16</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2012</span>      <span class="mf">0.0025787</span>      <span class="mf">1.2789</span>       <span class="mf">92.95</span>      <span class="mf">94.2</span>     <span class="mf">88.58</span>     <span class="mf">93.19</span>    <span class="mf">3.3247e+07</span>
+       ?</code></pre>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
