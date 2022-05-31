@@ -1,0 +1,56 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB金融工具箱：02：布林带指标图</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB金融工具箱：02：布林带指标图</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="E0oXEoTF">Financial Toolbox中的<code><a href="https://www.mathworks.com/help/finance/bolling.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">bolling</a></code>函数使用IBM?股票价格矩阵中的所有收盘价来生成布林带图。布林带图绘制了实际数据以及其他三个数据带。上带是移动均线上方的两倍标准差；下带是该移动平均线以下的两倍标准差；中间带是移动平均线本身。本示例使用15天移动平均线。首先，使用ibm.dat数据文件加载数据，然后执行该<code><a href="https://www.mathworks.com/help/finance/bolling.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">bolling</a></code>函数绘制布林带。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">load</span> <span class="n">ibm</span><span class="p">.</span><span class="n">dat</span><span class="p">;</span>
+ <span class="p">[</span><span class="n">ro</span><span class="p">,</span> <span class="n">co</span><span class="p">]</span> <span class="p">=</span> <span class="nb">size</span><span class="p">(</span><span class="n">ibm</span><span class="p">);</span>
+ <span class="n">bolling</span><span class="p">(</span><span class="n">ibm</span><span class="p">(:,</span><span class="mi">4</span><span class="p">),</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>     
+ <span class="n">Warning</span><span class="p">:</span> <span class="n">BOLLING</span> <span class="n">will</span> <span class="n">be</span> <span class="n">removed</span> <span class="n">in</span> <span class="n">a</span> <span class="n">future</span> <span class="n">release</span><span class="p">.</span> <span class="n">Use</span> <span class="n">BOLLINGER</span> <span class="n">instead</span><span class="p">.</span>
+ <span class="n">axis</span><span class="p">([</span><span class="mi">0</span> <span class="n">ro</span> <span class="n">min</span><span class="p">(</span><span class="n">ibm</span><span class="p">(:,</span><span class="mi">4</span><span class="p">))</span> <span class="n">max</span><span class="p">(</span><span class="n">ibm</span><span class="p">(:,</span><span class="mi">4</span><span class="p">))]);</span>
+ <span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Price ($)&#39;</span><span class="p">);</span>
+ <span class="n">title</span><span class="p">([</span><span class="s">&#39;International Business Machines&#39;</span><span class="p">]);</span>
+ <span class="n">dateaxis</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span><span class="s">&#39;31-Dec-1994&#39;</span><span class="p">)</span></code></pre></div><br><img src="v2-fa6a2d0834fb124d510af08bd286f68b_720w.jpg"><p data-pid="Mzx8S7qH">指定轴，标签和标题。使用<code><a href="https://www.mathworks.com/help/finance/dateaxis.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">dateaxis</a></code>添加的<i>X</i>轴日期。</p><p data-pid="yZ59nrXZ">有关使用MATLAB?绘图功能的帮助，请参见MATLAB文档中的<a href="https://www.mathworks.com/help/matlab/creating_plots/using-high-level-plotting-functions.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">创建二维线图</a>（MATLAB）。请参阅有关细节MATLAB文档<code><a href="https://www.mathworks.com/help/matlab/ref/axis.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">axis</a></code>，<code><a href="https://www.mathworks.com/help/matlab/ref/title.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">title</a></code>，<code><a href="https://www.mathworks.com/help/matlab/ref/xlabel.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">xlabel</a></code>，和<code><a href="https://www.mathworks.com/help/matlab/ref/ylabel.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">ylabel</a></code>函数。</p><hr/><p data-pid="xPsobXvs">注：本文根据MATLAB官网内容修改而成。</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
