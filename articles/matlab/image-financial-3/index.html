@@ -1,0 +1,139 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB金融工具箱：03：有缺失数据的投资组合</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB金融工具箱：03：有缺失数据的投资组合</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="C4Rni6zM">本示例说明如何使用缺失的数据算法进行投资组合优化和评估。本示例使用12种计算机技术股，6家硬件和6家软件公司的五年间每日总收益数据进行分析。该示例估计了这些股票的均值和协方差矩阵，并通过朴素方法和ECM方法形成了有效的边界，然后比较了结果。</p><p data-pid="zVdGZ5nz">加载数据文件。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">load</span> <span class="n">ecmtechdemo</span><span class="p">.</span><span class="n">mat</span></code></pre></div><p data-pid="yCQXyAl8">该数据文件包含以下三个量：</p><ul><li data-pid="uPuxBaee"><code>Assets</code> 是示例中12种股票的股票行情的元胞数组。</li><li data-pid="yru3E32p"><code>Data</code>是12只股票每日总收益的<code>1254</code>X <code>12</code>矩阵。</li><li data-pid="-Iu5hZVs"><code>Dates</code>是与数据关联的日期的<code>1254</code>X<code>1</code>列向量。</li></ul><p data-pid="pl3bCjIk">数据的时间范围从2000年4月19日到2005年4月18日。<code>Assets</code>的第六只股票是Google（GOOG），该股票于2004年8月19日开始交易。因此，2004年8月20日之前的所有回报均不存在并表示为<code>NaN</code>。此外，亚马逊（AMZN）在过去五年中也有几天的数据缺失。</p><p data-pid="4FbVy4Dn">估算这12只股票的均值和协方差的朴素方法是：消除含有缺值的任何一行（天）的数据。使用<code><a href="https://www.mathworks.com/help/finance/ecmninit.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">ecmninit</a></code>函数的<code>&#39;nanskip&#39;</code>选项的来实现此操作。</p><div class="highlight"><pre><code class="language-matlab"> <span class="p">[</span><span class="n">NaNMean</span><span class="p">,</span> <span class="n">NaNCovar</span><span class="p">]</span> <span class="p">=</span> <span class="n">ecmninit</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span><span class="s">&#39;nanskip&#39;</span><span class="p">);</span></code></pre></div><p data-pid="uoDC18_5">将上述朴素方法与使用所有可用数据和函数<code><a href="https://www.mathworks.com/help/finance/ecmnmle.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">ecmnmle</a></code>计算均值和协方差的方法进行比较。首先，调用<code><a href="https://www.mathworks.com/help/finance/ecmnmle.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">ecmnmle</a></code>，不使用任何输出参数，为获取有意义的估计建立足够的数据。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">ecmnmle</span><span class="p">(</span><span class="n">Data</span><span class="p">);</span></code></pre></div><br><img src="v2-b88b8f9c4c5d17fdb221fa778e663cb8_720w.jpg"><p data-pid="6dRlRdxW">该图表明，即使有将近87％的Google数据都是<code>NaN</code>值，该算法也只经过四次迭代即可收敛。</p><p data-pid="xY8pZO1_"><code><a href="https://www.mathworks.com/help/finance/ecmnmle.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">ecmnmle</a></code>完成均值和协方差的估算。</p><div class="highlight"><pre><code class="language-matlab"> <span class="p">[</span><span class="n">ECMMean</span><span class="p">,</span> <span class="n">ECMCovar</span><span class="p">]</span> <span class="p">=</span> <span class="n">ecmnmle</span><span class="p">(</span><span class="n">Data</span><span class="p">)</span>
+ <span class="n">ECMMean</span> <span class="p">=</span> <span class="mi">12</span>×<span class="mi">1</span>
+ ?
+     <span class="mf">0.0008</span>
+     <span class="mf">0.0008</span>
+    <span class="o">-</span><span class="mf">0.0005</span>
+     <span class="mf">0.0002</span>
+     <span class="mf">0.0011</span>
+     <span class="mf">0.0038</span>
+    <span class="o">-</span><span class="mf">0.0003</span>
+    <span class="o">-</span><span class="mf">0.0000</span>
+    <span class="o">-</span><span class="mf">0.0003</span>
+    <span class="o">-</span><span class="mf">0.0000</span>
+       ?
+ <span class="n">ECMCovar</span> <span class="p">=</span> <span class="mi">12</span>×<span class="mi">12</span>
+ ?
+     <span class="mf">0.0012</span>    <span class="mf">0.0005</span>    <span class="mf">0.0006</span>    <span class="mf">0.0005</span>    <span class="mf">0.0005</span>    <span class="mf">0.0003</span>    <span class="mf">0.0005</span>    <span class="mf">0.0003</span>    <span class="mf">0.0006</span>    <span class="mf">0.0003</span>    <span class="mf">0.0005</span>    <span class="mf">0.0006</span>
+     <span class="mf">0.0005</span>    <span class="mf">0.0024</span>    <span class="mf">0.0007</span>    <span class="mf">0.0006</span>    <span class="mf">0.0010</span>    <span class="mf">0.0004</span>    <span class="mf">0.0005</span>    <span class="mf">0.0003</span>    <span class="mf">0.0006</span>    <span class="mf">0.0004</span>    <span class="mf">0.0006</span>    <span class="mf">0.0012</span>
+     <span class="mf">0.0006</span>    <span class="mf">0.0007</span>    <span class="mf">0.0013</span>    <span class="mf">0.0007</span>    <span class="mf">0.0007</span>    <span class="mf">0.0003</span>    <span class="mf">0.0006</span>    <span class="mf">0.0004</span>    <span class="mf">0.0008</span>    <span class="mf">0.0005</span>    <span class="mf">0.0008</span>    <span class="mf">0.0008</span>
+     <span class="mf">0.0005</span>    <span class="mf">0.0006</span>    <span class="mf">0.0007</span>    <span class="mf">0.0009</span>    <span class="mf">0.0006</span>    <span class="mf">0.0002</span>    <span class="mf">0.0005</span>    <span class="mf">0.0003</span>    <span class="mf">0.0007</span>    <span class="mf">0.0004</span>    <span class="mf">0.0005</span>    <span class="mf">0.0007</span>
+     <span class="mf">0.0005</span>    <span class="mf">0.0010</span>    <span class="mf">0.0007</span>    <span class="mf">0.0006</span>    <span class="mf">0.0016</span>    <span class="mf">0.0006</span>    <span class="mf">0.0005</span>    <span class="mf">0.0003</span>    <span class="mf">0.0006</span>    <span class="mf">0.0004</span>    <span class="mf">0.0007</span>    <span class="mf">0.0011</span>
+     <span class="mf">0.0003</span>    <span class="mf">0.0004</span>    <span class="mf">0.0003</span>    <span class="mf">0.0002</span>    <span class="mf">0.0006</span>    <span class="mf">0.0022</span>    <span class="mf">0.0001</span>    <span class="mf">0.0002</span>    <span class="mf">0.0002</span>    <span class="mf">0.0001</span>    <span class="mf">0.0003</span>    <span class="mf">0.0016</span>
+     <span class="mf">0.0005</span>    <span class="mf">0.0005</span>    <span class="mf">0.0006</span>    <span class="mf">0.0005</span>    <span class="mf">0.0005</span>    <span class="mf">0.0001</span>    <span class="mf">0.0009</span>    <span class="mf">0.0003</span>    <span class="mf">0.0005</span>    <span class="mf">0.0004</span>    <span class="mf">0.0005</span>    <span class="mf">0.0006</span>
+     <span class="mf">0.0003</span>    <span class="mf">0.0003</span>    <span class="mf">0.0004</span>    <span class="mf">0.0003</span>    <span class="mf">0.0003</span>    <span class="mf">0.0002</span>    <span class="mf">0.0003</span>    <span class="mf">0.0005</span>    <span class="mf">0.0004</span>    <span class="mf">0.0003</span>    <span class="mf">0.0004</span>    <span class="mf">0.0004</span>
+     <span class="mf">0.0006</span>    <span class="mf">0.0006</span>    <span class="mf">0.0008</span>    <span class="mf">0.0007</span>    <span class="mf">0.0006</span>    <span class="mf">0.0002</span>    <span class="mf">0.0005</span>    <span class="mf">0.0004</span>    <span class="mf">0.0011</span>    <span class="mf">0.0005</span>    <span class="mf">0.0007</span>    <span class="mf">0.0007</span>
+     <span class="mf">0.0003</span>    <span class="mf">0.0004</span>    <span class="mf">0.0005</span>    <span class="mf">0.0004</span>    <span class="mf">0.0004</span>    <span class="mf">0.0001</span>    <span class="mf">0.0004</span>    <span class="mf">0.0003</span>    <span class="mf">0.0005</span>    <span class="mf">0.0006</span>    <span class="mf">0.0004</span>    <span class="mf">0.0005</span>
+       ?</code></pre></div><p data-pid="UL6d59ki">给出了从朴素方法和ECM方法得出的资产收益的均值和协方差的估计值，估计投资组合以及在这两种方法的有效边界上，相关预期收益和风险。</p><div class="highlight"><pre><code class="language-matlab"> <span class="p">[</span><span class="n">ECMRisk</span><span class="p">,</span> <span class="n">ECMReturn</span><span class="p">,</span> <span class="n">ECMWts</span><span class="p">]</span> <span class="p">=</span> <span class="n">portopt</span><span class="p">(</span><span class="n">ECMMean</span><span class="o">&#39;</span><span class="p">,</span><span class="n">ECMCovar</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+ <span class="p">[</span><span class="n">NaNRisk</span><span class="p">,</span> <span class="n">NaNReturn</span><span class="p">,</span> <span class="n">NaNWts</span><span class="p">]</span> <span class="p">=</span> <span class="n">portopt</span><span class="p">(</span><span class="n">NaNMean</span><span class="o">&#39;</span><span class="p">,</span><span class="n">NaNCovar</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span></code></pre></div><p data-pid="S-bmLyrZ">将结果绘制在同一张图上以说明差异。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">figure</span><span class="p">(</span><span class="n">gcf</span><span class="p">)</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">ECMRisk</span><span class="p">,</span><span class="n">ECMReturn</span><span class="p">,</span><span class="s">&#39;-bo&#39;</span><span class="p">,</span><span class="s">&#39;MarkerFaceColor&#39;</span><span class="p">,</span><span class="s">&#39;b&#39;</span><span class="p">,</span><span class="s">&#39;MarkerSize&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+ <span class="n">hold</span> <span class="n">on</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">NaNRisk</span><span class="p">,</span><span class="n">NaNReturn</span><span class="p">,</span><span class="s">&#39;-ro&#39;</span><span class="p">,</span><span class="s">&#39;MarkerFaceColor&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">,</span><span class="s">&#39;MarkerSize&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+ <span class="n">title</span><span class="p">(</span><span class="s">&#39;\bfEfficient Frontiers Under Various Assumptions&#39;</span><span class="p">);</span>
+ <span class="n">legend</span><span class="p">(</span><span class="s">&#39;ECM&#39;</span><span class="p">,</span><span class="s">&#39;NaN&#39;</span><span class="p">,</span><span class="s">&#39;Location&#39;</span><span class="p">,</span><span class="s">&#39;SouthEast&#39;</span><span class="p">);</span>
+ <span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;\bfStd. Deviation of Returns&#39;</span><span class="p">);</span>
+ <span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;\bfMean of Returns&#39;</span><span class="p">);</span>
+ <span class="n">hold</span> <span class="n">off</span></code></pre></div><br><img src="v2-5208a109040aef97422557d5539736d5_720w.jpg"><p data-pid="VqUeIofD">显然，朴素方法对这12只技术股的风险收益权衡持乐观态度。但是，证明在于投资组合的权重。要查看权重：</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">Assets</span>
+ <span class="n">Assets</span> <span class="p">=</span> <span class="mi">1</span><span class="n">x12</span> <span class="n">cell</span>
+   <span class="n">Columns</span> <span class="mi">1</span> <span class="n">through</span> <span class="mi">6</span>
+ ?
+     <span class="p">{</span><span class="s">&#39;AAPL&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;AMZN&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;CSCO&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;DELL&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;EBAY&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;GOOG&#39;</span><span class="p">}</span>
+ ?
+   <span class="n">Columns</span> <span class="mi">7</span> <span class="n">through</span> <span class="mi">12</span>
+ ?
+     <span class="p">{</span><span class="s">&#39;HPQ&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;IBM&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;INTC&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;MSFT&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;ORCL&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;YHOO&#39;</span><span class="p">}</span>
+ <span class="n">ECMWts</span>
+ <span class="n">ECMWts</span> <span class="p">=</span> <span class="mi">10</span>×<span class="mi">12</span>
+ ?
+     <span class="mf">0.0358</span>    <span class="mf">0.0011</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.0989</span>    <span class="mf">0.0535</span>    <span class="mf">0.4676</span>         <span class="mi">0</span>    <span class="mf">0.3431</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.0654</span>    <span class="mf">0.0110</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.1877</span>    <span class="mf">0.0179</span>    <span class="mf">0.3899</span>         <span class="mi">0</span>    <span class="mf">0.3282</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.0923</span>    <span class="mf">0.0194</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.2784</span>         <span class="mi">0</span>    <span class="mf">0.3025</span>         <span class="mi">0</span>    <span class="mf">0.3074</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.1165</span>    <span class="mf">0.0264</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.3712</span>         <span class="mi">0</span>    <span class="mf">0.2054</span>         <span class="mi">0</span>    <span class="mf">0.2806</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.1407</span>    <span class="mf">0.0334</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.4639</span>         <span class="mi">0</span>    <span class="mf">0.1083</span>         <span class="mi">0</span>    <span class="mf">0.2538</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.1648</span>    <span class="mf">0.0403</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.5566</span>         <span class="mi">0</span>    <span class="mf">0.0111</span>         <span class="mi">0</span>    <span class="mf">0.2271</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.1755</span>    <span class="mf">0.0457</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.6532</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.1255</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.1845</span>    <span class="mf">0.0509</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.7502</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.0143</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.1093</span>    <span class="mf">0.0174</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.8733</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>
+          <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">1.0000</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>
+ <span class="n">NaNWts</span>
+ <span class="n">NaNWts</span> <span class="p">=</span> <span class="mi">10</span>×<span class="mi">12</span>
+ ?
+          <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.1185</span>         <span class="mi">0</span>    <span class="mf">0.0522</span>    <span class="mf">0.0824</span>    <span class="mf">0.1779</span>         <span class="mi">0</span>    <span class="mf">0.5691</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.0576</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.1219</span>         <span class="mi">0</span>    <span class="mf">0.0854</span>    <span class="mf">0.1274</span>    <span class="mf">0.0460</span>         <span class="mi">0</span>    <span class="mf">0.5617</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.1248</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.0952</span>         <span class="mi">0</span>    <span class="mf">0.1195</span>    <span class="mf">0.1674</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.4802</span>    <span class="mf">0.0129</span>         <span class="mi">0</span>
+     <span class="mf">0.1969</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.0529</span>         <span class="mi">0</span>    <span class="mf">0.1551</span>    <span class="mf">0.2056</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.3621</span>    <span class="mf">0.0274</span>         <span class="mi">0</span>
+     <span class="mf">0.2690</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.0105</span>         <span class="mi">0</span>    <span class="mf">0.1906</span>    <span class="mf">0.2438</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.2441</span>    <span class="mf">0.0419</span>         <span class="mi">0</span>
+     <span class="mf">0.3414</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.2265</span>    <span class="mf">0.2782</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.0988</span>    <span class="mf">0.0551</span>         <span class="mi">0</span>
+     <span class="mf">0.4235</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.2639</span>    <span class="mf">0.2788</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.0337</span>         <span class="mi">0</span>
+     <span class="mf">0.5245</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.3034</span>    <span class="mf">0.1721</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">0.6269</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">0.3425</span>    <span class="mf">0.0306</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>
+     <span class="mf">1.0000</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span></code></pre></div><p data-pid="oq5rtP1d">从Google IPO到估算期末期间，<code>NaNWts</code>中朴素的投资组合倾向于偏爱APL，而<code>ECMWts</code>中的ECM组合则抑制AAPL权重，并且相对于朴素权重而言，推荐增加GOOG的权重。</p><p data-pid="A1ocmK23">为了评估估计误差的影响，尤其是缺失数据的影响，可用<code><a href="https://www.mathworks.com/help/finance/ecmnstd.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">ecmnstd</a></code>计算标准误差。尽管可以估计均值和协方差的标准误（standard error），但通常仅靠均值估计的标准误是主要的关注量。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">StdMeanF</span> <span class="p">=</span> <span class="n">ecmnstd</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span><span class="n">ECMMean</span><span class="p">,</span><span class="n">ECMCovar</span><span class="p">,</span><span class="s">&#39;fisher&#39;</span><span class="p">);</span></code></pre></div><p data-pid="K-M6BtVP">使用<code>&#39;hessian&#39;</code>选项计算使用数据生成的Hessian矩阵（其说明由于缺少数据而可能造成的信息丢失）的标准误。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">StdMeanH</span> <span class="p">=</span> <span class="n">ecmnstd</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span><span class="n">ECMMean</span><span class="p">,</span><span class="n">ECMCovar</span><span class="p">,</span><span class="s">&#39;hessian&#39;</span><span class="p">);</span></code></pre></div><p data-pid="zXcYpX5w">标准误的差异表明，由于缺少数据，资产预期收益估计的不确定性增加。要查看差异：</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">Assets</span>
+ <span class="n">Assets</span> <span class="p">=</span> <span class="mi">1</span><span class="n">x12</span> <span class="n">cell</span>
+   <span class="n">Columns</span> <span class="mi">1</span> <span class="n">through</span> <span class="mi">6</span>
+ ?
+     <span class="p">{</span><span class="s">&#39;AAPL&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;AMZN&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;CSCO&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;DELL&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;EBAY&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;GOOG&#39;</span><span class="p">}</span>
+ ?
+   <span class="n">Columns</span> <span class="mi">7</span> <span class="n">through</span> <span class="mi">12</span>
+ ?
+     <span class="p">{</span><span class="s">&#39;HPQ&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;IBM&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;INTC&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;MSFT&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;ORCL&#39;</span><span class="p">}</span>    <span class="p">{</span><span class="s">&#39;YHOO&#39;</span><span class="p">}</span>
+ <span class="n">StdMeanH</span><span class="o">&#39;</span>
+ <span class="nb">ans</span> <span class="p">=</span> <span class="mi">1</span>×<span class="mi">12</span>
+ ?
+     <span class="mf">0.0010</span>    <span class="mf">0.0014</span>    <span class="mf">0.0010</span>    <span class="mf">0.0009</span>    <span class="mf">0.0011</span>    <span class="mf">0.0021</span>    <span class="mf">0.0009</span>    <span class="mf">0.0006</span>    <span class="mf">0.0009</span>    <span class="mf">0.0007</span>    <span class="mf">0.0010</span>    <span class="mf">0.0012</span>
+ <span class="n">StdMeanF</span><span class="o">&#39;</span>
+ <span class="nb">ans</span> <span class="p">=</span> <span class="mi">1</span>×<span class="mi">12</span>
+ ?
+     <span class="mf">0.0010</span>    <span class="mf">0.0014</span>    <span class="mf">0.0010</span>    <span class="mf">0.0009</span>    <span class="mf">0.0011</span>    <span class="mf">0.0013</span>    <span class="mf">0.0009</span>    <span class="mf">0.0006</span>    <span class="mf">0.0009</span>    <span class="mf">0.0007</span>    <span class="mf">0.0010</span>    <span class="mf">0.0012</span>
+ <span class="n">StdMeanH</span><span class="o">&#39;</span> <span class="o">-</span> <span class="n">StdMeanF</span><span class="o">&#39;</span>
+ <span class="nb">ans</span> <span class="p">=</span> <span class="mi">1</span>×<span class="mi">12</span>
+ <span class="mi">10</span><span class="o">-</span><span class="mi">3</span> ×
+ ?
+    <span class="o">-</span><span class="mf">0.0000</span>    <span class="mf">0.0021</span>   <span class="o">-</span><span class="mf">0.0000</span>   <span class="o">-</span><span class="mf">0.0000</span>   <span class="o">-</span><span class="mf">0.0000</span>    <span class="mf">0.7742</span>   <span class="o">-</span><span class="mf">0.0000</span>   <span class="o">-</span><span class="mf">0.0000</span>   <span class="o">-</span><span class="mf">0.0000</span>   <span class="o">-</span><span class="mf">0.0000</span>   <span class="o">-</span><span class="mf">0.0000</span>   <span class="o">-</span><span class="mf">0.0000</span></code></pre></div><p data-pid="YfJG-JSX">缺失数据的两只资产AMZN和GOOG是唯一由于信息丢失而具有差异的资产。</p><hr/><p data-pid="O7vZYhrS">注：本文根据MATLAB官网内容修改而成。</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
