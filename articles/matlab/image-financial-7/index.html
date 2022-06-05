@@ -1,0 +1,237 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB金融工具箱：07：统计套利的机器学习3：训练、调优和预测</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB金融工具箱：07：统计套利的机器学习3：训练、调优和预测</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="Bh44TFhp">此示例使用贝叶斯优化来优化算法交易模型中的超参数，并由日末收益监督。</p><p data-pid="RkDES96g">加载预处理的LOB数据集<code>LOBVars.mat</code>，来自NASDAQ证券INTC。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">load</span> <span class="n">LOBVars</span></code></pre></div><p data-pid="pXNaXAKP">数据集包含每个订单的以下信息：到达时间<code>t</code>（从午夜开始的秒数），1级要价<code>MOAsk</code>，1级出价<code>MOBid</code>，中间价<code>S</code>和失衡指数<code>I</code>。</p><p data-pid="3jCsmZ-6">此示例包括几个支持函数，这些函数存储在中<code>matlabroot/examples/finance/data/LOBSupportingFiles</code>。要查看它们，请更改您的工作文件夹。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">cd</span><span class="p">(</span><span class="n">fullfile</span><span class="p">(</span><span class="n">matlabroot</span><span class="p">,</span><span class="s">&#39;examples&#39;</span><span class="p">,</span><span class="s">&#39;finance&#39;</span><span class="p">,</span><span class="s">&#39;data&#39;</span><span class="p">,</span><span class="s">&#39;LOBSupportingFiles&#39;</span><span class="p">));</span></code></pre></div><h3><b>交易策略</b></h3><p data-pid="OR8uvMjG">给定限价单（LOB）不平衡指数<code>I</code>的当前和先前状态<code>rho</code>，以及价格<code>DS</code>中最新观察到的方向，交易矩阵<code>Q</code>包含未来价格走势的概率。</p><p data-pid="8jteRjCu">查看支持函数 <code>tradeOnQ.m</code>，该函数根据<code>Q</code>中的交易模式实施一个简单的交易策略。</p><div class="highlight"><pre><code class="language-matlab"><span class="k"> function</span><span class="w"> </span>cash <span class="p">=</span><span class="w"> </span><span class="nf">tradeOnQ</span><span class="p">(</span>Data,Q,n,N<span class="p">)</span><span class="w">
+</span><span class="w"> </span>?
+ <span class="c">% Reference: Machine Learning for Statistical Arbitrage</span>
+ <span class="c">%            Part II: Feature Engineering and Model Development</span>
+    
+ <span class="c">% Data</span>
+ ?
+ <span class="n">t</span> <span class="p">=</span> <span class="n">Data</span><span class="p">.</span><span class="n">t</span><span class="p">;</span>
+ <span class="n">MOBid</span> <span class="p">=</span> <span class="n">Data</span><span class="p">.</span><span class="n">MOBid</span><span class="p">;</span>
+ <span class="n">MOAsk</span> <span class="p">=</span> <span class="n">Data</span><span class="p">.</span><span class="n">MOAsk</span><span class="p">;</span>
+ ?
+ <span class="c">% States</span>
+ ?
+ <span class="p">[</span><span class="n">rho</span><span class="p">,</span><span class="n">DS</span><span class="p">]</span> <span class="p">=</span> <span class="n">getStates</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">N</span><span class="p">);</span>
+ ?
+ <span class="c">% Start of trading</span>
+ ?
+ <span class="n">cash</span> <span class="p">=</span> <span class="mi">0</span><span class="p">;</span>
+ <span class="n">assets</span> <span class="p">=</span> <span class="mi">0</span><span class="p">;</span>
+ ?
+ <span class="c">% Active trading</span>
+ ?
+ <span class="n">T</span> <span class="p">=</span> <span class="nb">length</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+ ?
+ <span class="k">for</span> <span class="n">tt</span> <span class="p">=</span> <span class="mi">2</span><span class="p">:</span><span class="n">T</span><span class="o">-</span><span class="n">N</span>  <span class="c">% Trading ticks</span>
+ ?
+     <span class="c">% Get Q row, column indices of current state</span>
+     
+     <span class="n">row</span> <span class="p">=</span> <span class="n">rho</span><span class="p">(</span><span class="n">tt</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="n">DS</span><span class="p">(</span><span class="n">tt</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+     <span class="n">downColumn</span> <span class="p">=</span> <span class="n">rho</span><span class="p">(</span><span class="n">tt</span><span class="p">);</span>
+     <span class="n">upColumn</span> <span class="p">=</span> <span class="n">rho</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">;</span>
+ ?
+     <span class="c">% If predicting downward price move</span>
+     
+     <span class="k">if</span> <span class="n">Q</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">downColumn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+ ?
+         <span class="n">cash</span> <span class="p">=</span> <span class="n">cash</span> <span class="o">+</span> <span class="n">MOBid</span><span class="p">(</span><span class="n">tt</span><span class="p">);</span> <span class="c">% Sell</span>
+         <span class="n">assets</span> <span class="p">=</span> <span class="n">assets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+             
+     <span class="c">% If predicting upward price move</span>
+ ?
+     <span class="k">elseif</span> <span class="n">Q</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">upColumn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+ ?
+         <span class="n">cash</span> <span class="p">=</span> <span class="n">cash</span> <span class="o">-</span> <span class="n">MOAsk</span><span class="p">(</span><span class="n">tt</span><span class="p">);</span> <span class="c">% Buy</span>
+         <span class="n">assets</span> <span class="p">=</span> <span class="n">assets</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> 
+ ?
+     <span class="k">end</span>
+ ?
+ <span class="k">end</span>
+ ?
+ <span class="c">% End of trading (liquidate position)</span>
+ ?
+ <span class="k">if</span> <span class="n">assets</span> <span class="o">&gt;</span> <span class="mi">0</span>
+ ?
+     <span class="n">cash</span> <span class="p">=</span> <span class="n">cash</span> <span class="o">+</span> <span class="n">assets</span><span class="o">*</span><span class="n">MOBid</span><span class="p">(</span><span class="n">T</span><span class="p">);</span> <span class="c">% Sell off</span>
+ ?
+ <span class="k">elseif</span> <span class="n">assets</span> <span class="o">&lt;</span> <span class="mi">0</span>
+ ?
+     <span class="n">cash</span> <span class="p">=</span> <span class="n">cash</span> <span class="o">+</span> <span class="n">assets</span><span class="o">*</span><span class="n">MOAsk</span><span class="p">(</span><span class="n">T</span><span class="p">);</span> <span class="c">% Buy back</span>
+ ?
+ <span class="k">end</span></code></pre></div><p data-pid="DnKAtgyN">该算法使用来自<code>Q</code>的预测来做出每笔交易的决策。它说明了任何优化的机器学习算法的一般机制。</p><p data-pid="ne4yJ58W">如果套利机会出现，该策略将试图通过在每个报价时使用单个股票的市场定单（最好的报价）从预期的价格变化中获利。该策略可以扩大到更大的交易量。使用从<code>Q</code>中获得的条件概率，该<code>tradeOnQ</code>函数采取以下操作之一：</p><ul><li data-pid="rTmRIcNc">如果向上远期价格变动的可能性大于0.5，则买入</li><li data-pid="Pw5xY6VE">如果向下远期价格变动的可能性大于0.5，则卖出</li></ul><p data-pid="pbP9OigF">在交易日结束时，该功能会立即平仓（liquidates the position at the touch）。</p><p data-pid="7lEop-Hl">该策略要求<code>Data</code>具有<code>t</code>报价时间和相应的市场订单买入价<code>MOBid</code>和卖出价<code>MOAsk</code>。在实时交易中，数据由交易所提供。本示例通过将历史样本分为<i>训练</i>（校准）和<i>验证</i>子样本来评估策略。验证子样本可充当实时交易数据的代表。该策略取决于其本身的交易矩阵<code>Q</code>，我们可以在做出许多超参数选择后进行估算。当优化策略时，输入<code>n</code>和<code>N</code>是要调整的超参数。</p><h3><b>超参数</b></h3><p data-pid="seB9qbhw">连续时间马尔可夫模型和所得的交易矩阵<code>Q</code>取决于四个超参数的值：</p><ul><li data-pid="Vhd-_RQe"><code>lambda</code> —用于计算失衡指数 <code>I</code>的加权参数</li><li data-pid="PHLhWiWl"><code>dI</code>— 平滑期间用于平均<code>I</code>的反向刻度数</li><li data-pid="R1kXBYs1"><code>numBins</code>—用于分割平滑的<code>I</code>以进行离散化的分组数</li><li data-pid="UYH7COix"><code>dS</code>—用于将价格<code>S</code>转换为离散价格<code>DS</code>的远期报价数量</li></ul><p data-pid="wYZw1Z5p">通常，所有四个超参数都是可调的。但是，为了便于可视化，该示例仅通过调整<code>numBins</code>和<code>N</code>压缩了维度。本例中：</p><ul><li data-pid="0WAEeP-2">修正 <code>lambda</code></li><li data-pid="ofcqJ4je">让<code>numBins</code>= <code>n</code>，<code>n</code>可以自由变化</li><li data-pid="MFfN4OiK">均衡窗口长度<code>dI</code>= <code>dS</code>= <code>N</code>，其中<code>N</code>可以自由变化</li></ul><p data-pid="iR5tlv0L">这些限制不会显着影响优化结果。优化算法搜索二维参数空间（<code>n</code>，<code>N</code>），以便配置可以获得最大交易回报。</p><h3><b>训练和验证数据</b></h3><p data-pid="VLRLU4jG">机器学习需要一个子样本用以估计<code>Q</code>，另一个子样本进行评估超参数选择。</p><p data-pid="2XiUwrD4">指定一个断点以将数据分为训练和验证子样本。断点影响目标函数的评估，实际上是另一个超参数。但是，由于您不调整断点，因此它是优化过程的外部条件。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">bp</span> <span class="p">=</span> <span class="nb">round</span><span class="p">((</span><span class="mf">0.80</span><span class="p">)</span><span class="o">*</span><span class="nb">length</span><span class="p">(</span><span class="n">t</span><span class="p">));</span> <span class="c">% Use 80% of data for training</span></code></pre></div><p data-pid="060MuHxP">在时间表中收集数据以传递给<code>tradeOnQ</code>。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">Data</span> <span class="p">=</span> <span class="n">timetable</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="n">I</span><span class="p">,</span><span class="n">MOBid</span><span class="p">,</span><span class="n">MOAsk</span><span class="p">);</span>
+ <span class="n">TData</span> <span class="p">=</span> <span class="n">Data</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">bp</span><span class="p">,:);</span>       <span class="c">% Training data</span>
+ <span class="n">VData</span> <span class="p">=</span> <span class="n">Data</span><span class="p">(</span><span class="n">bp</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="k">end</span><span class="p">,:);</span>   <span class="c">% Validation data</span></code></pre></div><h3><b>交叉验证</b></h3><p data-pid="SoDgSUvH"><i>交叉验证</i>描述了各种技术，这些技术用于评估训练结果（此处是计算<code>Q</code>）如何以预测的可靠性泛化为独立的验证数据（此处为获利的交易）。交叉验证的目的是在训练结果中标记问题，例如偏差和过度拟合。在交易策略的上下文中，过度拟合是指<code>Q</code>的时间的依存关系，即非平稳性。随着<code>Q</code>时间的变化，它在预测未来价格走势中的作用减弱。关键的诊断问题是在有限的交易范围内<code>Q</code>变化的程度和速率。</p><p data-pid="rgjH-2Po">在有训练和验证数据的情况下，指定超参数并在两个子样本中比较<code>Q</code>。支持函数<code>makeQ.m</code>提供了生成<code>Q</code>的步骤。</p><div class="highlight"><pre><code class="language-matlab"> <span class="c">% Set specific hyperparameters</span>
+ ?
+ <span class="n">n</span> <span class="p">=</span> <span class="mi">3</span><span class="p">;</span>  <span class="c">% Number of bins for I</span>
+ <span class="n">N</span> <span class="p">=</span> <span class="mi">20</span><span class="p">;</span> <span class="c">% Window lengths</span>
+ ?
+ <span class="c">% Compare Qs</span>
+ ?
+ <span class="n">QT</span> <span class="p">=</span> <span class="n">makeQ</span><span class="p">(</span><span class="n">TData</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">N</span><span class="p">);</span>
+ <span class="n">QV</span> <span class="p">=</span> <span class="n">makeQ</span><span class="p">(</span><span class="n">VData</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">N</span><span class="p">);</span>
+ <span class="n">QTVDiff</span> <span class="p">=</span> <span class="n">QT</span> <span class="o">-</span> <span class="n">QV</span>
+ <span class="n">QTVDiff</span> <span class="p">=</span> <span class="mi">9</span>×<span class="mi">9</span>
+ ?
+     <span class="mf">0.0070</span>    <span class="mf">0.0182</span>    <span class="mf">0.1198</span>   <span class="o">-</span><span class="mf">0.0103</span>   <span class="o">-</span><span class="mf">0.0175</span>   <span class="o">-</span><span class="mf">0.0348</span>    <span class="mf">0.0034</span>   <span class="o">-</span><span class="mf">0.0007</span>   <span class="o">-</span><span class="mf">0.0851</span>
+    <span class="o">-</span><span class="mf">0.0009</span>    <span class="mf">0.0176</span>    <span class="mf">0.2535</span>   <span class="o">-</span><span class="mf">0.0010</span>   <span class="o">-</span><span class="mf">0.0233</span>   <span class="o">-</span><span class="mf">0.2430</span>    <span class="mf">0.0019</span>    <span class="mf">0.0058</span>   <span class="o">-</span><span class="mf">0.0106</span>
+     <span class="mf">0.0184</span>    <span class="mf">0.0948</span>    <span class="mf">0.0835</span>   <span class="o">-</span><span class="mf">0.0195</span>   <span class="o">-</span><span class="mf">0.1021</span>   <span class="o">-</span><span class="mf">0.1004</span>    <span class="mf">0.0011</span>    <span class="mf">0.0073</span>    <span class="mf">0.0168</span>
+     <span class="mf">0.0462</span>    <span class="mf">0.0180</span>    <span class="mf">0.0254</span>   <span class="o">-</span><span class="mf">0.0512</span>   <span class="o">-</span><span class="mf">0.0172</span>    <span class="mf">0.0417</span>    <span class="mf">0.0050</span>   <span class="o">-</span><span class="mf">0.0009</span>   <span class="o">-</span><span class="mf">0.0671</span>
+     <span class="mf">0.0543</span>    <span class="mf">0.0089</span>    <span class="mf">0.0219</span>   <span class="o">-</span><span class="mf">0.0556</span>   <span class="o">-</span><span class="mf">0.0169</span>   <span class="o">-</span><span class="mf">0.0331</span>    <span class="mf">0.0013</span>    <span class="mf">0.0080</span>    <span class="mf">0.0112</span>
+     <span class="mf">0.1037</span>    <span class="mf">0.0221</span>    <span class="mf">0.0184</span>   <span class="o">-</span><span class="mf">0.1043</span>   <span class="o">-</span><span class="mf">0.0401</span>   <span class="o">-</span><span class="mf">0.0479</span>    <span class="mf">0.0006</span>    <span class="mf">0.0180</span>    <span class="mf">0.0295</span>
+     <span class="mf">0.0266</span>    <span class="mf">0.0066</span>    <span class="mf">0.0054</span>   <span class="o">-</span><span class="mf">0.0821</span>   <span class="o">-</span><span class="mf">0.0143</span>   <span class="o">-</span><span class="mf">0.0116</span>    <span class="mf">0.0555</span>    <span class="mf">0.0077</span>    <span class="mf">0.0062</span>
+     <span class="mf">0.0615</span>    <span class="mf">0.0050</span>    <span class="mf">0.0060</span>   <span class="o">-</span><span class="mf">0.0189</span>   <span class="o">-</span><span class="mf">0.0207</span>   <span class="o">-</span><span class="mf">0.0262</span>   <span class="o">-</span><span class="mf">0.0426</span>    <span class="mf">0.0157</span>    <span class="mf">0.0203</span>
+     <span class="mf">0.0735</span>    <span class="mf">0.0103</span>    <span class="mf">0.0090</span>   <span class="o">-</span><span class="mf">0.0788</span>   <span class="o">-</span><span class="mf">0.1216</span>   <span class="o">-</span><span class="mf">0.0453</span>    <span class="mf">0.0053</span>    <span class="mf">0.1113</span>    <span class="mf">0.0362</span></code></pre></div><p data-pid="fFZurX9w"><code>QT</code>和<code>QV</code>之间的差异很小，尽管它们根据其在矩阵中的位置而有所不同。识别交易效率低下，是由指数（市场状态）引起的，其中一个矩阵给出交易提示（概率值&gt; 0.5），而另一个矩阵则没有。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">Inhomogeneity</span> <span class="p">=</span> <span class="p">(</span><span class="n">QT</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="o">&amp;</span> <span class="n">QV</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">QT</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="o">&amp;</span> <span class="n">QV</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="p">)</span>
+ <span class="n">Inhomogeneity</span> <span class="p">=</span> <span class="mi">9</span><span class="n">x9</span> <span class="n">logical</span> <span class="n">array</span>
+ ?
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span></code></pre></div><p data-pid="X5xtCuRe">使用给定的超参数设置，数据中不会出现明显的不均匀性。</p><p data-pid="awePxL2q">进行同质性假设的严重性不是<i>先验的</i>，只能从更全面的回溯测试中得出。统计检验是可用的，例如，如<a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/finance/machine-learning-for-statistical-arbitrage-iii-training-tuning-prediction.html%23mw_3e2b98ef-701d-490f-97b9-33fefbcf5cab" class=" wrap external" target="_blank" rel="nofollow noreferrer">[4]</a>和[<a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/finance/machine-learning-for-statistical-arbitrage-iii-training-tuning-prediction.html%23mw_a71bbed3-4968-4e3e-9975-093cf7a7aea5" class=" wrap external" target="_blank" rel="nofollow noreferrer">5</a>]中所述。在实时交易期间，对适当大小的训练数据进行<code>Q</code>的滚动计算可以提供最可靠的提示。这种方法承认市场固有的不稳定性。</p><h3><b>机器学习</b></h3><p data-pid="DyE7J9Cp"><i>机器学习</i>是指通过检测模式（例如计算<code>Q</code>）并基于可用数据进行推断，以自动化方式有效执行任务（例如交易）的一般方法。通常，数据是动态的并且足够大，需要专门的计算技术。评估过程（调整超参数以描述数据和任务的直接执行）是持续存在的。</p><p data-pid="9G2d4dJv">除了处理大数据的挑战外，评估复杂的，有时是黑箱的目标函数的过程也具有挑战性。目标函数监督超参数的计算。交易策略首先通过<code>Q</code>对训练子样本进行计算，然后在评估（实时）子样本中进行交易来评估超参数调整。目标是最大化利润，或者最小化亏损，经适当地约束配置（<code>n</code>，<code>N</code>）空间。该目标是典型的“昂贵”目标函数。<i>贝叶斯优化</i>是一种适合于此类目标函数的机器学习。它的主要优点之一是无需进行昂贵的衍生计算。要实现贝叶斯优化，请使用“统计和机器学习工具箱（Statistics and Machine Learning Toolbox）”的函数<code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/stats/bayesopt.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">bayesopt</a></code>。</p><p data-pid="D3zN5Q2Q">支持函数<code>optimizeTrading.m</code>使用<code>bayesopt</code>在<code>tradeOnQ</code>中优化交易策略。</p><div class="highlight"><pre><code class="language-matlab"><span class="k"> function</span><span class="w"> </span>results <span class="p">=</span><span class="w"> </span><span class="nf">optimizeTrading</span><span class="p">(</span>TData,VData<span class="p">)</span><span class="w">
+</span><span class="w"> </span>?
+ <span class="c">% Optimization variables</span>
+ ?
+ <span class="n">n</span> <span class="p">=</span> <span class="n">optimizableVariable</span><span class="p">(</span><span class="s">&#39;numBins&#39;</span><span class="p">,[</span><span class="mi">1</span> <span class="mi">10</span><span class="p">],</span><span class="s">&#39;Type&#39;</span><span class="p">,</span><span class="s">&#39;integer&#39;</span><span class="p">);</span>
+ <span class="n">N</span> <span class="p">=</span> <span class="n">optimizableVariable</span><span class="p">(</span><span class="s">&#39;numTicks&#39;</span><span class="p">,[</span><span class="mi">1</span> <span class="mi">50</span><span class="p">],</span><span class="s">&#39;Type&#39;</span><span class="p">,</span><span class="s">&#39;integer&#39;</span><span class="p">);</span>
+ ?
+ <span class="c">% Objective function handle</span>
+ ?
+ <span class="n">f</span> <span class="p">=</span> <span class="p">@(</span><span class="n">x</span><span class="p">)</span><span class="n">negativeCash</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">TData</span><span class="p">,</span><span class="n">VData</span><span class="p">);</span>
+ ?
+ <span class="c">% Optimize</span>
+ ?
+ <span class="n">results</span> <span class="p">=</span> <span class="n">bayesopt</span><span class="p">(</span><span class="n">f</span><span class="p">,[</span><span class="n">n</span><span class="p">,</span><span class="n">N</span><span class="p">],</span><span class="c">...</span>
+                    <span class="s">&#39;IsObjectiveDeterministic&#39;</span><span class="p">,</span><span class="n">true</span><span class="p">,</span><span class="c">...</span>
+                    <span class="s">&#39;AcquisitionFunctionName&#39;</span><span class="p">,</span><span class="s">&#39;expected-improvement-plus&#39;</span><span class="p">,</span><span class="c">...</span>
+                    <span class="s">&#39;MaxObjectiveEvaluations&#39;</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="c">...</span>
+                    <span class="s">&#39;ExplorationRatio&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="c">...</span>
+                    <span class="s">&#39;Verbose&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+ ?
+ <span class="k">end</span> <span class="c">% optimizeTrading</span>
+ ?
+ <span class="c">% Objective (local)</span>
+<span class="k"> function</span><span class="w"> </span>loss <span class="p">=</span><span class="w"> </span><span class="nf">negativeCash</span><span class="p">(</span>x,TData,VData<span class="p">)</span><span class="w">
+</span><span class="w"> </span>?
+ <span class="n">n</span> <span class="p">=</span> <span class="n">x</span><span class="p">.</span><span class="n">numBins</span><span class="p">;</span>
+ <span class="n">N</span> <span class="p">=</span> <span class="n">x</span><span class="p">.</span><span class="n">numTicks</span><span class="p">;</span>
+ ?
+ <span class="c">% Make trading matrix Q</span>
+ ?
+ <span class="n">Q</span> <span class="p">=</span> <span class="n">makeQ</span><span class="p">(</span><span class="n">TData</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">N</span><span class="p">);</span>
+ ?
+ <span class="c">% Trade on Q</span>
+ ?
+ <span class="n">cash</span> <span class="p">=</span> <span class="n">tradeOnQ</span><span class="p">(</span><span class="n">VData</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">N</span><span class="p">);</span>
+ ?
+ <span class="c">% Objective value</span>
+ ?
+ <span class="n">loss</span> <span class="p">=</span> <span class="o">-</span><span class="n">cash</span><span class="p">;</span>
+ ?
+ <span class="k">end</span> <span class="c">% negativeCash</span></code></pre></div><p data-pid="-Odp_0bh">通过将训练和验证数据传递给<code>optimizeTrading</code>来优化交易策略。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c">% For reproducibility</span>
+ <span class="n">results</span> <span class="p">=</span> <span class="n">optimizeTrading</span><span class="p">(</span><span class="n">TData</span><span class="p">,</span><span class="n">VData</span><span class="p">);</span> </code></pre></div><br><img src="v2-fe9f7cd44d70257d938198feca4237b4_720w.jpg" ><br><img src="v2-766747fcef274d62fc34ec0a184585df_720w.jpg" ><p data-pid="2xAZl68k">估计的最小目标与观察到的最小目标一致（搜索是单调的）。与基于导数的算法不同，<code>bayesopt</code>不会收敛。在尝试寻找全局最小值时，<code>bayesopt</code>持续搜索直到达到指定的迭代次数（<code>25</code>）。</p><p data-pid="kLMOAWGR">通过将<code>results</code>传递给<code>bestPoint</code>来获得最佳配置。</p><div class="highlight"><pre><code class="language-matlab"> <span class="p">[</span><span class="n">Calibration</span><span class="p">,</span><span class="n">negReturn</span><span class="p">]</span> <span class="p">=</span> <span class="n">bestPoint</span><span class="p">(</span><span class="n">results</span><span class="p">,</span><span class="s">&#39;Criterion&#39;</span><span class="p">,</span><span class="s">&#39;min-observed&#39;</span><span class="p">)</span>
+ <span class="n">Calibration</span><span class="p">=</span><span class="mi">1</span>×<span class="mi">2</span> <span class="n">table</span>
+     <span class="n">numBins</span>    <span class="n">numTicks</span>
+     <span class="n">_______</span>    <span class="n">________</span>
+ ?
+        <span class="mi">3</span>          <span class="mi">24</span>   
+ <span class="n">negReturn</span> <span class="p">=</span> <span class="o">-</span><span class="mi">7100</span></code></pre></div><p data-pid="vdCzLsDq">每次交易一股，由<code>Q</code>指定，使用最优策略（<code>n</code>，<code>N</code>）=（3,24）在交易日的最后20％获利$ 0.71。修改交易量可以缩放收益。</p><p data-pid="j52VsvyD">专为昂贵目标而设计的另一种优化器是<code><a href="https://link.zhihu.com/?target=https%3A//www.mathworks.com/help/gads/surrogateopt.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">surrogateopt</a></code> （Global Optimization Toolbox?）。它使用不同的搜索策略，并且可以根据目标更快地找到最佳位置。支持函数<code>optimizeTrading2.m</code>使用<code>surrogateopt</code>而不是<code>bayesopt</code>优化<code>tradeOnQ</code>中的交易策略。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c">% For reproducibility</span>
+ <span class="n">results2</span> <span class="p">=</span> <span class="n">optimizeTrading2</span><span class="p">(</span><span class="n">TData</span><span class="p">,</span><span class="n">VData</span><span class="p">)</span>
+ <span class="n">Scalar</span> <span class="n">objective</span> <span class="k">function</span>
+ <span class="n">Number</span> <span class="n">of</span> <span class="n">variables</span><span class="p">:</span> <span class="mi">2</span>
+ <span class="n">Number</span> <span class="n">of</span> <span class="n">integer</span> <span class="n">constraints</span><span class="p">:</span> <span class="mi">2</span>
+ <span class="n">Number</span> <span class="n">of</span> <span class="n">inequality</span> <span class="n">constraints</span><span class="p">:</span> <span class="mi">0</span>
+ ?
+ <span class="n">F</span><span class="o">-</span><span class="n">count</span>       <span class="n">Time</span>        <span class="n">Best</span>          <span class="n">Current</span>         <span class="n">Trial</span>
+              <span class="p">(</span><span class="n">seconds</span><span class="p">)</span>    <span class="n">Fval</span>          <span class="n">Fval</span>            <span class="n">type</span>
+    <span class="mi">1</span>         <span class="mf">1.25</span>      <span class="o">-</span><span class="mf">0.0000e+00</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">random</span> 
+    <span class="mi">2</span>         <span class="mf">2.31</span>      <span class="o">-</span><span class="mf">0.0000e+00</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">random</span> 
+    <span class="mi">3</span>         <span class="mf">2.74</span>      <span class="o">-</span><span class="mf">1.3000e+03</span>     <span class="o">-</span><span class="mf">1.3000e+03</span>   <span class="n">random</span> 
+    <span class="mi">4</span>         <span class="mf">3.15</span>      <span class="o">-</span><span class="mf">1.3000e+03</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">random</span> 
+    <span class="mi">5</span>         <span class="mf">3.55</span>      <span class="o">-</span><span class="mf">1.3000e+03</span>      <span class="mf">1.1000e+03</span>   <span class="n">random</span> 
+    <span class="mi">6</span>         <span class="mf">4.20</span>      <span class="o">-</span><span class="mf">1.3000e+03</span>      <span class="mf">8.0000e+02</span>   <span class="n">adaptive</span>
+    <span class="mi">7</span>         <span class="mf">4.73</span>      <span class="o">-</span><span class="mf">1.3000e+03</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">adaptive</span>
+    <span class="mi">8</span>         <span class="mf">5.09</span>      <span class="o">-</span><span class="mf">3.1000e+03</span>     <span class="o">-</span><span class="mf">3.1000e+03</span>   <span class="n">adaptive</span>
+    <span class="mi">9</span>         <span class="mf">5.47</span>      <span class="o">-</span><span class="mf">4.3000e+03</span>     <span class="o">-</span><span class="mf">4.3000e+03</span>   <span class="n">adaptive</span>
+   <span class="mi">10</span>         <span class="mf">5.86</span>      <span class="o">-</span><span class="mf">6.8000e+03</span>     <span class="o">-</span><span class="mf">6.8000e+03</span>   <span class="n">adaptive</span>
+   <span class="mi">11</span>         <span class="mf">6.24</span>      <span class="o">-</span><span class="mf">6.8000e+03</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">adaptive</span>
+   <span class="mi">12</span>         <span class="mf">6.54</span>      <span class="o">-</span><span class="mf">6.8000e+03</span>     <span class="o">-</span><span class="mf">6.2000e+03</span>   <span class="n">adaptive</span>
+   <span class="mi">13</span>         <span class="mf">6.83</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">7.1000e+03</span>   <span class="n">adaptive</span>
+   <span class="mi">14</span>         <span class="mf">7.24</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">adaptive</span>
+   <span class="mi">15</span>         <span class="mf">7.55</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">5.8000e+03</span>   <span class="n">adaptive</span>
+   <span class="mi">16</span>         <span class="mf">7.90</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>      <span class="mf">1.1000e+03</span>   <span class="n">adaptive</span>
+   <span class="mi">17</span>         <span class="mf">8.30</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">5.5000e+03</span>   <span class="n">adaptive</span>
+   <span class="mi">18</span>         <span class="mf">8.69</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">adaptive</span>
+   <span class="mi">19</span>         <span class="mf">8.96</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">adaptive</span>
+   <span class="mi">20</span>         <span class="mf">9.31</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">5.3000e+03</span>   <span class="n">adaptive</span>
+   <span class="mi">21</span>         <span class="mf">9.59</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">4.4000e+03</span>   <span class="n">adaptive</span>
+   <span class="mi">22</span>         <span class="mf">9.99</span>      <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">adaptive</span>
+   <span class="mi">23</span>         <span class="mf">10.30</span>     <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">adaptive</span>
+   <span class="mi">24</span>         <span class="mf">10.70</span>     <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">0.0000e+00</span>   <span class="n">adaptive</span>
+   <span class="mi">25</span>         <span class="mf">11.02</span>     <span class="o">-</span><span class="mf">7.1000e+03</span>     <span class="o">-</span><span class="mf">4.5000e+03</span>   <span class="n">adaptive</span></code></pre></div><br><img src="v2-0e927b507da5b8f5ddde728ab2b2ccd3_720w.jpg" ><div class="highlight"><pre><code class="language-matlab"> <span class="n">Surrogateopt</span> <span class="n">stopped</span> <span class="n">because</span> <span class="n">it</span> <span class="n">exceeded</span> <span class="n">the</span> <span class="k">function</span> <span class="n">evaluation</span> <span class="n">limit</span> <span class="n">set</span> <span class="n">by</span> 
+ <span class="s">&#39;options.MaxFunctionEvaluations&#39;</span><span class="p">.</span>
+ <span class="n">results2</span> <span class="p">=</span> <span class="mi">1</span>×<span class="mi">2</span>
+ ?
+      <span class="mi">3</span>    <span class="mi">24</span></code></pre></div><p data-pid="BDPxSFtu">使用<code>surrogateopt</code>所获得的结果与采用<code>bayesopt</code>获得的结果相同。图中包含有关特定于<code>surrogateopt</code>算法的搜索进度的信息。</p><p data-pid="FfUYtXrf">通过将最佳超参数和整个数据集传递到<code>makeQ</code>计算<code>Q</code>。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">bestQ</span> <span class="p">=</span> <span class="n">makeQ</span><span class="p">(</span><span class="n">Data</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">24</span><span class="p">)</span>
+ <span class="n">bestQ</span> <span class="p">=</span> <span class="mi">9</span>×<span class="mi">9</span>
+ ?
+     <span class="mf">0.3933</span>    <span class="mf">0.1868</span>    <span class="mf">0.1268</span>    <span class="mf">0.5887</span>    <span class="mf">0.7722</span>    <span class="mf">0.6665</span>    <span class="mf">0.0180</span>    <span class="mf">0.0410</span>    <span class="mf">0.2068</span>
+     <span class="mf">0.5430</span>    <span class="mf">0.3490</span>    <span class="mf">0.2716</span>    <span class="mf">0.4447</span>    <span class="mf">0.6379</span>    <span class="mf">0.6518</span>    <span class="mf">0.0123</span>    <span class="mf">0.0131</span>    <span class="mf">0.0766</span>
+     <span class="mf">0.6197</span>    <span class="mf">0.3897</span>    <span class="mf">0.3090</span>    <span class="mf">0.3705</span>    <span class="mf">0.5954</span>    <span class="mf">0.6363</span>    <span class="mf">0.0098</span>    <span class="mf">0.0150</span>    <span class="mf">0.0547</span>
+     <span class="mf">0.1509</span>    <span class="mf">0.0440</span>    <span class="mf">0.0261</span>    <span class="mf">0.8217</span>    <span class="mf">0.8960</span>    <span class="mf">0.6908</span>    <span class="mf">0.0273</span>    <span class="mf">0.0601</span>    <span class="mf">0.2831</span>
+     <span class="mf">0.1900</span>    <span class="mf">0.0328</span>    <span class="mf">0.0280</span>    <span class="mf">0.7862</span>    <span class="mf">0.9415</span>    <span class="mf">0.8316</span>    <span class="mf">0.0238</span>    <span class="mf">0.0257</span>    <span class="mf">0.1404</span>
+     <span class="mf">0.2370</span>    <span class="mf">0.0441</span>    <span class="mf">0.0329</span>    <span class="mf">0.7391</span>    <span class="mf">0.9221</span>    <span class="mf">0.8745</span>    <span class="mf">0.0239</span>    <span class="mf">0.0338</span>    <span class="mf">0.0925</span>
+     <span class="mf">0.1306</span>    <span class="mf">0.0234</span>    <span class="mf">0.0101</span>    <span class="mf">0.7861</span>    <span class="mf">0.6566</span>    <span class="mf">0.4168</span>    <span class="mf">0.0833</span>    <span class="mf">0.3200</span>    <span class="mf">0.5731</span>
+     <span class="mf">0.1276</span>    <span class="mf">0.0169</span>    <span class="mf">0.0118</span>    <span class="mf">0.7242</span>    <span class="mf">0.6505</span>    <span class="mf">0.4712</span>    <span class="mf">0.1482</span>    <span class="mf">0.3326</span>    <span class="mf">0.5171</span>
+     <span class="mf">0.1766</span>    <span class="mf">0.0282</span>    <span class="mf">0.0186</span>    <span class="mf">0.7216</span>    <span class="mf">0.7696</span>    <span class="mf">0.6185</span>    <span class="mf">0.1018</span>    <span class="mf">0.2023</span>    <span class="mf">0.3629</span></code></pre></div><p data-pid="jeOfyOLb">交易矩阵<code>bestQ</code>可以用作下一个交易日的起点。</p><h3><b>概要</b></h3><p data-pid="OMlKtmtm">本示例实现了前两个相关示例中开发的优化交易策略。数据分为训练和验证子样本，分别用于计算交易矩阵<code>Q</code>和执行交易算法。在超参数设置的空间上，使用全局优化器<code>bayesopt</code>和<code>surrogateopt</code>重复该过程，这两个过程都可确定产生正收益的最优策略。该方法有许多选项可以进一步定制。</p><h2><b>参考文献</b></h2><p data-pid="u5C6s03g">[1] Bull, Adam D. &#34;Convergence Rates of Efficient Global Optimization Algorithms.&#34; <i>Journal of Machine Learning Research</i> 12, (November 2011): 2879–904.</p><p data-pid="2lXrh3Wf">[2] Rubisov, Anton D. &#34;<a href="https://link.zhihu.com/?target=https%3A//tspace.library.utoronto.ca/bitstream/1807/70567/3/Rubisov_Anton_201511_MAS_thesis.pdf" class=" wrap external" target="_blank" rel="nofollow noreferrer">Statistical Arbitrage Using Limit Order Book Imbalance</a>.&#34; Master&#39;s thesis, University of Toronto, 2015.</p><p data-pid="ButC54xE">[3] Snoek, Jasper, Hugo Larochelle, and Ryan P. Adams. &#34;<a href="https://link.zhihu.com/?target=https%3A//papers.nips.cc/paper/4522-practical-bayesian-optimization-of-machine-learning-algorithms.pdf" class=" wrap external" target="_blank" rel="nofollow noreferrer">Practical Bayesian Optimization of Machine Learning Algorithms</a>.&#34; In <i>Advances in Neural Information Processing Systems 25</i>, F. Pereira et. al. editors, 2012.</p><p data-pid="UzCvOyZI">[4] Tan, Bar??, and Kamil Y?lmaz. “Markov Chain Test for Time Dependence and Homogeneity: An Analytical and Empirical Evaluation.” <i>European Journal of Operational Research</i> 137, no. 3 (March 2002): 524–43. <a href="https://link.zhihu.com/?target=https%3A//doi.org/10.1016/S0377-2217%2801%2900081-9" class=" external" target="_blank" rel="nofollow noreferrer"><span class="invisible">https://</span><span class="visible">doi.org/10.1016/S0377-2</span><span class="invisible">217(01)00081-9</span><span class="ellipsis"></span></a>.</p><p data-pid="py-MFOT3">[5] Wei?bach, Rafael, and Ronja Walter. “A Likelihood Ratio Test for Stationarity of Rating Transitions.” <i>Journal of Econometrics</i> 155, no. 2 (April 2010): 188–94. <a href="https://link.zhihu.com/?target=https%3A//doi.org/10.1016/j.jeconom.2009.10.016" class=" external" target="_blank" rel="nofollow noreferrer"><span class="invisible">https://</span><span class="visible">doi.org/10.1016/j.jecon</span><span class="invisible">om.2009.10.016</span><span class="ellipsis"></span></a>.</p><hr/><p data-pid="K07iYdIe">注：本文根据MATLAB官网内容修改而成。</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
