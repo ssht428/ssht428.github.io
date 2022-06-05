@@ -1,0 +1,209 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB金融工具箱：06：统计套利的机器学习2：特征工程和模型开发</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB金融工具箱：06：统计套利的机器学习2：特征工程和模型开发</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="urK3TMzY">本示例创建了限价订单（LOB）动力学的连续时间马尔可夫模型，并根据数据中观察到的模式开发了用于算法交易的策略。它是有关用于统计套利的机器学习的一系列相关示例的一部分（请参阅<a href="https://www.mathworks.com/help/finance/machine-learning-with-financial-data.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">机器学习应用程序</a>）。</p><h3><b>探索性数据分析</b></h3><p data-pid="2qN3KdAi">要预测系统的未来行为，您需要发现历史数据中的模式。纳斯达克等交易所提供的大量数据在提供统计机会的同时，也给计算带来了挑战。该示例遵循 [<a href="https://www.mathworks.com/help/finance/machine-learning-for-statistical-arbitrage-ii-feature-engineering-model-development.html%23mw_ce89acd2-e46f-4b90-b439-930fbba619d2" class=" wrap external" target="_blank" rel="nofollow noreferrer">4]</a>的方法，通过寻找价格动能指标来探索LOB数据。</p><h3><b>原始数据</b></h3><p data-pid="8AiO_eXF">加载<code>LOBVars.mat</code>NASDAQ证券INTC的LOB预处理数据集。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">load</span> <span class="n">LOBVars</span></code></pre></div><p data-pid="I8Lv8TXL">数据集包含每个订单的以下信息：到达时间<code>t</code>（从午夜开始的秒数），1级要价<code>MOAsk</code>，1级竞标价格<code>MOBid</code>，中间价 <code>S</code>和失衡指数<code>I</code>。</p><p data-pid="tcVwXkPP">创建一个图表，显示LOB不平衡指数<code>I</code>和中间价的日内演变<code>S</code>。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">figure</span>
+ ?
+ <span class="n">t</span><span class="p">.</span><span class="n">Format</span> <span class="p">=</span> &#34;<span class="n">hh</span><span class="p">:</span><span class="n">mm</span><span class="p">:</span><span class="n">ss</span>&#34;<span class="p">;</span>
+ ?
+ <span class="n">yyaxis</span> <span class="n">left</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">I</span><span class="p">)</span>
+ <span class="n">ylabel</span><span class="p">(</span>&#34;<span class="n">Imbalance</span> <span class="n">Index</span>&#34;<span class="p">)</span>
+ ?
+ <span class="n">yyaxis</span> <span class="n">right</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">S</span><span class="o">/</span><span class="mi">10000</span><span class="p">,</span><span class="s">&#39;LineWidth&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+ <span class="n">ylabel</span><span class="p">(</span>&#34;<span class="n">Midprice</span> <span class="p">(</span><span class="n">Dollars</span><span class="p">)</span>&#34;<span class="p">)</span>
+ ?
+ <span class="n">xlabel</span><span class="p">(</span>&#34;<span class="n">Time</span>&#34;<span class="p">)</span>
+ ?
+ <span class="n">title</span><span class="p">(</span><span class="s">&#39;Exchange Data: One Day&#39;</span><span class="p">)</span>
+ <span class="n">legend</span><span class="p">([</span>&#34;<span class="n">Imbalance</span>&#34;<span class="p">,</span>&#34;<span class="n">Midprice</span>&#34;<span class="p">],</span><span class="s">&#39;Location&#39;</span><span class="p">,</span><span class="s">&#39;NE&#39;</span><span class="p">)</span>
+ <span class="n">grid</span> <span class="n">on</span></code></pre></div><br><img src="v2-7fe7beecf29ff360731030c8fbcf133d_720w.jpg" ><p data-pid="-lukc0Ko">在这种规模下，失衡指数无法表明中间价格的未来变化。</p><p data-pid="JYNJccjF">要查看更多详细信息，请将时间标度限制为一分钟。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">timeRange</span> <span class="p">=</span> <span class="n">seconds</span><span class="p">([</span><span class="mi">36000</span> <span class="mi">36060</span><span class="p">]);</span> <span class="c">% One minute after 10 AM, when prices were climbing</span>
+ <span class="n">xlim</span><span class="p">(</span><span class="n">timeRange</span><span class="p">)</span>
+ <span class="n">legend</span><span class="p">(</span><span class="s">&#39;Location&#39;</span><span class="p">,</span><span class="s">&#39;SE&#39;</span><span class="p">)</span>
+ <span class="n">title</span><span class="p">(</span>&#34;<span class="n">Exchange</span> <span class="n">Data</span><span class="p">:</span> <span class="n">One</span> <span class="n">Minute</span>&#34;<span class="p">)</span></code></pre></div><br><img src="v2-417024d1ed2deabf13df31d70d2b33a9_720w.jpg" ><p data-pid="DyJX3zoH">在这种尺度下，失衡指数的急剧偏离与中间价格的相应偏离一致。如果这种关系是可预测的，则意味着一定规模的失衡可以预测<i>未来的</i>价格走势，那么对该关系进行量化可以提供统计套利机会。</p><p data-pid="W-X2TN8w">在LOB中绘制间隔时间的直方图。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">DT</span> <span class="p">=</span> <span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">);</span> <span class="c">% Interarrival Times</span>
+ <span class="n">DT</span><span class="p">.</span><span class="n">Format</span> <span class="p">=</span> &#34;<span class="n">s</span>&#34;<span class="p">;</span>
+ ?
+ <span class="n">figure</span>
+ <span class="n">binEdges</span> <span class="p">=</span> <span class="n">seconds</span><span class="p">(</span><span class="mf">0.01</span><span class="p">:</span><span class="mf">0.01</span><span class="p">:</span><span class="mi">1</span><span class="p">);</span>
+ <span class="n">histogram</span><span class="p">(</span><span class="n">DT</span><span class="p">,</span><span class="n">binEdges</span><span class="p">)</span>
+ <span class="n">xlabel</span><span class="p">(</span>&#34;<span class="n">Seconds</span>&#34;<span class="p">)</span>
+ <span class="n">ylabel</span><span class="p">(</span>&#34;<span class="n">Number</span> <span class="n">of</span> <span class="n">Orders</span>&#34;<span class="p">)</span>
+ <span class="n">title</span><span class="p">(</span>&#34;<span class="n">LOB</span> <span class="n">Interarrival</span> <span class="n">Times</span>&#34;<span class="p">)</span></code></pre></div><br><img src="v2-1f14e85e6234c5f2e34878603ba4acb7_720w.jpg" ><p data-pid="yeMryGws">间隔时间遵循泊松过程的特征模式。</p><p data-pid="Y1Hfmb-A">通过将指数分布拟合到间隔时间来计算订单之间的平均等待时间。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">DTAvg</span> <span class="p">=</span> <span class="n">expfit</span><span class="p">(</span><span class="n">DT</span><span class="p">)</span>
+ <span class="n">DTAvg</span> <span class="p">=</span> <span class="n">duration</span>
+    <span class="mf">0.040273</span> <span class="nb">sec</span></code></pre></div><h3><b>平滑数据</b></h3><p data-pid="Kz3HNJJB">原始不平衡序列<code>I</code>不稳定。要识别最重要的动态变化，请引入平滑度<code>dI</code>，该平滑度是用于平均原始不平衡序列的后向标记的数量。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">dI</span> <span class="p">=</span> <span class="mi">10</span><span class="p">;</span> <span class="c">% Hyperparameter</span>
+ <span class="n">dTI</span> <span class="p">=</span> <span class="n">dI</span><span class="o">*</span><span class="n">DTAvg</span>
+ <span class="n">dTI</span> <span class="p">=</span> <span class="n">duration</span>
+    <span class="mf">0.40273</span> <span class="nb">sec</span></code></pre></div><p data-pid="7x5jWna4">该设置对应于10个标记的间隔，或平均约0.4秒。在后续窗口中平滑不平衡指数。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">sI</span> <span class="p">=</span> <span class="n">smoothdata</span><span class="p">(</span><span class="n">I</span><span class="p">,</span><span class="s">&#39;movmean&#39;</span><span class="p">,[</span><span class="n">dI</span> <span class="mi">0</span><span class="p">]);</span></code></pre></div><p data-pid="l4TNu3UY">可视化平滑程度以评估丢失或保留的波动率。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">figure</span>
+ <span class="n">hold</span> <span class="n">on</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">I</span><span class="p">)</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">sI</span><span class="p">,</span><span class="s">&#39;c&#39;</span><span class="p">,</span><span class="s">&#39;LineWidth&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+ <span class="n">hold</span> <span class="n">off</span>
+ ?
+ <span class="n">xlabel</span><span class="p">(</span>&#34;<span class="n">Time</span>&#34;<span class="p">)</span>
+ <span class="n">xlim</span><span class="p">(</span><span class="n">timeRange</span><span class="p">)</span>
+ <span class="n">ylabel</span><span class="p">(</span>&#34;<span class="n">Imbalance</span> <span class="n">Index</span>&#34;<span class="p">)</span>
+ <span class="n">title</span><span class="p">(</span>&#34;<span class="n">Imbalance</span> <span class="n">Data</span><span class="p">:</span> <span class="n">One</span> <span class="n">Minute</span>&#34;<span class="p">)</span>
+ <span class="n">legend</span><span class="p">([</span>&#34;<span class="n">Raw</span>&#34;<span class="p">,</span>&#34;<span class="n">Smoothed</span>&#34;<span class="p">],</span><span class="s">&#39;Location&#39;</span><span class="p">,</span><span class="s">&#39;SE&#39;</span><span class="p">)</span>
+ <span class="n">grid</span> <span class="n">on</span></code></pre></div><br><img src="v2-298f6d7fef63aea7dc66ea5140407aa5_720w.jpg" ><h3><b>离散数据</b></h3><p data-pid="UgHmPiwf">要创建动力学的马尔可夫模型，请将平滑的不平衡指数收集<code>sI</code>放到分组中，将其离散化为有限的状态集合<code>rho</code>（<i>ρ</i>）。分组数<code>numBins</code>是一个超参数。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">numBins</span> <span class="p">=</span> <span class="mi">3</span><span class="p">;</span> <span class="c">% Hyperparameter</span>
+ <span class="n">binEdges</span> <span class="p">=</span> <span class="nb">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">numBins</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+ <span class="n">rho</span> <span class="p">=</span> <span class="n">discretize</span><span class="p">(</span><span class="n">sI</span><span class="p">,</span><span class="n">binEdges</span><span class="p">);</span></code></pre></div><p data-pid="pAA9cRFT">要对预测效果进行建模，请在先导窗口中汇总价格。窗口中的间隔数<code>dS</code>是一个超参数。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">dS</span> <span class="p">=</span> <span class="mi">20</span><span class="p">;</span> <span class="c">% Hyperparameter</span>
+ <span class="n">dTS</span> <span class="p">=</span> <span class="n">dS</span><span class="o">*</span><span class="n">DTAvg</span>
+ <span class="n">dTS</span> <span class="p">=</span> <span class="n">duration</span>
+    <span class="mf">0.80547</span> <span class="nb">sec</span></code></pre></div><p data-pid="oFVMLYSv">该设置对应于20个间隔，或平均约0.8秒。将价格变动离散化为由远期价格变动的符号给出的三个状态<code>DS</code>（Δ<i>S</i>）。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">DS</span> <span class="p">=</span> <span class="n">NaN</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">S</span><span class="p">));</span>
+ <span class="n">shiftS</span> <span class="p">=</span> <span class="n">S</span><span class="p">(</span><span class="n">dS</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="k">end</span><span class="p">);</span>
+ <span class="n">DS</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="k">end</span><span class="o">-</span><span class="n">dS</span><span class="p">)</span> <span class="p">=</span> <span class="nb">sign</span><span class="p">(</span><span class="n">shiftS</span><span class="o">-</span><span class="n">S</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="k">end</span><span class="o">-</span><span class="n">dS</span><span class="p">));</span></code></pre></div><p data-pid="XAcyQXEN">可视化离散化数据。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">figure</span>
+ ?
+ <span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+ <span class="n">hold</span> <span class="n">on</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">sI</span><span class="p">,</span><span class="s">&#39;c&#39;</span><span class="p">,</span><span class="s">&#39;LineWidth&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+ <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">2</span><span class="p">:</span><span class="n">numBins</span>
+     <span class="n">yline</span><span class="p">(</span><span class="n">binEdges</span><span class="p">(</span><span class="nb">i</span><span class="p">),</span><span class="s">&#39;b--&#39;</span><span class="p">);</span>
+ <span class="k">end</span>
+ <span class="n">hold</span> <span class="n">off</span>
+ <span class="n">xlim</span><span class="p">(</span><span class="n">timeRange</span><span class="p">)</span>
+ <span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span> <span class="mi">1</span><span class="p">])</span>
+ <span class="n">yticks</span><span class="p">(</span><span class="n">binEdges</span><span class="p">)</span>
+ <span class="n">title</span><span class="p">(</span>&#34;<span class="n">Imbalance</span> <span class="n">Index</span> <span class="p">(</span><span class="n">Smoothed</span><span class="p">)</span>&#34;<span class="p">)</span>
+ <span class="n">grid</span> <span class="n">on</span>
+ ?
+ <span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">rho</span><span class="p">,</span><span class="s">&#39;co&#39;</span><span class="p">,</span><span class="s">&#39;MarkerSize&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+ <span class="n">xlim</span><span class="p">(</span><span class="n">timeRange</span><span class="p">)</span>
+ <span class="n">ylim</span><span class="p">([</span><span class="mi">1</span> <span class="n">numBins</span><span class="p">])</span>
+ <span class="n">yticks</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">numBins</span><span class="p">)</span>
+ <span class="n">ylabel</span><span class="p">(</span>&#34;<span class="o">\</span><span class="n">rho</span>&#34;<span class="p">)</span>
+ <span class="n">title</span><span class="p">(</span>&#34;<span class="n">Imbalance</span> <span class="n">Index</span> <span class="p">(</span><span class="n">Discretized</span><span class="p">)</span>&#34;<span class="p">)</span>
+ <span class="n">grid</span> <span class="n">on</span>
+ ?
+ <span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">DS</span><span class="p">,</span><span class="s">&#39;ro&#39;</span><span class="p">,</span><span class="s">&#39;MarkerSize&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+ <span class="n">xlim</span><span class="p">(</span><span class="n">timeRange</span><span class="p">)</span>
+ <span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span> <span class="mi">1</span><span class="p">])</span>
+ <span class="n">yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span><span class="p">])</span>
+ <span class="n">ylabel</span><span class="p">(</span>&#34;<span class="o">\</span><span class="n">DeltaS</span>&#34;<span class="p">)</span>
+ <span class="n">title</span><span class="p">(</span>&#34;<span class="n">Price</span> <span class="n">Movement</span>&#34;<span class="p">)</span>
+ <span class="n">grid</span> <span class="n">on</span></code></pre></div><br><img src="v2-5b210bf7cc636424e467ee448d62bcc4_720w.jpg" ><h3><b>连续时间马尔可夫过程</b></h3><p data-pid="-1NVWCmN">总而言之，LOB不平衡指数的状态<code>rho</code>（<i>ρ</i>）和远期价格走势的状态<code>DS</code>（Δ<i>S</i>）描述了二维连续时间马尔可夫链（CTMC）。该链由订单到达的泊松过程调制，该过程指示状态之间的任何转换。</p><p data-pid="vi87zesD">为了简化说明，为二维CTMC提供一维编码成状态<code>phi</code>（<i>φ</i> =（<i>ρ</i> ，Δ<i>S</i>））。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">numStates</span> <span class="p">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">numBins</span><span class="p">;</span> <span class="c">% numStates(DS)*numStates(rho)</span>
+ ?
+ <span class="n">phi</span> <span class="p">=</span> <span class="n">NaN</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">t</span><span class="p">));</span>
+ <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="nb">length</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+     <span class="k">switch</span> <span class="n">DS</span><span class="p">(</span><span class="nb">i</span><span class="p">)</span>
+         <span class="k">case</span> <span class="o">-</span><span class="mi">1</span>
+             <span class="n">phi</span><span class="p">(</span><span class="nb">i</span><span class="p">)</span> <span class="p">=</span> <span class="n">rho</span><span class="p">(</span><span class="nb">i</span><span class="p">);</span>
+         <span class="k">case</span> <span class="mi">0</span>
+             <span class="n">phi</span><span class="p">(</span><span class="nb">i</span><span class="p">)</span> <span class="p">=</span> <span class="n">rho</span><span class="p">(</span><span class="nb">i</span><span class="p">)</span> <span class="o">+</span> <span class="n">numBins</span><span class="p">;</span>
+         <span class="k">case</span> <span class="mi">1</span>
+             <span class="n">phi</span><span class="p">(</span><span class="nb">i</span><span class="p">)</span> <span class="p">=</span> <span class="n">rho</span><span class="p">(</span><span class="nb">i</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">numBins</span><span class="p">;</span>
+     <span class="k">end</span>
+ <span class="k">end</span></code></pre></div><p data-pid="Mf1NjE5d">连续状态 <i>φ</i>，以及组件状态 <i>ρ</i> 和  Δ<i>S</i>， 进行如下操作。</p><br><img src="v2-b1801513bc7a97bbb6479b3cb1975264_720w.jpg" ><p data-pid="cSIUYi1V">超参数<code>dI</code>和<code>dS</code>确定表征动力学的滚动状态的大小。在时间 <i>t</i>，过程从 <i>φ</i> =(<i>ρ**previous</i>,Δ<i>S**current</i>)=<i>i</i> 至 <i>φ</i> =(<i>ρ**current</i>,Δ<i>S**future</i>)=<i>j</i> （如果 <i>i</i> = <i>j</i>，保持相同的状态）。</p><h3><b>估计过程参数</b></h3><p data-pid="IomgyODX">在任何时间 <i>t</i>执行交易策略是基于 Δ<i>S**future</i>处于特定状态，以其他状态的当前值和先前值为条件。根据[<a href="https://www.mathworks.com/help/finance/machine-learning-for-statistical-arbitrage-ii-feature-engineering-model-development.html%23mw_58c268cf-1cab-4489-9a15-84f0a80c14b7" class=" wrap external" target="_blank" rel="nofollow noreferrer">3]</a>和[<a href="https://www.mathworks.com/help/finance/machine-learning-for-statistical-arbitrage-ii-feature-engineering-model-development.html%23mw_ce89acd2-e46f-4b90-b439-930fbba619d2" class=" wrap external" target="_blank" rel="nofollow noreferrer">4]</a>，确定经验转移概率，然后评估它们的预测能力。</p><div class="highlight"><pre><code class="language-matlab"> <span class="c">% Transition counts</span>
+ ?
+ <span class="n">C</span> <span class="p">=</span> <span class="nb">zeros</span><span class="p">(</span><span class="n">numStates</span><span class="p">);</span>
+ <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="nb">length</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">-</span><span class="n">dS</span><span class="o">-</span><span class="mi">1</span>  
+     <span class="n">C</span><span class="p">(</span><span class="n">phi</span><span class="p">(</span><span class="nb">i</span><span class="p">),</span><span class="n">phi</span><span class="p">(</span><span class="nb">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="p">=</span> <span class="n">C</span><span class="p">(</span><span class="n">phi</span><span class="p">(</span><span class="nb">i</span><span class="p">),</span><span class="n">phi</span><span class="p">(</span><span class="nb">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+ <span class="k">end</span>
+ ?
+ <span class="c">% Holding times</span>
+ ?
+ <span class="n">H</span> <span class="p">=</span> <span class="nb">diag</span><span class="p">(</span><span class="n">C</span><span class="p">);</span>
+ ?
+ <span class="c">% Transition rate matrix (infinitesimal generator)</span>
+ ?
+ <span class="n">G</span> <span class="p">=</span> <span class="n">C</span><span class="o">./</span><span class="n">H</span><span class="p">;</span>
+ <span class="n">v</span> <span class="p">=</span> <span class="n">sum</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+ <span class="n">G</span> <span class="p">=</span> <span class="n">G</span> <span class="o">+</span> <span class="nb">diag</span><span class="p">(</span><span class="o">-</span><span class="n">v</span><span class="p">);</span>
+ ?
+ <span class="c">% Transition probability matrix (stochastic for all dI)</span>
+ ?
+ <span class="n">P</span> <span class="p">=</span> <span class="n">expm</span><span class="p">(</span><span class="n">G</span><span class="o">*</span><span class="n">dI</span><span class="p">);</span> <span class="c">% Matrix exponential</span></code></pre></div><p data-pid="pM2eAv4G">如文献 [<a href="https://www.mathworks.com/help/finance/machine-learning-for-statistical-arbitrage-ii-feature-engineering-model-development.html%23mw_ce89acd2-e46f-4b90-b439-930fbba619d2" class=" wrap external" target="_blank" rel="nofollow noreferrer">4]</a>所述，为了获得包含概率：</p><br><img src="v2-1a9c9d89a6dbb8c637b9cfc0a58f7c29_720w.jpg" ><p data-pid="erwGj3gH">的交易矩阵呢 <code>Q</code>，应用贝叶斯法则：</p><br><img src="v2-f6a64b0187f5536932273429b273b578_720w.jpg" ><p data-pid="KjEqB6Dv">分子是转移概率矩阵<code>P</code>。计算分母<code>PCond.</code></p><div class="highlight"><pre><code class="language-matlab"> <span class="n">PCond</span> <span class="p">=</span> <span class="nb">zeros</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">P</span><span class="p">));</span>
+ <span class="n">phiNums</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">numStates</span><span class="p">;</span>
+ <span class="n">modNums</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="n">phiNums</span><span class="p">,</span><span class="n">numBins</span><span class="p">);</span>
+ <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="n">phiNums</span>
+     <span class="k">for</span> <span class="nb">j</span> <span class="p">=</span> <span class="n">phiNums</span>
+         <span class="n">idx</span> <span class="p">=</span> <span class="p">(</span><span class="n">modNums</span> <span class="o">==</span> <span class="n">modNums</span><span class="p">(</span><span class="nb">j</span><span class="p">));</span>
+         <span class="n">PCond</span><span class="p">(</span><span class="nb">i</span><span class="p">,</span><span class="nb">j</span><span class="p">)</span> <span class="p">=</span> <span class="n">sum</span><span class="p">(</span><span class="n">P</span><span class="p">(</span><span class="nb">i</span><span class="p">,</span><span class="n">idx</span><span class="p">));</span>        
+     <span class="k">end</span>    
+ <span class="k">end</span>
+ ?
+ <span class="n">Q</span> <span class="p">=</span> <span class="n">P</span><span class="o">./</span><span class="n">PCond</span><span class="p">;</span></code></pre></div><p data-pid="OV41evAm"><code>Q</code>在表格中显示。用复合状态<i>φ</i>=(<i>ρ</i>,Δ<i>S</i>)标记行和列。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">binNames</span> <span class="p">=</span> <span class="n">string</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">numBins</span><span class="p">);</span>
+ <span class="n">stateNames</span> <span class="p">=</span> <span class="p">[</span>&#34;<span class="p">(</span>&#34;<span class="o">+</span><span class="n">binNames</span><span class="o">+</span>&#34;<span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>&#34;<span class="p">,</span>&#34;<span class="p">(</span>&#34;<span class="o">+</span><span class="n">binNames</span><span class="o">+</span>&#34;<span class="p">,</span><span class="mi">0</span><span class="p">)</span>&#34;<span class="p">,</span>&#34;<span class="p">(</span>&#34;<span class="o">+</span><span class="n">binNames</span><span class="o">+</span>&#34;<span class="p">,</span><span class="mi">1</span><span class="p">)</span>&#34;<span class="p">];</span>
+ <span class="n">QTable</span> <span class="p">=</span> <span class="n">array2table</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span><span class="s">&#39;RowNames&#39;</span><span class="p">,</span><span class="n">stateNames</span><span class="p">,</span><span class="s">&#39;VariableNames&#39;</span><span class="p">,</span><span class="n">stateNames</span><span class="p">)</span>
+ <span class="n">QTable</span><span class="p">=</span><span class="mi">9</span>×<span class="mi">9</span> <span class="n">table</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>      <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>       <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>       <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>      <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>      <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>       <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>        <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>       <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>  
+               <span class="n">________</span>    <span class="n">_________</span>    <span class="n">_________</span>    <span class="n">_______</span>    <span class="n">_______</span>    <span class="n">_______</span>    <span class="n">_________</span>    <span class="n">_________</span>    <span class="n">________</span>
+ ?
+     <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.59952</span>      <span class="mf">0.30458</span>      <span class="mf">0.19165</span>    <span class="mf">0.39343</span>    <span class="mf">0.67723</span>     <span class="mf">0.7099</span>    <span class="mf">0.0070457</span>     <span class="mf">0.018196</span>    <span class="mf">0.098447</span>
+     <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.74092</span>      <span class="mf">0.58445</span>      <span class="mf">0.40023</span>    <span class="mf">0.25506</span>    <span class="mf">0.41003</span>    <span class="mf">0.56386</span>    <span class="mf">0.0040178</span>    <span class="mf">0.0055189</span>    <span class="mf">0.035914</span>
+     <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.79895</span>      <span class="mf">0.60866</span>      <span class="mf">0.55443</span>    <span class="mf">0.19814</span>      <span class="mf">0.385</span>    <span class="mf">0.42501</span>    <span class="mf">0.0029096</span>    <span class="mf">0.0063377</span>    <span class="mf">0.020554</span>
+     <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>     <span class="mf">0.094173</span>     <span class="mf">0.036014</span>     <span class="mf">0.019107</span>    <span class="mf">0.88963</span>    <span class="mf">0.91688</span>    <span class="mf">0.75192</span>     <span class="mf">0.016195</span>     <span class="mf">0.047101</span>     <span class="mf">0.22897</span>
+     <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>      <span class="mf">0.12325</span>     <span class="mf">0.017282</span>     <span class="mf">0.015453</span>    <span class="mf">0.86523</span>    <span class="mf">0.96939</span>     <span class="mf">0.9059</span>     <span class="mf">0.011525</span>     <span class="mf">0.013328</span>    <span class="mf">0.078648</span>
+     <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>       <span class="mf">0.1773</span>      <span class="mf">0.02616</span>     <span class="mf">0.018494</span>    <span class="mf">0.81155</span>    <span class="mf">0.95359</span>    <span class="mf">0.92513</span>     <span class="mf">0.011154</span>     <span class="mf">0.020252</span>    <span class="mf">0.056377</span>
+     <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.041132</span>    <span class="mf">0.0065127</span>    <span class="mf">0.0021313</span>    <span class="mf">0.59869</span>    <span class="mf">0.39374</span>    <span class="mf">0.21787</span>      <span class="mf">0.36017</span>      <span class="mf">0.59975</span>        <span class="mf">0.78</span>
+     <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.059151</span>    <span class="mf">0.0053554</span>    <span class="mf">0.0027769</span>    <span class="mf">0.65672</span>    <span class="mf">0.42325</span>    <span class="mf">0.26478</span>      <span class="mf">0.28413</span>       <span class="mf">0.5714</span>     <span class="mf">0.73244</span>
+     <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>     <span class="mf">0.095832</span>     <span class="mf">0.010519</span>    <span class="mf">0.0051565</span>     <span class="mf">0.7768</span>     <span class="mf">0.6944</span>     <span class="mf">0.3906</span>      <span class="mf">0.12736</span>      <span class="mf">0.29508</span>     <span class="mf">0.60424</span></code></pre></div><br><img src="v2-b9e3b4709daae98be2b8f90fdee1dc3a_720w.jpg" ><div class="highlight"><pre><code class="language-matlab"> <span class="n">figure</span>
+ <span class="n">imagesc</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>
+ <span class="n">axis</span> <span class="n">equal</span> <span class="n">tight</span>
+ <span class="n">hCB</span> <span class="p">=</span> <span class="n">colorbar</span><span class="p">;</span>
+ <span class="n">hCB</span><span class="p">.</span><span class="n">Label</span><span class="p">.</span><span class="n">String</span> <span class="p">=</span> &#34;<span class="n">Prob</span><span class="p">(</span><span class="o">\</span><span class="n">DeltaS_</span><span class="p">{</span><span class="n">future</span><span class="p">}</span> <span class="o">|</span> <span class="o">\</span><span class="n">rho_</span><span class="p">{</span><span class="n">previous</span><span class="p">},</span><span class="o">\</span><span class="n">rho_</span><span class="p">{</span><span class="n">current</span><span class="p">},</span><span class="o">\</span><span class="n">DeltaS_</span><span class="p">{</span><span class="n">current</span><span class="p">})</span>&#34;<span class="p">;</span>
+ <span class="n">xticks</span><span class="p">(</span><span class="n">phiNums</span><span class="p">)</span>
+ <span class="n">xticklabels</span><span class="p">(</span><span class="n">stateNames</span><span class="p">)</span>
+ <span class="n">xlabel</span><span class="p">(</span>&#34;<span class="p">(</span><span class="o">\</span><span class="n">rho_</span><span class="p">{</span><span class="n">current</span><span class="p">},</span><span class="o">\</span><span class="n">DeltaS_</span><span class="p">{</span><span class="n">future</span><span class="p">})</span>&#34;<span class="p">)</span>
+ <span class="n">yticks</span><span class="p">(</span><span class="n">phiNums</span><span class="p">)</span>
+ <span class="n">yticklabels</span><span class="p">(</span><span class="n">stateNames</span><span class="p">)</span>
+ <span class="n">ylabel</span><span class="p">(</span>&#34;<span class="p">(</span><span class="o">\</span><span class="n">rho_</span><span class="p">{</span><span class="n">previous</span><span class="p">},</span><span class="o">\</span><span class="n">DeltaS_</span><span class="p">{</span><span class="n">current</span><span class="p">})</span>&#34;<span class="p">)</span>
+ <span class="n">title</span><span class="p">(</span>&#34;<span class="n">Trading</span> <span class="n">Matrix</span>&#34;<span class="p">)</span></code></pre></div><br><img src="v2-0cc7efcded53595a71226239daa05e26_720w.jpg" ><br><img src="v2-fc13e6130ec485b0a1c5e1017ae9375a_720w.jpg" ><div class="highlight"><pre><code class="language-matlab"> <span class="n">trigger</span> <span class="p">=</span> <span class="mf">0.5</span><span class="p">;</span>
+ <span class="n">QPattern</span> <span class="p">=</span> <span class="p">(</span><span class="n">Q</span> <span class="o">&gt;</span> <span class="n">trigger</span><span class="p">)</span>
+ <span class="n">QPattern</span> <span class="p">=</span> <span class="mi">9</span><span class="n">x9</span> <span class="n">logical</span> <span class="n">array</span>
+ ?
+    <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">1</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">1</span>
+    <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">0</span>   <span class="mi">1</span></code></pre></div><br><img src="v2-123197d48037441746b7dce4ffc4663d_720w.jpg" ><h3><b>是交易策略吗？</b></h3><p data-pid="oy1A8inA"><code>Q</code>基于可用的交换数据和超参数设置构建。使用<code>Q</code>，以便让未来的交易决策取决于市场统计模式的连续型。市场在某些状态下是否表现出动力，是对弱形式的<i>有效市场假说</i>（EMH）的检验。对于大量交易的资产，例如本示例 (INTC)中使用的资产，EMH可能会长期持有，套利机会很快消失。但是，失效的EMH可能会在短时间内出现在某些资产中。使用最佳超参数设置和要进行交易的验证期，有效的交易策略将交易日的一部分（足够短以显示一定程度的统计平衡）划分为一个训练期，以进行估算<code>Q</code>。</p><h3><b>概要</b></h3><p data-pid="MWnzLwOt">本示例从LOB上的原始数据开始，然后将其转换为统计套利机会的概要矩阵<code>Q</code>。该分析使用连续时间马尔可夫链模型的数学方法，首先是识别LOB到达时间的泊松过程，然后将数据离散化为代表市场瞬时位置的二维状态。根据经验得出的状态转换的描述导致了算法交易策略的可能性。</p><h2><b>参考文献</b></h2><p data-pid="NOwGbPLP">[1] Cartea, álvaro, Sebastian Jaimungal, and Jason Ricci. &#34;Buy Low, Sell High: A High-Frequency Trading Perspective.&#34; <i>SIAM Journal on Financial Mathematics</i> 5, no. 1 (January 2014): 415–44. <a href="https://doi.org/10.1137/130911196" class=" external" target="_blank" rel="nofollow noreferrer"><span class="invisible">https://</span><span class="visible">doi.org/10.1137/1309111</span><span class="invisible">96</span><span class="ellipsis"></span></a>.</p><p data-pid="qJEJ0hUh">[2] Guilbaud, Fabien, and Huyen Pham. &#34;Optimal High-Frequency Trading with Limit and Market Orders.&#34; <i>Quantitative Finance</i> 13, no. 1 (January 2013): 79–94. <a href="https://doi.org/10.1080/14697688.2012.708779" class=" external" target="_blank" rel="nofollow noreferrer"><span class="invisible">https://</span><span class="visible">doi.org/10.1080/1469768</span><span class="invisible">8.2012.708779</span><span class="ellipsis"></span></a>.</p><p data-pid="tBHxlB32">[3] Norris, J. R. <i>Markov Chains</i>. Cambridge, UK: Cambridge University Press, 1997.</p><p data-pid="g9x3mlA0">[4] Rubisov, Anton D. &#34;<a href="https://tspace.library.utoronto.ca/bitstream/1807/70567/3/Rubisov_Anton_201511_MAS_thesis.pdf" class=" wrap external" target="_blank" rel="nofollow noreferrer">Statistical Arbitrage Using Limit Order Book Imbalance</a>.&#34; Master&#39;s thesis, University of Toronto, 2015.</p><hr/><p data-pid="oTDQXgpM">注：本文根据MATLAB官网内容修改而成。</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
