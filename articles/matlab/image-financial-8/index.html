@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB金融工具箱：08：寿命表分析案例研究</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB金融工具箱：08：寿命表分析案例研究</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="1XztAApm">本示例说明如何对寿命表使用基本工作流程。</p><p data-pid="PXXv72fG">加载寿命表数据文件。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">load</span> <span class="n">us_lifetable_2009</span></code></pre></div><p data-pid="19JYUS3m">使用默认<code>heligman-pollard</code>参数模型根据生存数据校准寿命数据。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">a</span> <span class="p">=</span> <span class="n">lifetablefit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lx</span><span class="p">);</span></code></pre></div><p data-pid="5KpilkAS">从校准的死亡率模型生成寿命表系列。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">qx</span> <span class="p">=</span> <span class="n">lifetablegen</span><span class="p">((</span><span class="mi">0</span><span class="p">:</span><span class="mi">100</span><span class="p">),</span> <span class="n">a</span><span class="p">);</span>
+ <span class="n">display</span><span class="p">(</span><span class="n">qx</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">40</span><span class="p">,:))</span>
+     <span class="mf">0.0063</span>    <span class="mf">0.0069</span>    <span class="mf">0.0057</span>
+     <span class="mf">0.0005</span>    <span class="mf">0.0006</span>    <span class="mf">0.0004</span>
+     <span class="mf">0.0002</span>    <span class="mf">0.0003</span>    <span class="mf">0.0002</span>
+     <span class="mf">0.0002</span>    <span class="mf">0.0002</span>    <span class="mf">0.0002</span>
+     <span class="mf">0.0001</span>    <span class="mf">0.0001</span>    <span class="mf">0.0001</span>
+     <span class="mf">0.0001</span>    <span class="mf">0.0001</span>    <span class="mf">0.0001</span>
+     <span class="mf">0.0001</span>    <span class="mf">0.0001</span>    <span class="mf">0.0001</span>
+     <span class="mf">0.0001</span>    <span class="mf">0.0001</span>    <span class="mf">0.0001</span>
+     <span class="mf">0.0001</span>    <span class="mf">0.0001</span>    <span class="mf">0.0001</span>
+     <span class="mf">0.0001</span>    <span class="mf">0.0001</span>    <span class="mf">0.0001</span>
+     <span class="mf">0.0001</span>    <span class="mf">0.0001</span>    <span class="mf">0.0001</span>
+     <span class="mf">0.0001</span>    <span class="mf">0.0001</span>    <span class="mf">0.0001</span>
+     <span class="mf">0.0002</span>    <span class="mf">0.0002</span>    <span class="mf">0.0001</span>
+     <span class="mf">0.0002</span>    <span class="mf">0.0002</span>    <span class="mf">0.0002</span>
+     <span class="mf">0.0002</span>    <span class="mf">0.0003</span>    <span class="mf">0.0002</span>
+     <span class="mf">0.0003</span>    <span class="mf">0.0004</span>    <span class="mf">0.0002</span>
+     <span class="mf">0.0004</span>    <span class="mf">0.0005</span>    <span class="mf">0.0002</span>
+     <span class="mf">0.0005</span>    <span class="mf">0.0006</span>    <span class="mf">0.0003</span>
+     <span class="mf">0.0006</span>    <span class="mf">0.0008</span>    <span class="mf">0.0003</span>
+     <span class="mf">0.0007</span>    <span class="mf">0.0009</span>    <span class="mf">0.0003</span>
+     <span class="mf">0.0008</span>    <span class="mf">0.0011</span>    <span class="mf">0.0003</span>
+     <span class="mf">0.0008</span>    <span class="mf">0.0012</span>    <span class="mf">0.0004</span>
+     <span class="mf">0.0009</span>    <span class="mf">0.0013</span>    <span class="mf">0.0004</span>
+     <span class="mf">0.0009</span>    <span class="mf">0.0014</span>    <span class="mf">0.0005</span>
+     <span class="mf">0.0010</span>    <span class="mf">0.0014</span>    <span class="mf">0.0005</span>
+     <span class="mf">0.0010</span>    <span class="mf">0.0015</span>    <span class="mf">0.0005</span>
+     <span class="mf">0.0010</span>    <span class="mf">0.0015</span>    <span class="mf">0.0006</span>
+     <span class="mf">0.0010</span>    <span class="mf">0.0015</span>    <span class="mf">0.0006</span>
+     <span class="mf">0.0010</span>    <span class="mf">0.0015</span>    <span class="mf">0.0007</span>
+     <span class="mf">0.0010</span>    <span class="mf">0.0014</span>    <span class="mf">0.0007</span>
+     <span class="mf">0.0011</span>    <span class="mf">0.0014</span>    <span class="mf">0.0007</span>
+     <span class="mf">0.0011</span>    <span class="mf">0.0014</span>    <span class="mf">0.0008</span>
+     <span class="mf">0.0011</span>    <span class="mf">0.0014</span>    <span class="mf">0.0008</span>
+     <span class="mf">0.0011</span>    <span class="mf">0.0014</span>    <span class="mf">0.0009</span>
+     <span class="mf">0.0011</span>    <span class="mf">0.0014</span>    <span class="mf">0.0009</span>
+     <span class="mf">0.0012</span>    <span class="mf">0.0015</span>    <span class="mf">0.0010</span>
+     <span class="mf">0.0012</span>    <span class="mf">0.0015</span>    <span class="mf">0.0011</span>
+     <span class="mf">0.0013</span>    <span class="mf">0.0016</span>    <span class="mf">0.0011</span>
+     <span class="mf">0.0014</span>    <span class="mf">0.0017</span>    <span class="mf">0.0012</span>
+     <span class="mf">0.0015</span>    <span class="mf">0.0018</span>    <span class="mf">0.0013</span></code></pre></div><p data-pid="vMqWGXhH">绘制<code>qx</code>系列并显示图例。级数<code>qx</code>是一个人在年龄<i>X</i> 时，会在年龄 <i>X</i> 和系列中下一个年龄值之间死亡的条件概率</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">plot</span><span class="p">((</span><span class="mi">0</span><span class="p">:</span><span class="mi">100</span><span class="p">),</span> <span class="nb">log</span><span class="p">(</span><span class="n">qx</span><span class="p">));</span>
+ <span class="n">legend</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="s">&#39;location&#39;</span><span class="p">,</span> <span class="s">&#39;southeast&#39;</span><span class="p">);</span>
+ <span class="n">title</span><span class="p">(</span><span class="s">&#39;Conditional Probability of Dying within One Year of Current Age&#39;</span><span class="p">);</span>
+ <span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Age&#39;</span><span class="p">);</span>
+ <span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Log Probability&#39;</span><span class="p">);</span></code></pre></div><br><img src="v2-ed6ceda2545e973104961d60c0399ff2_720w.jpg"><hr/><p data-pid="8eUkZD5T">注：本文根据MATLAB官网内容修改而成。</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
