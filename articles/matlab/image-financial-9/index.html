@@ -1,0 +1,252 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB金融工具箱：09：资产配置案例研究</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB金融工具箱：09：资产配置案例研究</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="MBEMQtPr">此示例说明如何设置基本资产配置问题，该问题使用均值方差投资组合优化和一个<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象来估算有效投资组合。</p><h3><b>步骤1.定义投资配置问题</b></h3><p data-pid="diGCErsW">假设您要管理具有四个资产类别的资产配置基金：债券、大盘股票、小盘股票和新兴股票。该基金只有多头，没有借款或杠杆作用，股票投资组合中的资金不应超过85％，新兴股票投资组合中的资金不应超过投资组合的35％。前三项资产的交易成本为每年10个基点，而新兴股票的交易成本则高出四倍。最后，您要确保平均营业额不超过15％。要解决此问题，您将建立一个基本的均值方差投资组合优化问题，然后慢慢引入对该问题的各种约束条件以获得解决方案。</p><p data-pid="T9ye_8jA">要设置投资组合优化问题，请从与该问题的结构相关的已知数量的基本定义开始。假定每个资产类别都具有具有实时价格的可交易资产。这样的资产可以是，例如，交易所买卖基金（ETF）。初始投资组合中每个资产的总资产为750万美元，另外还有6万美元的现金头寸。这些基本数量和交易成本是在以下元胞阵列<code>Asset</code>中以下的变量里设置：即当前价格是向量<code>Price</code>中，当前投资组合是向量<code>Holding</code>，交易成本是向量<code>UnitCost</code>。</p><p data-pid="RV20iT8A">要分析此投资组合，您可以在<code><a href="https://www.mathworks.com/help/matlab/ref/table.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">table</a></code>对象中设置交易记事本，以帮助跟踪价格、持仓、权重等。特别是，您可以计算初始投资组合权重，并将其维持在一个名为<code>InitPort</code>的新交易记事本中。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">Asset</span> <span class="p">=</span> <span class="p">{</span> <span class="s">&#39;Bonds&#39;</span><span class="p">,</span> <span class="s">&#39;Large-Cap Equities&#39;</span><span class="p">,</span> <span class="s">&#39;Small-Cap Equities&#39;</span><span class="p">,</span> <span class="s">&#39;Emerging Equities&#39;</span> <span class="p">};</span>
+ <span class="n">Price</span> <span class="p">=</span> <span class="p">[</span> <span class="mf">52.4</span><span class="p">;</span> <span class="mf">122.7</span><span class="p">;</span> <span class="mf">35.2</span><span class="p">;</span> <span class="mf">46.9</span> <span class="p">];</span>
+ <span class="n">Holding</span> <span class="p">=</span> <span class="p">[</span> <span class="mi">42938</span><span class="p">;</span> <span class="mi">24449</span><span class="p">;</span> <span class="mi">42612</span><span class="p">;</span> <span class="mi">15991</span> <span class="p">];</span>
+ <span class="n">UnitCost</span> <span class="p">=</span> <span class="p">[</span> <span class="mf">0.001</span><span class="p">;</span> <span class="mf">0.001</span><span class="p">;</span> <span class="mf">0.001</span><span class="p">;</span> <span class="mf">0.004</span> <span class="p">];</span>
+ ?
+ <span class="n">Blotter</span> <span class="p">=</span> <span class="n">table</span><span class="p">(</span><span class="s">&#39;RowNames&#39;</span><span class="p">,</span> <span class="n">Asset</span><span class="p">);</span>
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">Price</span> <span class="p">=</span> <span class="n">Price</span><span class="p">;</span>
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">InitHolding</span> <span class="p">=</span> <span class="n">Holding</span><span class="p">;</span>
+ <span class="n">Wealth</span> <span class="p">=</span> <span class="n">sum</span><span class="p">(</span><span class="n">Blotter</span><span class="p">.</span><span class="n">Price</span> <span class="o">.*</span> <span class="n">Blotter</span><span class="p">.</span><span class="n">InitHolding</span><span class="p">);</span>
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">InitPort</span> <span class="p">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">Wealth</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">Blotter</span><span class="p">.</span><span class="n">Price</span> <span class="o">.*</span> <span class="n">Blotter</span><span class="p">.</span><span class="n">InitHolding</span><span class="p">);</span>
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">UnitCost</span> <span class="p">=</span> <span class="n">UnitCost</span><span class="p">;</span>
+ <span class="n">Blotter</span>
+ <span class="n">Blotter</span><span class="p">=</span><span class="mi">4</span>×<span class="mi">4</span> <span class="n">table</span>
+                           <span class="n">Price</span>    <span class="n">InitHolding</span>    <span class="n">InitPort</span>    <span class="n">UnitCost</span>
+                           <span class="n">_____</span>    <span class="n">___________</span>    <span class="n">________</span>    <span class="n">________</span>
+ ?
+     <span class="n">Bonds</span>                  <span class="mf">52.4</span>       <span class="mi">42938</span>         <span class="mf">0.3</span>        <span class="mf">0.001</span>  
+     <span class="n">Large</span><span class="o">-</span><span class="n">Cap</span> <span class="n">Equities</span>    <span class="mf">122.7</span>       <span class="mi">24449</span>         <span class="mf">0.4</span>        <span class="mf">0.001</span>  
+     <span class="n">Small</span><span class="o">-</span><span class="n">Cap</span> <span class="n">Equities</span>     <span class="mf">35.2</span>       <span class="mi">42612</span>         <span class="mf">0.2</span>        <span class="mf">0.001</span>  
+     <span class="n">Emerging</span> <span class="n">Equities</span>      <span class="mf">46.9</span>       <span class="mi">15991</span>         <span class="mf">0.1</span>        <span class="mf">0.004</span>  </code></pre></div><h3><b>步骤2.模拟资产价格</b></h3><p data-pid="iBKhw7JX">由于这是一个假设示例，因此要根据资产类别的年度资产总回报的给定均值和协方差来模拟资产价格，<code><a href="https://www.mathworks.com/help/finance/portsim.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">portsim</a></code>函数可用于创建具有所需均值和协方差的资产收益。具体来说，<code>portsim</code>用于模拟五年的每月总收益，然后绘制以显示模拟的总收益价格的对数。</p><p data-pid="UgJNRgNM">变量<code>AssetMean</code>和<code>AssetCovar</code>中保持年度资产总收益的均值和协方差。变量<code>Y</code>中保留了模拟资产的总回报价格（复合总回报）。在此示例中，所有初始资产总回报价格均已标准化为<code>1</code>。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">AssetMean</span> <span class="p">=</span> <span class="p">[</span> <span class="mf">0.05</span><span class="p">;</span> <span class="mf">0.1</span><span class="p">;</span> <span class="mf">0.12</span><span class="p">;</span> <span class="mf">0.18</span> <span class="p">];</span>
+ <span class="n">AssetCovar</span> <span class="p">=</span> <span class="p">[</span> <span class="mf">0.0064</span> <span class="mf">0.00408</span> <span class="mf">0.00192</span> <span class="mi">0</span><span class="p">;</span>
+     <span class="mf">0.00408</span> <span class="mf">0.0289</span> <span class="mf">0.0204</span> <span class="mf">0.0119</span><span class="p">;</span>
+     <span class="mf">0.00192</span> <span class="mf">0.0204</span> <span class="mf">0.0576</span> <span class="mf">0.0336</span><span class="p">;</span>
+     <span class="mi">0</span> <span class="mf">0.0119</span> <span class="mf">0.0336</span> <span class="mf">0.1225</span> <span class="p">];</span>
+ ?
+ <span class="n">X</span> <span class="p">=</span> <span class="n">portsim</span><span class="p">(</span><span class="n">AssetMean</span><span class="o">&#39;/</span><span class="mi">12</span><span class="p">,</span> <span class="n">AssetCovar</span><span class="o">/</span><span class="mi">12</span><span class="p">,</span> <span class="mi">60</span><span class="p">);</span> <span class="c">% monthly total returns for 5 years (60 months)</span>
+ <span class="p">[</span><span class="n">Y</span><span class="p">,</span> <span class="n">T</span><span class="p">]</span> <span class="p">=</span> <span class="n">ret2tick</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="p">[],</span> <span class="mi">1</span><span class="o">/</span><span class="mi">12</span><span class="p">);</span>                <span class="c">% form total return prices</span>
+ <span class="n">plot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="nb">log</span><span class="p">(</span><span class="n">Y</span><span class="p">));</span>
+ <span class="n">title</span><span class="p">(</span><span class="s">&#39;\bfSimulated Asset Class Total Return Prices&#39;</span><span class="p">);</span>
+ <span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Year&#39;</span><span class="p">);</span>
+ <span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Log Total Return Price&#39;</span><span class="p">);</span>
+ <span class="n">legend</span><span class="p">(</span><span class="n">Asset</span><span class="p">,</span><span class="s">&#39;Location&#39;</span><span class="p">,</span><span class="s">&#39;best&#39;</span><span class="p">);</span></code></pre></div><br><img src="v2-cf6a998f22898bd788aaea4b8373d7cf_720w.jpg" ><h3><b>步骤3.设置Portfolio对象</b></h3><p data-pid="6vcAQukM">要探索高效边界上的投资组合，请使用以下规范设置<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象：</p><ul><li data-pid="KuuIqS5m">投资组合权重为非负数，总和为<code>1</code></li><li data-pid="uRyN8g3S">股权分配不超过投资组合的85％</li><li data-pid="dJKTLxol">新兴股权不超过投资组合的35％</li></ul><p data-pid="q1mQPBBy">这些规范在以下使用<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象的步骤中被并入<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象<code>p</code>。</p><ol><li data-pid="vyHpeyiR"><code>Blotter</code>中的初始投资组合规格提供了全部资产的数量，因此您无需直接指定<code>NumAssets</code>属性。接下来，设置默认约束（仅限长期预算约束）。此外，设置对投资组合中的股票施加上限的组约束（在组矩阵中以<code>1</code>标识的股票）和对新兴股票的上限约束。尽管您可以使用<code>setBounds</code>函数来设置新兴市场股票的上限，但请注意如何使用函数<code>addGroups</code>来设置此约束。</li><li data-pid="8Gc5nBbI">要完全说明均值方差投资组合优化问题，必须指定资产收益率的均值和协方差。由于从变量中<code>AssetMean</code>和<code>AssetCovar</code>中的这些时刻开始，因此您可以使用<code>setAssetMoments</code>函数将这些变量输入到<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象中（请记住，您假设原始数据是月收益，这就是为什么您将年度输入时刻除以12以获得月收益的原因）。</li><li data-pid="4lVq1Oeq">将总退货价格与<code>estimateAssetMoments</code>函数一起使用，并指定您的数据<code>Y</code>是价格而不是退货，以估算<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象的资产退货时间。</li><li data-pid="cEBBGONv">尽管您<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象的收益以月收益为单位，并且由于以后的费用是按年计算的，所以通过对<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象<code>p</code>的<code>AssetMean</code>和<code>AssetCovar</code>属性的直接转换，将它们指定为年化总收益很方便。</li><li data-pid="6YHrtiEc">显示Portfolio对象<code>p</code>。</li></ol><div class="highlight"><pre><code class="language-matlab"> <span class="n">p</span> <span class="p">=</span> <span class="n">Portfolio</span><span class="p">(</span><span class="s">&#39;Name&#39;</span><span class="p">,</span> <span class="s">&#39;Asset Allocation Portfolio&#39;</span><span class="p">,</span> <span class="c">...</span>
+ <span class="s">&#39;AssetList&#39;</span><span class="p">,</span> <span class="n">Asset</span><span class="p">,</span> <span class="s">&#39;InitPort&#39;</span><span class="p">,</span> <span class="n">Blotter</span><span class="p">.</span><span class="n">InitPort</span><span class="p">);</span>
+ ?
+ <span class="n">p</span> <span class="p">=</span> <span class="n">setDefaultConstraints</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+ <span class="n">p</span> <span class="p">=</span> <span class="n">setGroups</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[],</span> <span class="mf">0.85</span><span class="p">);</span>
+ <span class="n">p</span> <span class="p">=</span> <span class="n">addGroups</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[],</span> <span class="mf">0.35</span><span class="p">);</span>
+ ?
+ <span class="n">p</span> <span class="p">=</span> <span class="n">setAssetMoments</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">AssetMean</span><span class="o">/</span><span class="mi">12</span><span class="p">,</span> <span class="n">AssetCovar</span><span class="o">/</span><span class="mi">12</span><span class="p">);</span>
+ <span class="n">p</span> <span class="p">=</span> <span class="n">estimateAssetMoments</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="s">&#39;DataFormat&#39;</span><span class="p">,</span> <span class="s">&#39;Prices&#39;</span><span class="p">);</span>
+ ?
+ <span class="n">p</span><span class="p">.</span><span class="n">AssetMean</span> <span class="p">=</span> <span class="mi">12</span><span class="o">*</span><span class="n">p</span><span class="p">.</span><span class="n">AssetMean</span><span class="p">;</span>
+ <span class="n">p</span><span class="p">.</span><span class="n">AssetCovar</span> <span class="p">=</span> <span class="mi">12</span><span class="o">*</span><span class="n">p</span><span class="p">.</span><span class="n">AssetCovar</span><span class="p">;</span>
+ ?
+ <span class="n">display</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+ <span class="n">p</span> <span class="p">=</span> 
+   <span class="n">Portfolio</span> <span class="n">with</span> <span class="k">properties</span><span class="p">:</span>
+ ?
+           <span class="n">BuyCost</span><span class="p">:</span> <span class="p">[]</span>
+          <span class="n">SellCost</span><span class="p">:</span> <span class="p">[]</span>
+      <span class="n">RiskFreeRate</span><span class="p">:</span> <span class="p">[]</span>
+         <span class="n">AssetMean</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+        <span class="n">AssetCovar</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x4</span> <span class="n">double</span><span class="p">]</span>
+     <span class="n">TrackingError</span><span class="p">:</span> <span class="p">[]</span>
+      <span class="n">TrackingPort</span><span class="p">:</span> <span class="p">[]</span>
+          <span class="n">Turnover</span><span class="p">:</span> <span class="p">[]</span>
+       <span class="n">BuyTurnover</span><span class="p">:</span> <span class="p">[]</span>
+      <span class="n">SellTurnover</span><span class="p">:</span> <span class="p">[]</span>
+              <span class="n">Name</span><span class="p">:</span> <span class="s">&#39;Asset Allocation Portfolio&#39;</span>
+         <span class="n">NumAssets</span><span class="p">:</span> <span class="mi">4</span>
+         <span class="n">AssetList</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="n">x4</span> <span class="n">cell</span><span class="p">}</span>
+          <span class="n">InitPort</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+       <span class="n">AInequality</span><span class="p">:</span> <span class="p">[]</span>
+       <span class="n">bInequality</span><span class="p">:</span> <span class="p">[]</span>
+         <span class="n">AEquality</span><span class="p">:</span> <span class="p">[]</span>
+         <span class="n">bEquality</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="n">LowerBound</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+        <span class="n">UpperBound</span><span class="p">:</span> <span class="p">[]</span>
+       <span class="n">LowerBudget</span><span class="p">:</span> <span class="mi">1</span>
+       <span class="n">UpperBudget</span><span class="p">:</span> <span class="mi">1</span>
+       <span class="n">GroupMatrix</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="n">x4</span> <span class="n">double</span><span class="p">]</span>
+        <span class="n">LowerGroup</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="n">UpperGroup</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+            <span class="n">GroupA</span><span class="p">:</span> <span class="p">[]</span>
+            <span class="n">GroupB</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="n">LowerRatio</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="n">UpperRatio</span><span class="p">:</span> <span class="p">[]</span>
+      <span class="n">MinNumAssets</span><span class="p">:</span> <span class="p">[]</span>
+      <span class="n">MaxNumAssets</span><span class="p">:</span> <span class="p">[]</span>
+         <span class="n">BoundType</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">categorical</span><span class="p">]</span></code></pre></div><h3><b>步骤4.验证投资组合问题</b></h3><p data-pid="ureaOQD_">投资组合优化的重要步骤是验证投资组合问题是否可行，主要测试是确保投资组合集是非空的且是有界的。使用<code>estimateBounds</code>函数确定投资组合集的边界。在这种情况下，由于<code>lb</code>和<code>ub</code>都是有限的，因此集合是有界的。</p><div class="highlight"><pre><code class="language-matlab"> <span class="p">[</span><span class="n">lb</span><span class="p">,</span> <span class="n">ub</span><span class="p">]</span> <span class="p">=</span> <span class="n">estimateBounds</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+ <span class="n">display</span><span class="p">([</span><span class="n">lb</span><span class="p">,</span> <span class="n">ub</span><span class="p">]);</span>
+     <span class="mf">0.1500</span>    <span class="mf">1.0000</span>
+          <span class="mi">0</span>    <span class="mf">0.8500</span>
+          <span class="mi">0</span>    <span class="mf">0.8500</span>
+          <span class="mi">0</span>    <span class="mf">0.3500</span></code></pre></div><h3><b>步骤5.绘制有效边界</b></h3><p data-pid="0oPzC-z9">给定已构造的<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象，请使用<code>plotFrontier</code>函数查看有效边界。您可以使用40个投资组合显示边界，而不必使用默认的10个投资组合查看边界。注意，有效投资组合的总回报每年大约介于6％和16％之间。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">plotFrontier</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">40</span><span class="p">);</span></code></pre></div><br><img src="v2-0f33d4bc845ef8bc46d24e1297eb08bc_720w.jpg" ><h3><b>步骤6.评估总投资回报与净投资回报</b></h3><p data-pid="xKXBcVW_"><code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象<code>p</code>不包括交易成本，因此在<code>p</code>中指定的投资组合优化问题使用总投资组合收益作为收益替代。要处理净回报，请创建包含交易成本的第二个<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象<code>q</code>。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">q</span> <span class="p">=</span> <span class="n">setCosts</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">UnitCost</span><span class="p">,</span> <span class="n">UnitCost</span><span class="p">);</span>
+ <span class="n">display</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+ <span class="n">q</span> <span class="p">=</span> 
+   <span class="n">Portfolio</span> <span class="n">with</span> <span class="k">properties</span><span class="p">:</span>
+ ?
+           <span class="n">BuyCost</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+          <span class="n">SellCost</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+      <span class="n">RiskFreeRate</span><span class="p">:</span> <span class="p">[]</span>
+         <span class="n">AssetMean</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+        <span class="n">AssetCovar</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x4</span> <span class="n">double</span><span class="p">]</span>
+     <span class="n">TrackingError</span><span class="p">:</span> <span class="p">[]</span>
+      <span class="n">TrackingPort</span><span class="p">:</span> <span class="p">[]</span>
+          <span class="n">Turnover</span><span class="p">:</span> <span class="p">[]</span>
+       <span class="n">BuyTurnover</span><span class="p">:</span> <span class="p">[]</span>
+      <span class="n">SellTurnover</span><span class="p">:</span> <span class="p">[]</span>
+              <span class="n">Name</span><span class="p">:</span> <span class="s">&#39;Asset Allocation Portfolio&#39;</span>
+         <span class="n">NumAssets</span><span class="p">:</span> <span class="mi">4</span>
+         <span class="n">AssetList</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="n">x4</span> <span class="n">cell</span><span class="p">}</span>
+          <span class="n">InitPort</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+       <span class="n">AInequality</span><span class="p">:</span> <span class="p">[]</span>
+       <span class="n">bInequality</span><span class="p">:</span> <span class="p">[]</span>
+         <span class="n">AEquality</span><span class="p">:</span> <span class="p">[]</span>
+         <span class="n">bEquality</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="n">LowerBound</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+        <span class="n">UpperBound</span><span class="p">:</span> <span class="p">[]</span>
+       <span class="n">LowerBudget</span><span class="p">:</span> <span class="mi">1</span>
+       <span class="n">UpperBudget</span><span class="p">:</span> <span class="mi">1</span>
+       <span class="n">GroupMatrix</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="n">x4</span> <span class="n">double</span><span class="p">]</span>
+        <span class="n">LowerGroup</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="n">UpperGroup</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="n">x1</span> <span class="n">double</span><span class="p">]</span>
+            <span class="n">GroupA</span><span class="p">:</span> <span class="p">[]</span>
+            <span class="n">GroupB</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="n">LowerRatio</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="n">UpperRatio</span><span class="p">:</span> <span class="p">[]</span>
+      <span class="n">MinNumAssets</span><span class="p">:</span> <span class="p">[]</span>
+      <span class="n">MaxNumAssets</span><span class="p">:</span> <span class="p">[]</span>
+         <span class="n">BoundType</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="n">x1</span> <span class="n">categorical</span><span class="p">]</span></code></pre></div><h3><b>步骤7.分析投资组合结构的描述性属性</b></h3><p data-pid="68Gup7mC">要更具体地了解有效投资组合收益和风险的范围，请使用<code><a href="https://www.mathworks.com/help/finance/portfolio.estimatefrontierlimits.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">estimateFrontierLimits</a></code>函数在有效边界的端点获取投资组合。给定这些投资组合，使用<code><a href="https://www.mathworks.com/help/finance/portfolio.estimateportmoments.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">estimatePortMoments</a></code>函数计算他们的矩。以下代码生成一个表格，该表格列出了初始投资组合的风险和回报，以及在有效边界端点处的投资组合的投资回报的总和净矩。</p><div class="highlight"><pre><code class="language-matlab"> <span class="p">[</span><span class="n">prsk0</span><span class="p">,</span> <span class="n">pret0</span><span class="p">]</span> <span class="p">=</span> <span class="n">estimatePortMoments</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">InitPort</span><span class="p">);</span>
+ ?
+ <span class="n">pret</span> <span class="p">=</span> <span class="n">estimatePortReturn</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">estimateFrontierLimits</span><span class="p">);</span>
+ <span class="n">qret</span> <span class="p">=</span> <span class="n">estimatePortReturn</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">q</span><span class="p">.</span><span class="n">estimateFrontierLimits</span><span class="p">);</span>
+ ?
+ <span class="n">displayReturns</span><span class="p">(</span><span class="n">pret0</span><span class="p">,</span> <span class="n">pret</span><span class="p">,</span> <span class="n">qret</span><span class="p">);</span>
+ <span class="n">Annualized</span> <span class="n">Portfolio</span> <span class="n">Returns</span> <span class="c">...</span>
+                                     <span class="n">Gross</span>       <span class="n">Net</span>
+ <span class="n">Initial</span> <span class="n">Portfolio</span> <span class="n">Return</span>             <span class="mf">9.70</span> <span class="c">%    9.70 %</span>
+ <span class="n">Minimum</span> <span class="n">Efficient</span> <span class="n">Portfolio</span> <span class="n">Return</span>   <span class="mf">5.90</span> <span class="c">%    5.77 %</span>
+ <span class="n">Maximum</span> <span class="n">Efficient</span> <span class="n">Portfolio</span> <span class="n">Return</span>  <span class="mf">13.05</span> <span class="c">%   12.86 %</span></code></pre></div><p data-pid="YrWoK4rn">结果表明，从当前投资组合到有效边界端点的有效投资组合的交易成本在14到19个基点之间（这些成本是投资组合总收益和净收益之间的差）。由于股权分配的限制，最高有效投资组合收益（13％）小于最高资产收益（18％）。</p><h3><b>步骤8.在有效边界上以指定的回报水平获得投资组合。</b></h3><p data-pid="wR6E_3RZ">选择有效投资组合的一种常见方法是选择一个投资组合，该投资组合具有预期投资组合收益范围的期望部分。要获得有效边界上从最小收益到最大收益范围的30％的投资组合，请使用<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象<code>q</code>从<code>qret</code>中获得净收益范围，并使用内插函数<code><a href="https://www.mathworks.com/help/matlab/ref/interp1.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">interp1</a></code>以获得30％的水平以获得投资组合<code>qwgt</code>。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">Level</span> <span class="p">=</span> <span class="mf">0.3</span><span class="p">;</span>
+ ?
+ <span class="n">qret</span> <span class="p">=</span> <span class="n">estimatePortReturn</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">q</span><span class="p">.</span><span class="n">estimateFrontierLimits</span><span class="p">);</span>
+ <span class="n">qwgt</span> <span class="p">=</span> <span class="n">estimateFrontierByReturn</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">interp1</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">qret</span><span class="p">,</span> <span class="n">Level</span><span class="p">));</span>
+ <span class="p">[</span><span class="n">qrsk</span><span class="p">,</span> <span class="n">qret</span><span class="p">]</span> <span class="p">=</span> <span class="n">estimatePortMoments</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">qwgt</span><span class="p">);</span>
+ ?
+ <span class="n">displayReturnLevel</span><span class="p">(</span><span class="n">Level</span><span class="p">,</span> <span class="n">qret</span><span class="p">,</span> <span class="n">qrsk</span><span class="p">);</span>
+ <span class="n">Portfolio</span> <span class="n">at</span> <span class="mi">30</span><span class="c">% return level on efficient frontier ...</span>
+     <span class="n">Return</span>       <span class="n">Risk</span>
+       <span class="mf">7.90</span>       <span class="mf">9.09</span>
+ <span class="n">display</span><span class="p">(</span><span class="n">qwgt</span><span class="p">);</span>
+ <span class="n">qwgt</span> <span class="p">=</span> <span class="mi">4</span>×<span class="mi">1</span>
+ ?
+     <span class="mf">0.6252</span>
+     <span class="mf">0.1856</span>
+     <span class="mf">0.0695</span>
+     <span class="mf">0.1198</span></code></pre></div><p data-pid="VTK43qd_">目标投资组合是从最小到最大净收益率范围的30％，收益率为7.9％，风险为9.1％。</p><h3><b>步骤9.在有效边界上以指定的风险级别获得投资组合</b></h3><p data-pid="BUCj_PD8">尽管您可以接受此结果，但假设您要为投资组合风险设定目标价值。具体来说，假设您的保守目标风险为10％，中度目标风险为15％，激进目标风险为20％，并且您想要获得满足每个风险目标的投资组合。使用<code><a href="https://www.mathworks.com/help/finance/portfolio.estimatefrontierbyrisk.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">estimateFrontierByRisk</a></code>函数获取变量<code>TargetRisk</code>中指定的目标风险。由此产生的三个有效的投资组合在<code>qwgt</code>中。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">TargetRisk</span> <span class="p">=</span> <span class="p">[</span> <span class="mf">0.10</span><span class="p">;</span> <span class="mf">0.15</span><span class="p">;</span> <span class="mf">0.20</span> <span class="p">];</span>
+ <span class="n">qwgt</span> <span class="p">=</span> <span class="n">estimateFrontierByRisk</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">TargetRisk</span><span class="p">);</span>
+ <span class="n">display</span><span class="p">(</span><span class="n">qwgt</span><span class="p">);</span>
+ <span class="n">qwgt</span> <span class="p">=</span> <span class="mi">4</span>×<span class="mi">3</span>
+ ?
+     <span class="mf">0.5407</span>    <span class="mf">0.2020</span>    <span class="mf">0.1500</span>
+     <span class="mf">0.2332</span>    <span class="mf">0.4000</span>    <span class="mf">0.0318</span>
+     <span class="mf">0.0788</span>    <span class="mf">0.1280</span>    <span class="mf">0.4682</span>
+     <span class="mf">0.1474</span>    <span class="mf">0.2700</span>    <span class="mf">0.3500</span></code></pre></div><p data-pid="BuaYLdB9">使用<code><a href="https://www.mathworks.com/help/finance/portfolio.estimateportrisk.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">estimatePortRisk</a></code>函数计算三个投资组合的投资组合风险，以确认已达到目标风险：</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">display</span><span class="p">(</span><span class="n">estimatePortRisk</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">qwgt</span><span class="p">));</span>
+     <span class="mf">0.1000</span>
+     <span class="mf">0.1500</span>
+     <span class="mf">0.2000</span></code></pre></div><p data-pid="iKSik2uz">假设您要从当前投资组合转到中等投资组合。您可以估算购买和销售以达到此投资组合：</p><div class="highlight"><pre><code class="language-matlab"> <span class="p">[</span><span class="n">qwgt</span><span class="p">,</span> <span class="n">qbuy</span><span class="p">,</span> <span class="n">qsell</span><span class="p">]</span> <span class="p">=</span> <span class="n">estimateFrontierByRisk</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">);</span></code></pre></div><p data-pid="TsqLp_BW">如果将此投资组合的购买和销售平均，您可以看到平均营业额为17％，高于15％的目标：</p><div class="highlight"><pre><code class="language-matlab"> <span class="nb">disp</span><span class="p">(</span><span class="n">sum</span><span class="p">(</span><span class="n">qbuy</span> <span class="o">+</span> <span class="n">qsell</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> 
+     <span class="mf">0.1700</span></code></pre></div><p data-pid="f_df5x5J">由于还希望确保平均周转率不超过15％，因此可以使用<code><a href="https://www.mathworks.com/help/finance/portfolio.setturnover.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">setTurnover</a></code>将平均周转约束添加到<code><a href="https://www.mathworks.com/help/finance/portfolio.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Portfolio</a></code>对象：</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">q</span> <span class="p">=</span> <span class="n">setTurnover</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">);</span>
+ <span class="p">[</span><span class="n">qwgt</span><span class="p">,</span> <span class="n">qbuy</span><span class="p">,</span> <span class="n">qsell</span><span class="p">]</span> <span class="p">=</span> <span class="n">estimateFrontierByRisk</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">);</span></code></pre></div><p data-pid="htGJPWso">您可以将估计的有购买和销售的有效投资组合输入到记录中：</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">qbuy</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">qbuy</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0e-5</span><span class="p">)</span> <span class="p">=</span> <span class="mi">0</span><span class="p">;</span>
+ <span class="n">qsell</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">qsell</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0e-5</span><span class="p">)</span> <span class="p">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="c">% zero out near 0 trade weights</span>
+ ?
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">Port</span> <span class="p">=</span> <span class="n">qwgt</span><span class="p">;</span>
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">Buy</span> <span class="p">=</span> <span class="n">qbuy</span><span class="p">;</span>
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">Sell</span> <span class="p">=</span> <span class="n">qsell</span><span class="p">;</span>
+ ?
+ <span class="n">display</span><span class="p">(</span><span class="n">Blotter</span><span class="p">);</span>
+ <span class="n">Blotter</span><span class="p">=</span><span class="mi">4</span>×<span class="mi">7</span> <span class="n">table</span>
+                           <span class="n">Price</span>    <span class="n">InitHolding</span>    <span class="n">InitPort</span>    <span class="n">UnitCost</span>     <span class="n">Port</span>      <span class="n">Buy</span>       <span class="n">Sell</span>  
+                           <span class="n">_____</span>    <span class="n">___________</span>    <span class="n">________</span>    <span class="n">________</span>    <span class="n">_______</span>    <span class="n">____</span>    <span class="n">________</span>
+ ?
+     <span class="n">Bonds</span>                  <span class="mf">52.4</span>       <span class="mi">42938</span>         <span class="mf">0.3</span>        <span class="mf">0.001</span>      <span class="mf">0.18787</span>       <span class="mi">0</span>     <span class="mf">0.11213</span>
+     <span class="n">Large</span><span class="o">-</span><span class="n">Cap</span> <span class="n">Equities</span>    <span class="mf">122.7</span>       <span class="mi">24449</span>         <span class="mf">0.4</span>        <span class="mf">0.001</span>          <span class="mf">0.4</span>       <span class="mi">0</span>           <span class="mi">0</span>
+     <span class="n">Small</span><span class="o">-</span><span class="n">Cap</span> <span class="n">Equities</span>     <span class="mf">35.2</span>       <span class="mi">42612</span>         <span class="mf">0.2</span>        <span class="mf">0.001</span>      <span class="mf">0.16213</span>       <span class="mi">0</span>    <span class="mf">0.037871</span>
+     <span class="n">Emerging</span> <span class="n">Equities</span>      <span class="mf">46.9</span>       <span class="mi">15991</span>         <span class="mf">0.1</span>        <span class="mf">0.004</span>         <span class="mf">0.25</span>    <span class="mf">0.15</span>           <span class="mi">0</span></code></pre></div><p data-pid="9eisSWW5">记录中的<code>Buy</code>和<code>Sell</code>元素是投资组合权重的变化，必须将其转换为投资组合持有量的变化才能确定交易。由于您正在使用净投资组合收益，因此必须首先计算从初始投资组合到新投资组合的交易成本。这可以通过以下方式完成：</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">TotalCost</span> <span class="p">=</span> <span class="n">Wealth</span> <span class="o">*</span> <span class="n">sum</span><span class="p">(</span><span class="n">Blotter</span><span class="p">.</span><span class="n">UnitCost</span> <span class="o">.*</span> <span class="p">(</span><span class="n">Blotter</span><span class="p">.</span><span class="n">Buy</span> <span class="o">+</span> <span class="n">Blotter</span><span class="p">.</span><span class="n">Sell</span><span class="p">))</span>
+ <span class="n">TotalCost</span> <span class="p">=</span> <span class="mf">5.6248e+03</span></code></pre></div><p data-pid="8ZPh68b5">交易成本为5,625美元，因此，通常来说，您必须在设置新的投资组合权重之前相应地调整初始财富。但是，为了简化分析，请注意，您有足够的现金（60,0000美元）留作支付交易成本，并且您不会动用现金头寸来建立投资组合中的任何头寸。因此，您可以使用新的投资组合持有量和交易量来填充您的记事本，从而获得新的投资组合，而无需更改总投资财富。首先，计算投资组合持有量：</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">Blotter</span><span class="p">.</span><span class="n">Holding</span> <span class="p">=</span> <span class="n">Wealth</span> <span class="o">*</span> <span class="p">(</span><span class="n">Blotter</span><span class="p">.</span><span class="n">Port</span> <span class="o">./</span> <span class="n">Blotter</span><span class="p">.</span><span class="n">Price</span><span class="p">);</span></code></pre></div><p data-pid="Uc6NOfYq">Compute number of shares to <code>Buy</code> and <code>Sell</code> in your Blotter:</p><p data-pid="YxJT6ui-">计算<code>Buy</code>和<code>Sell</code>的股份数量到记事本：</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">Blotter</span><span class="p">.</span><span class="n">BuyShare</span> <span class="p">=</span> <span class="n">Wealth</span> <span class="o">*</span> <span class="p">(</span><span class="n">Blotter</span><span class="p">.</span><span class="n">Buy</span> <span class="o">./</span> <span class="n">Blotter</span><span class="p">.</span><span class="n">Price</span><span class="p">);</span>
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">SellShare</span> <span class="p">=</span> <span class="n">Wealth</span> <span class="o">*</span> <span class="p">(</span><span class="n">Blotter</span><span class="p">.</span><span class="n">Sell</span> <span class="o">./</span> <span class="n">Blotter</span><span class="p">.</span><span class="n">Price</span><span class="p">);</span></code></pre></div><p data-pid="MH8WhuoB">请注意，您如何使用<i>临时</i>截断规则来获取要购买和出售的股票单位数量。通过除去单位成本和买卖投资组合权重来清理记事本：</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">Blotter</span><span class="p">.</span><span class="n">Buy</span> <span class="p">=</span> <span class="p">[];</span>
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">Sell</span> <span class="p">=</span> <span class="p">[];</span>
+ <span class="n">Blotter</span><span class="p">.</span><span class="n">UnitCost</span> <span class="p">=</span> <span class="p">[];</span></code></pre></div><h3><b>步骤10.显示最终结果</b></h3><p data-pid="lPe9hdhc">最终的结果是一个总结，其中包含拟议的交易，这些交易可以从您当前的投资组合转变为中等风险的投资组合。为了进行交易，您将需要出售16,049股债券资产和8,069股小型股票资产，并需要购买23,986股新兴股票资产。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">display</span><span class="p">(</span><span class="n">Blotter</span><span class="p">);</span>
+ <span class="n">Blotter</span><span class="p">=</span><span class="mi">4</span>×<span class="mi">7</span> <span class="n">table</span>
+                           <span class="n">Price</span>    <span class="n">InitHolding</span>    <span class="n">InitPort</span>     <span class="n">Port</span>      <span class="n">Holding</span>    <span class="n">BuyShare</span>    <span class="n">SellShare</span>
+                           <span class="n">_____</span>    <span class="n">___________</span>    <span class="n">________</span>    <span class="n">_______</span>    <span class="n">_______</span>    <span class="n">________</span>    <span class="n">_________</span>
+ ?
+     <span class="n">Bonds</span>                  <span class="mf">52.4</span>       <span class="mi">42938</span>         <span class="mf">0.3</span>       <span class="mf">0.18787</span>     <span class="mi">26889</span>          <span class="mi">0</span>        <span class="mi">16049</span>  
+     <span class="n">Large</span><span class="o">-</span><span class="n">Cap</span> <span class="n">Equities</span>    <span class="mf">122.7</span>       <span class="mi">24449</span>         <span class="mf">0.4</span>           <span class="mf">0.4</span>     <span class="mi">24449</span>          <span class="mi">0</span>            <span class="mi">0</span>  
+     <span class="n">Small</span><span class="o">-</span><span class="n">Cap</span> <span class="n">Equities</span>     <span class="mf">35.2</span>       <span class="mi">42612</span>         <span class="mf">0.2</span>       <span class="mf">0.16213</span>     <span class="mi">34543</span>          <span class="mi">0</span>       <span class="mf">8068.8</span>  
+     <span class="n">Emerging</span> <span class="n">Equities</span>      <span class="mf">46.9</span>       <span class="mi">15991</span>         <span class="mf">0.1</span>          <span class="mf">0.25</span>     <span class="mi">39977</span>      <span class="mi">23986</span>            <span class="mi">0</span>  </code></pre></div><p data-pid="fAzcwrxn">最终使用<code><a href="https://www.mathworks.com/help/finance/portfolio.plotfrontier.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">plotFrontier</a></code>函数显示有效边界和针对完全指定的投资组合优化问题的初始投资组合。它还在高效率边界上增加了中等风险或最终投资组合的位置。</p><div class="highlight"><pre><code class="language-matlab"> <span class="n">plotFrontier</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mi">40</span><span class="p">);</span>
+ <span class="n">hold</span> <span class="n">on</span>
+ <span class="n">scatter</span><span class="p">(</span><span class="n">estimatePortRisk</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">qwgt</span><span class="p">),</span> <span class="n">estimatePortReturn</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">qwgt</span><span class="p">),</span> <span class="s">&#39;filled&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">);</span>
+ <span class="n">h</span> <span class="p">=</span> <span class="n">legend</span><span class="p">(</span><span class="s">&#39;Initial Portfolio&#39;</span><span class="p">,</span> <span class="s">&#39;Efficient Frontier&#39;</span><span class="p">,</span> <span class="s">&#39;Final Portfolio&#39;</span><span class="p">,</span> <span class="s">&#39;location&#39;</span><span class="p">,</span> <span class="s">&#39;best&#39;</span><span class="p">);</span>
+ <span class="n">set</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="s">&#39;Fontsize&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+ <span class="n">hold</span> <span class="n">off</span></code></pre></div><br><img src="v2-e2a9dd18c001acd3c89cf0b42cbbef38_720w.jpg" ><h3><b>工具函数</b></h3><div class="highlight"><pre><code class="language-matlab"><span class="k"> function</span><span class="w"> </span><span class="nf">displayReturns</span><span class="p">(</span>pret0, pret, qret<span class="p">)</span><span class="w">
+</span><span class="w"> </span><span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Annualized Portfolio Returns ...\n&#39;</span><span class="p">);</span>
+ <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;                                   %6s    %6s\n&#39;</span><span class="p">,</span><span class="s">&#39;Gross&#39;</span><span class="p">,</span><span class="s">&#39;Net&#39;</span><span class="p">);</span>
+ <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Initial Portfolio Return           %6.2f %%  %6.2f %%\n&#39;</span><span class="p">,</span><span class="mi">100</span><span class="o">*</span><span class="n">pret0</span><span class="p">,</span><span class="mi">100</span><span class="o">*</span><span class="n">pret0</span><span class="p">);</span>
+ <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Minimum Efficient Portfolio Return %6.2f %%  %6.2f %%\n&#39;</span><span class="p">,</span><span class="mi">100</span><span class="o">*</span><span class="n">pret</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="mi">100</span><span class="o">*</span><span class="n">qret</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+ <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Maximum Efficient Portfolio Return %6.2f %%  %6.2f %%\n&#39;</span><span class="p">,</span><span class="mi">100</span><span class="o">*</span><span class="n">pret</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="mi">100</span><span class="o">*</span><span class="n">qret</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+ <span class="k">end</span>
+ ?
+<span class="k"> function</span><span class="w"> </span><span class="nf">displayReturnLevel</span><span class="p">(</span>Level, qret, qrsk<span class="p">)</span><span class="w">
+</span><span class="w"> </span><span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Portfolio at %g%% return level on efficient frontier ...\n&#39;</span><span class="p">,</span><span class="mi">100</span><span class="o">*</span><span class="n">Level</span><span class="p">);</span>
+ <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;%10s %10s\n&#39;</span><span class="p">,</span><span class="s">&#39;Return&#39;</span><span class="p">,</span><span class="s">&#39;Risk&#39;</span><span class="p">);</span>
+ <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;%10.2f %10.2f\n&#39;</span><span class="p">,</span><span class="mi">100</span><span class="o">*</span><span class="n">qret</span><span class="p">,</span><span class="mi">100</span><span class="o">*</span><span class="n">qrsk</span><span class="p">);</span>
+ <span class="k">end</span></code></pre></div><hr/><p data-pid="QKBV85HO">注：本文根据MATLAB官网内容修改而成。</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width="868px" height="478px">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
