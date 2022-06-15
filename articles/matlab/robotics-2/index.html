@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>机械臂阻抗与导纳控制，附带6DOF导纳控制代码</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">机械臂阻抗与导纳控制，附带6DOF导纳控制代码</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child></p><br><img src="v2-d06efaca1a9d7d171c0add9d3139a504_720w.jpg"><p data-pid="HRLfCNSz">其实原理我想大家都非常清楚了</p><p data-pid="dK_LO8lp">导纳控制是基于末端六维力传感器获取外力/力矩，然后经过导纳控制器产生位移修正量，叠加到期望位置上。位置内环，力外环。</p><p data-pid="HeSYuYOu">阻抗控制是基于动力学模型，在力矩环做补偿力控制。位置外环，力内环。</p><p data-pid="t7oA4xGe">这里附上6DOF机械臂matlab仿真代码，这只是很简单的模拟外力代码，采用方案是离散化导纳模型+积分方式，给大家提供仿真思路，其实真正做起来还有不少需要优化的，我就不帮大家写了。详情请看韩冰老师的知乎</p><a href="https://zhuanlan.zhihu.com/p/133619926">韩冰：基于六维力传感器机器人导纳控制</a><p data-pid="sgjQ04Qc">简单复现基于积分方式，用的不是笛卡尔位移叠加，用的方式是导纳控制器产生速度，然后雅可比到关节空间速度，积分得到关节增量。与直接在笛卡尔叠加其实没有理论区别。也希望有人来交流这两种到底有没有本质区别呢。</p><p data-pid="GTBqX72g">一开始突然施加一个末端Z方向外力，然后突然撤掉，会发现机械臂像弹簧一样复原了哈</p><p data-pid="lUicSpCV">工具箱9.10版本。此代码适合学习，工程应用会有问题，韩老师也说了（其实还有很多问题哈，希望大家自己学习发现），大家学习思路就行了。</p><br><img src="v2-25559bdbe4266f376f40c07c98bb51c7.gif"><p data-pid="6KOl5yxd">代码</p><a href="https://github.com/OpenRobotSL/RobotForceControl">https://github.com/OpenRobotSL/RobotForceControl</a>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
