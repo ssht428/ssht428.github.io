@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Matlab与Github代码管理入门版及代码上传</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Matlab与Github代码管理入门版及代码上传</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="FxSjLhe_">本彩笔第一次写知乎，之后慢慢写哈</p><ol><li data-pid="fueNbgEr">在任意地址下创建一个文件夹，例如testforgit</li></ol><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-2f3dade7831e381dfaab22db4833b965_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><ol><li data-pid="IGkzRbX2">同步进行一项操作，在github上新建一个仓库，名字最好和上一步文件夹名字一样</li></ol><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-b36734d9f32efe8c453ed27ab0c4a993_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-c429851850a0b6da9d40bac2f7b635fd_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><ol><li data-pid="QfzP8CFL">双击进入第一个步骤中的testforgit文件夹，右键单击“当前文件夹”的空白部分，点击源代码管理——管理文件，跳出如下方框；</li></ol><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-fca13aa5f9d87b94039f4d0499430704_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="jy2T_FGS">重新打开github新建的仓库网页，如下图所示复制仓库地址链接，并将地址粘贴到上图中的存储库路径上，可以点击“更改”——“验证”检查是否为有效路径，是有效路径就正确。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-e694b20896121f8d2657a3affb047bb8_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-f56d4548dfaf7832f3df56e9ba583034_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-5977728159e5472bee779eeeb47dd836_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="1B_8vcKn">点击“检索”后会看到testforgit文件夹中出现如下东西，这说明和本地与远程仓库连接了，可以从本地仓库向远程提交代码。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-b55386e6bf2d086a6d02f3b6f7f65a59_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><ol><li data-pid="tIXffKZN">在本地仓库中新建文件夹以及代码文件，随意即可。</li></ol><br><img src="v2-0f63ab71c20372f9f758268a509307ee_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-95570f28fbba11c2f629156b226d2f54_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="9jwXf96q">如上图所示，保存后，在命令行中输入如下命令进行代码提交更新：</p><p data-pid="jHZY0LHv">!git status</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-1290631b5a1b6701976dc81d6b0d5c13_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="WIPdJyr0">提示本地分支要领先于远程分支，需要增加文件，输入如下命令：</p><p data-pid="43W6ftDM">!git add .</p><p data-pid="HkqVbvkq">!git commit -m “这里填写评论（做了哪些修改）”</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-628b25b1e3dfcd7ef73410a86bec9e3d_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="64xcRPQ2">先将远程的代码pull下来，看是否有冲突</p><p data-pid="FjidfMiE">!git pull</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-e114fd8dce9de51533e841082b836c7b_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="kGjRaW3W">没有冲突就直接把本地分支的代码push到远程分支上</p><p data-pid="79vvRSNf">!git push</p><p data-pid="vjxM2KO8">这时会跳出界面要求输入github账号和密码，填写即可。成功后会提示如下</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-e441e60b204062daf0473702d6488936_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="lTFv2JxM">此时打开github远程仓库，刷新一下界面就可以看见远程更新了。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-68cef91b8480ae9f3060ed93b3f07e3b_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-53deb82cae7bf6148a2a433acece895a_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="FjCwrfgD">删除：</p><p data-pid="oQFR5lBh">在setting中</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-e673fae8508cbcc6bea8281c2db6049a_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="pf72RA0P">最后一行就是了！</p>
+
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
