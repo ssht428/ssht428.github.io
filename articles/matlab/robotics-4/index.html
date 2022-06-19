@@ -1,0 +1,132 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB机器人工具箱【Robotics Toolbox】使用教程</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB机器人工具箱【Robotics Toolbox】使用教程</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自:<a href="https://blog.csdn.net/HIT_Kyrie/article/details/107425332"> https://blog.csdn.net/HIT_Kyrie/article/details/107425332 </a>  
+<p>MATLAB2020a&#43;Robotics Toolbox v10.4&#xff0c;工具箱版本不同命令有差异。<br /> 本文持续更新。<br /> 参考&#xff1a;<a href="http://www.petercorke.com/RTB/r9/html/">Robotics Toolbox官方文档</a></p> 
+<p></p>
+<div class="toc">
+ <h3>文章目录</h3>
+ <ul><li><a href="#1__6">1. 位姿描述</a></li><li><ul><li><a href="#11__8">1.1 二维空间位姿</a></li><li><a href="#12__15">1.2 三维空间位姿</a></li></ul>
+  </li><li><a href="#2__26">2. 运动学</a></li><li><ul><li><a href="#21__27">2.1 建立机器人模型</a></li><li><a href="#22__70">2.2 运动学</a></li><li><a href="#23__77">2.3 雅克比矩阵</a></li></ul>
+  </li><li><a href="#3__84">3. 机器人轨迹规划</a></li><li><ul><li><a href="#31__85">3.1 关节空间</a></li><li><a href="#32__89">3.2 笛卡尔空间</a></li></ul>
+  </li><li><a href="#4__93">4. 动力学</a></li><li><ul><li><a href="#41__98">4.1 逆动力学</a></li><li><a href="#42__103">4.2 动力学方程</a></li><li><a href="#43__110">4.3 正向动力学</a></li></ul>
+ </li></ul>
+</div>
+<p></p> 
+<h1><a id="1__6"></a>1. 位姿描述</h1> 
+<h2><a id="11__8"></a>1.1 二维空间位姿</h2> 
+<pre><code class="prism language-c">T <span class="token operator">&#61;</span> <span class="token function">SE2</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> theta<span class="token punctuation">)</span><span class="token punctuation">;</span>    	<span class="token operator">%</span> x、y为偏移量&#xff0c;theta为旋转角度
+<span class="token function">trplot2</span><span class="token punctuation">(</span>T<span class="token punctuation">)</span><span class="token punctuation">;</span>					<span class="token operator">%</span> 画出T坐标系
+T <span class="token operator">&#61;</span> <span class="token function">transl2</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">;</span> 			<span class="token operator">%</span> 纯平移变换
+</code></pre> 
+<h2><a id="12__15"></a>1.2 三维空间位姿</h2> 
+<pre><code class="prism language-c"><span class="token function">rotx</span><span class="token punctuation">(</span>alpha<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">roty</span><span class="token punctuation">(</span>beta<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">rotz</span><span class="token punctuation">(</span>theta<span class="token punctuation">)</span><span class="token punctuation">;</span>		<span class="token operator">%</span> 绕xyz轴旋转的旋转矩阵&#xff08;<span class="token number">3</span>x3&#xff09;
+<span class="token function">trplot</span><span class="token punctuation">(</span>T<span class="token punctuation">)</span><span class="token punctuation">;</span>									<span class="token operator">%</span> 画出相应的旋转坐标系
+<span class="token function">tranimate</span><span class="token punctuation">(</span>T<span class="token punctuation">)</span><span class="token punctuation">;</span>								<span class="token operator">%</span> 旋转动画
+<span class="token function">transl</span><span class="token punctuation">(</span> <span class="token punctuation">[</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> z<span class="token punctuation">]</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>						<span class="token operator">%</span> 平移变换&#xff08;<span class="token number">4</span>x4&#xff09;
+<span class="token function">trotx</span><span class="token punctuation">(</span>theta<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">troty</span><span class="token punctuation">(</span>theta<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">trotz</span><span class="token punctuation">(</span>theta<span class="token punctuation">)</span><span class="token punctuation">;</span>	<span class="token operator">%</span> 只有旋转的绕xyz轴旋转的齐次变换矩阵&#xff08;<span class="token number">4</span>x4&#xff09;
+</code></pre> 
+<p>三维齐次变换矩阵还可以使用 <strong>T &#61; SE3()</strong> 方法&#xff0c;在这里不多赘述。</p> 
+<h1><a id="2__26"></a>2. 运动学</h1> 
+<h2><a id="21__27"></a>2.1 建立机器人模型</h2> 
+<pre><code class="prism language-c"><span class="token function">L</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">&#61;</span> <span class="token function">Link</span><span class="token punctuation">(</span> <span class="token punctuation">[</span>theta<span class="token punctuation">,</span> d<span class="token punctuation">,</span> a<span class="token punctuation">,</span> alpha<span class="token punctuation">,</span> sigma<span class="token punctuation">]</span> <span class="token punctuation">)</span> 			<span class="token operator">%</span> 定义关节&#xff0c;DH参数&#xff1a;关节角、连杆偏距、连杆长度、连杆转角&#xff0c;sigma<span class="token operator">&#61;</span><span class="token number">1</span>为移动副
+
+<span class="token function">L</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>qlim <span class="token operator">&#61;</span> <span class="token punctuation">[</span> min<span class="token punctuation">,</span> max <span class="token punctuation">]</span>							<span class="token operator">%</span> 关节角度限制
+
+Six_link <span class="token operator">&#61;</span> <span class="token function">SerialLink</span><span class="token punctuation">(</span> L<span class="token punctuation">,</span> <span class="token string">&#39;name&#39;</span><span class="token punctuation">,</span> <span class="token string">&#39;Sixlink&#39;</span> <span class="token punctuation">)</span>		<span class="token operator">%</span> 将Link连接成一个机械臂
+
+Six_link<span class="token punctuation">.</span><span class="token function">plot</span><span class="token punctuation">(</span> <span class="token punctuation">[</span>theta_1<span class="token punctuation">,</span> theta_2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> theta_n<span class="token punctuation">]</span> <span class="token punctuation">)</span> 	<span class="token operator">%</span> 画出机械臂&#xff0c;theta为关节初始角度
+
+Six_link<span class="token punctuation">.</span>display									<span class="token operator">%</span> 输出机械臂信息
+
+Six_link<span class="token punctuation">.</span>teach										<span class="token operator">%</span> 机械臂操控交互界面		
+</code></pre> 
+<p><strong>Link的参数</strong>&#xff1a;<br /> 运动学参数&#xff1a;</p> 
+<table><thead><tr><th>名称</th><th>意义</th></tr></thead><tbody><tr><td>theta</td><td>关节角</td></tr><tr><td>d</td><td>连杆偏距</td></tr><tr><td>a</td><td>连杆长度</td></tr><tr><td>alpha</td><td>连杆转角</td></tr><tr><td>jointtype</td><td>R-转动副&#xff0c;P-移动副</td></tr><tr><td>mdh</td><td>0-标准DH&#xff0c;1-改进DH</td></tr><tr><td>offset</td><td>关节变量的偏移量&#xff08;转动副为角度&#xff0c;移动副为位移&#xff09;</td></tr><tr><td>qlim</td><td>关节变量的限制</td></tr></tbody></table>
+<p>动力学参数&#xff1a;</p> 
+<table><thead><tr><th>名称</th><th>意义</th></tr></thead><tbody><tr><td>m</td><td>连杆质量</td></tr><tr><td>r</td><td>连杆质心坐标 3x1</td></tr><tr><td>I</td><td>连杆惯性矩阵 3x3</td></tr><tr><td>B</td><td>粘性摩擦力(对于电机)1x1或2x1</td></tr><tr><td>Tc</td><td>库仑摩擦力1x1或2x1</td></tr></tbody></table>
+<p>电机参数&#xff1a;</p> 
+<table><thead><tr><th>名称</th><th>意义</th></tr></thead><tbody><tr><td>G</td><td>齿轮传动比</td></tr><tr><td>Jm</td><td>电机惯性矩&#xff08;对于电机&#xff09;</td></tr></tbody></table>
+<h2><a id="22__70"></a>2.2 运动学</h2> 
+<pre><code class="prism language-c">Six_link<span class="token punctuation">.</span><span class="token function">fkine</span><span class="token punctuation">(</span> <span class="token punctuation">[</span>theta_1<span class="token punctuation">,</span> theta_2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> theta_n<span class="token punctuation">]</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>	<span class="token operator">%</span> 正运动学
+Six_link<span class="token punctuation">.</span><span class="token function">ikine6s</span><span class="token punctuation">(</span>T<span class="token punctuation">)</span><span class="token punctuation">;</span>								<span class="token operator">%</span> 逆运动学封闭解
+Six_link<span class="token punctuation">.</span><span class="token function">ikine</span><span class="token punctuation">(</span>T<span class="token punctuation">)</span><span class="token punctuation">;</span>									<span class="token operator">%</span> 逆运动学数值解						
+</code></pre> 
+<h2><a id="23__77"></a>2.3 雅克比矩阵</h2> 
+<pre><code class="prism language-c"><span class="token operator">%</span> q是位姿
+Six_link<span class="token punctuation">.</span><span class="token function">jacob0</span><span class="token punctuation">(</span>q<span class="token punctuation">)</span>	<span class="token operator">%</span> 对于基坐标系的雅克比矩阵
+Six_link<span class="token punctuation">.</span><span class="token function">jacobn</span><span class="token punctuation">(</span>q<span class="token punctuation">)</span>	<span class="token operator">%</span> 对于末端坐标系的雅克比矩阵
+</code></pre> 
+<h1><a id="3__84"></a>3. 机器人轨迹规划</h1> 
+<h2><a id="31__85"></a>3.1 关节空间</h2> 
+<pre><code class="prism language-c"><span class="token punctuation">[</span>q<span class="token punctuation">,</span> qd<span class="token punctuation">,</span> qdd<span class="token punctuation">]</span> <span class="token operator">&#61;</span> <span class="token function">jtraj</span><span class="token punctuation">(</span>q0<span class="token punctuation">,</span> qf<span class="token punctuation">,</span> m<span class="token punctuation">)</span>		<span class="token operator">%</span> q0——初始位姿&#xff0c;qf——结束位姿&#xff0c;m——步数&#xff0c;q——位姿&#xff0c;qd——速度&#xff0c;qdd——加速度
+</code></pre> 
+<h2><a id="32__89"></a>3.2 笛卡尔空间</h2> 
+<pre><code class="prism language-c">Tc <span class="token operator">&#61;</span> <span class="token function">ctraj</span><span class="token punctuation">(</span>T0<span class="token punctuation">,</span> T1<span class="token punctuation">,</span> n<span class="token punctuation">)</span>			<span class="token operator">%</span> T0——初始齐次变换矩阵&#xff0c;T1——结束时齐次变换矩阵&#xff0c; n——步数
+</code></pre> 
+<h1><a id="4__93"></a>4. 动力学</h1> 
+<pre><code class="prism language-c"><span class="token operator">%</span> R是SerialLink类
+R<span class="token punctuation">.</span>dyn		<span class="token operator">%</span> 输出动力学特性
+</code></pre> 
+<h2><a id="41__98"></a>4.1 逆动力学</h2> 
+<pre><code class="prism language-c">R<span class="token punctuation">.</span><span class="token function">rne</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> qd<span class="token punctuation">,</span> qdd<span class="token punctuation">)</span>				<span class="token operator">%</span> 逆向动力学&#xff08;角度、角速度、角加速度——<span class="token operator">&gt;</span>力、力矩&#xff09;
+R<span class="token punctuation">.</span><span class="token function">rne</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> qd<span class="token punctuation">,</span> qdd<span class="token punctuation">,</span> grav<span class="token punctuation">,</span> fext<span class="token punctuation">)</span>	<span class="token operator">%</span> grav——重力加速度&#xff0c;fext——机械臂末端受力W<span class="token operator">&#61;</span><span class="token punctuation">[</span>Fx Fy Fz Mx My Mz<span class="token punctuation">]</span>
+</code></pre> 
+<h2><a id="42__103"></a>4.2 动力学方程</h2> 
+<pre><code class="prism language-c">R<span class="token punctuation">.</span><span class="token function">gravload</span><span class="token punctuation">(</span>q<span class="token punctuation">)</span>		<span class="token operator">%</span> 计算重力载荷
+R<span class="token punctuation">.</span><span class="token function">inertia</span><span class="token punctuation">(</span>q<span class="token punctuation">)</span>		<span class="token operator">%</span> 关节空间惯性矩阵
+R<span class="token punctuation">.</span><span class="token function">coriolis</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> qd<span class="token punctuation">)</span>	<span class="token operator">%</span> 科氏力和向心力的耦合矩阵
+R<span class="token punctuation">.</span><span class="token function">payload</span><span class="token punctuation">(</span>M<span class="token punctuation">,</span> P<span class="token punctuation">)</span>		<span class="token operator">%</span> 施加有效载荷&#xff1a;在P处施加质量M的载荷
+</code></pre> 
+<h2><a id="43__110"></a>4.3 正向动力学</h2> 
+<pre><code class="prism language-c"><span class="token punctuation">[</span>T2<span class="token punctuation">,</span> q<span class="token punctuation">,</span> qd<span class="token punctuation">]</span> <span class="token operator">&#61;</span> R<span class="token punctuation">.</span><span class="token function">fdyn</span><span class="token punctuation">(</span>T1<span class="token punctuation">,</span> torqfun<span class="token punctuation">)</span>			<span class="token operator">%</span> 正向动力学 
+<span class="token operator">%</span> 输入&#xff1a;T1——积分时间&#xff0c;torqfun——力矩函数
+<span class="token operator">%</span> 输出&#xff1a;T2——时间&#xff0c;q——角度&#xff0c;qd——角速度
+</code></pre> 
+<p>这里有点难理解&#xff0c;用一下官方文档的例子来说明</p> 
+<pre><code class="prism language-c"><span class="token operator">%</span> 首先定义一个力矩函数&#xff08;PD Controller&#xff09;
+function tau <span class="token operator">&#61;</span> <span class="token function">mytorqfun</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span> q<span class="token punctuation">,</span> qd<span class="token punctuation">,</span> qstar<span class="token punctuation">,</span> P<span class="token punctuation">,</span> D<span class="token punctuation">)</span>
+	tau <span class="token operator">&#61;</span> P<span class="token operator">*</span><span class="token punctuation">(</span>qstar<span class="token operator">-</span>q<span class="token punctuation">)</span> <span class="token operator">&#43;</span> D<span class="token operator">*</span>qd<span class="token punctuation">;</span>
+end
+<span class="token operator">%</span> 再使用正向动力学函数
+<span class="token punctuation">[</span>t<span class="token punctuation">,</span>q<span class="token punctuation">]</span> <span class="token operator">&#61;</span> robot<span class="token punctuation">.</span><span class="token function">fdyn</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> &#64;mytorqfun<span class="token punctuation">,</span> qstar<span class="token punctuation">,</span> P<span class="token punctuation">,</span> D<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+</p>
+<p>
+<br> ======================================================================
+
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
