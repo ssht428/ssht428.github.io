@@ -1,0 +1,194 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>MATLAB发布代码---生成文档pdf</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">MATLAB发布代码---生成文档pdf</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="up0Bvi1S">1、前记：</p><p data-pid="gOXsF06p"><i>发布</i> MATLAB? 代码文件 (<code>.m</code>) 可创建包括您的代码、注释和输出的格式化文档。发布代码的常见原因是与其他人共享文档以用于教学或演示，或者生成您代码的可读外部文档。要在 MATLAB 编辑器中创建同时包含您的代码、格式化内容和输出的交互式文档，请参阅<a href="https://ww2.mathworks.cn/help/matlab/matlab_prog/create-live-scripts.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">在实时编辑器中创建实时脚本</a>。</p><p data-pid="mr67v--7">2、步骤----打开要发布的代码文件（m文件）-----点击发布----选择编辑发布选项。如下：</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-d1af1b9bc53eb9491528a52176c7668d_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="0ii1cUTO">点击输出文件，选择格式和修改地址，点击发布</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-e17a07005a04c12540ac6264c6fe65c7_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="f-YcyoHI">如：源代码为<a href="https://blog.csdn.net/weixin_39090239/article/details/82803213" class=" wrap external" target="_blank" rel="nofollow noreferrer"> Robotics System Toolbox中的机器人运动 (3)</a>中的例子</p><div class="highlight"><pre><code class="language-text">
+%% Waypoint tracking demonstration using Robotics System Toolbox
+
+% This demonstration performs inverse kinematics of a
+
+% robot manipulator to follow a desired set of waypoints.
+
+% Copyright 2017-2018 The MathWorks, Inc.
+
+%% Load and display robot
+
+clear
+
+clc
+
+robot = importrobot(&#39;irb_140.urdf&#39;);
+
+axis([-0.6 0.8 -0.6 0.65 0 1.2]);
+
+show(robot);
+
+axes.CameraPositionMode = &#39;auto&#39;;
+
+%% Create a set of desired wayPoints
+
+wayPoints = [0.5 0.1 0.6;0.5 0.4 0.5]; % Alternate set of wayPoints
+
+%wayPoints = [0.2 -0.2 0.02;0.15 0 0.28;0.15 0.05 0.2; 0.15 0.09 0.15;0.1 0.12 0.1; 0.04 0.1 0.2;0.25 0 0.15; 0.2 0.2 0.02];
+
+exampleHelperPlotWaypoints(wayPoints);
+
+%% Create a smooth curve from the waypoints to serve as trajectory
+
+trajectory = cscvn(wayPoints&#39;);%在点之间创建轨迹
+
+% Plot trajectory spline and waypoints
+
+hold on
+
+fnplt(trajectory,&#39;r&#39;,2);
+
+
+
+%% Perform Inverse Kinematics for a point in space
+
+% Add end effector frame, offset from the grip link frame
+
+eeOffset = 0.01;
+
+eeBody = robotics.RigidBody(&#39;end_effector&#39;);
+
+setFixedTransform(eeBody.Joint,trvec2tform([eeOffset 0 0]));
+
+addBody(robot,eeBody,&#39;link_6&#39;);
+
+ik = robotics.InverseKinematics(&#39;RigidBodyTree&#39;,robot);
+
+weights = [0.1 0.1 0 1 1 1];
+
+initialguess = robot.homeConfiguration;
+
+% Calculate the inverse kinematic solution using the &#34;ik&#34; solver 
+
+% Use desired weights for solution (First three are orientation, last three are translation)
+
+% Since it is a 4-DOF robot with only one revolute joint in Z we do not
+
+% put a weight on Z rotation; otherwise it limits the solution space
+
+numTotalPoints =40;
+
+% Evaluate trajectory to create a vector of end-effector positions
+
+eePositions = ppval(trajectory,linspace(0,trajectory.breaks(end),numTotalPoints));
+
+% Call inverse kinematics solver for every end-effector position using the
+
+% previous configuration as initial guess
+
+for idx = 1:size(eePositions,2)
+
+    tform = trvec2tform(eePositions(:,idx)&#39;);
+
+    configSoln(idx,:) = ik(&#39;end_effector&#39;,tform,weights,initialguess);
+
+    initialguess = configSoln(idx,:);
+
+end
+
+%% Visualize robot configurations
+
+title(&#39;Robot waypoint tracking visualization&#39;)
+
+hold on
+
+axis([-0.6 0.8 -0.6 0.65 0 1.3]);
+
+for idx = 1:size(eePositions,2)
+
+    show(robot,configSoln(idx,:), &#39;PreservePlot&#39;, false,&#39;Frames&#39;,&#39;off&#39;);
+
+    pause(0.1)
+
+end
+
+%% Plot joints values
+
+A = cat(1,configSoln.JointPosition);
+
+clf
+
+figure
+
+stem(A)%overview
+
+%% Joints
+
+joint1=A(1:40,1);
+
+joint2=A(41:80,1);
+
+joint3=A(81:120,1);
+
+joint4=A(121:160,1);
+
+joint5=A(161:200,1);
+
+joint6=A(201:240,1);
+
+figure
+
+stem(joint1,&#39;LineStyle&#39;,&#39;none&#39;,&#39;MarkerFaceColor&#39;,&#39;r&#39;,&#39;MarkerEdgeColor&#39;,&#39;g&#39;)
+
+title(&#39;Joint关节的值变化&#39;)
+
+hold on
+
+stem(joint2,&#39;LineStyle&#39;,&#39;none&#39;,&#39;MarkerFaceColor&#39;,&#39;g&#39;,&#39;MarkerEdgeColor&#39;,&#39;b&#39;)
+
+stem(joint3,&#39;LineStyle&#39;,&#39;none&#39;,&#39;MarkerFaceColor&#39;,&#39;b&#39;,&#39;MarkerEdgeColor&#39;,&#39;y&#39;)
+
+stem(joint4,&#39;LineStyle&#39;,&#39;none&#39;,&#39;MarkerFaceColor&#39;,&#39;y&#39;,&#39;MarkerEdgeColor&#39;,&#39;m&#39;)
+
+stem(joint5,&#39;LineStyle&#39;,&#39;none&#39;,&#39;MarkerFaceColor&#39;,&#39;c&#39;,&#39;MarkerEdgeColor&#39;,&#39;w&#39;)
+
+stem(joint6,&#39;LineStyle&#39;,&#39;none&#39;,&#39;MarkerFaceColor&#39;,&#39;m&#39;,&#39;MarkerEdgeColor&#39;,&#39;b&#39;)</code></pre></div><p class="ztext-empty-paragraph"><br/></p><p data-pid="TSBhGAAQ">发布后生成的PDF文档效果为：</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-644e607ae01eac8409ffb0bfdaf23b6c_720w.gif" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="vTyER_MO">3、后记：figure图框的利用---打印图窗、点击箭头修改图占框大小、插入图例修改data标签，以便给论文提取所需的图。</p><br><img src="v2-b1a13ab013bfc0b8a411745e2400d446_720w.gif" >
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src=" "   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
