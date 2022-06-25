@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>机器人中的微分运动</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">机器人中的微分运动</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<h2 data-first-child>写在前面</h2><p data-pid="ZfHorpaX">微分运动指机构（例如机器人）的微小运动，可以用它来推导不同部件之间的速度关系。依据定义，微分运动就是微小的运动。因此，如果能够在一个很小的时间段内测量或者计算这个运动，就能得到速度关系。</p><p data-pid="xDInEkEk">为啥想讲讲这个微分运动呢，其实我的目的很简单，和雅可比矩阵联系上，进而帮助解决机械臂的逆运动学问题。当机器人关节做微量运动时，机器人手坐标系也会产生微量运动。而前面博客讲机器人雅可比矩阵已经讲到，这是机器人关节速度与末端机械手（末端坐标系）速度之间的映射，由于微分运动除以dt即可得到速度，因此可以说雅可比矩阵是机器人关节微分运动与末端微分运动之间的映射。当计算得到<b>机器人末端坐标系的微分运动</b>时，通过雅可比矩阵，则能计算得到各关节的微分运动，能解决逆运动学及速度控制的问题。以六轴机器人为例，</p><br><img src="v2-f29bc9ae7bd92d66b7d58d2428936ce4_720w.jpg" ><p data-pid="IcoShFR2">其中，<i>D</i>=[<i>dx</i>,<i>dy</i>,<i>dz</i>,<i>δx</i>,<i>δy</i>,<i>δz</i>]表示六轴机器人末端机械手坐标的微分运动，前三项表示机械手坐标沿x，y，z轴的微分平移，后三项表示绕这三个轴的微分旋转；<i>dθ</i>表示各关节的微分运动</p><h2>坐标系的微分运动</h2><p data-pid="FdDAmJ8I">此处探讨的微分运动是基于坐标系而言的，再细化一下，对于本博客而言，是基于机器人末端坐标系而言的。</p><p data-pid="Ih4tAAZf">坐标系的微分运动可以分为：微分平移、微分旋转、微分变换（平移和旋转的组合）。其中微分旋转还分为<b>绕参考轴xyz的微分旋转</b>和<b>绕一般轴q的微分旋转</b>。</p><h3>微分平移</h3><p data-pid="Kd1UoHdO">很简单，就是坐标系原点平移一个微分量，和之前的运动学公式一致，只是将参数改为微分量，可以用<i>Trans</i>(<i>dx</i>,<i>dy</i>,<i>dz</i>)来表示，其含义是坐标系原点沿着x，y，z轴做了微小平移。</p><h3>绕参考轴xyz的微分旋转</h3><br><img src="v2-8f4dab326b1038776d5db9bf6ecbab98_720w.jpg" ><h3><b>例如<i>δxδy</i>这样的高阶微分可忽略不计，故可将其略去，因此通过计算可以看出，几个微分运动以不同的顺序相乘可以得到同样的结果</b>。因此在微分运动中，可认为相乘的顺序不重要。这与前面大角度旋转顺序不能交换的原则不一样。</h3><h3>绕一般轴q的微分旋转</h3><p data-pid="LexvLNTE">上面分析可知，在微分运动中，任意相乘的顺序都能得到同样的结果。因此，可认为绕一般轴q的微分旋转运动可以表示以任意顺序绕3个坐标轴的3个微分旋转构成，如下<br/></p><br><img src="v2-62bb38dc2c6f4727df53750b0599d0c8_720w.jpg" ><br><img src="v2-6729a1aae29c4feb4b74b0c835438926_720w.jpg" ><h3>坐标系的微分变换</h3><p data-pid="SBYGRXUG">坐标系的微分变换是<b>微分平移</b>和以<b>任意次序进行微分旋转</b>的合成。用T表示微分变换前的坐标系位姿，这里默认<b>T为相对于固定参考坐标系（基系）的位姿</b>，下同，如果用位姿间的增量来进行表示的话，即用dT表示由于微分变换所引起的原坐标系T的变化量，<b>T[<i>dx</i>,<i>dy</i>,<i>dz</i>,<i>δx</i>,<i>δy</i>,<i>δz</i>]<i>T</i>是相对固定参考系（基系）的</b>，则可以得到我们定义的位姿微分变化量，有<br/></p><br><img src="v2-883325ed8f76cf592f62df57e84a855c_720w.jpg" ><p data-pid="PN-KiFzv">公式（5）可写为<br/></p><br><img src="v2-ba8dbdfde383068298a59cf18663ff4a_720w.jpg" ><p data-pid="AkZCSdES">我们将Δ称为微分运动算子，<b>坐标系的变化可以用微分运动算子乘以坐标系来实现</b>，这个算子并不是我们之前讲的变换矩阵或者坐标系，它只是一个算子，使<b>坐标系</b>实现微分变化。其公式及具体计算式为<br/></p><p data-pid="1QfEs0LT">前面讲到的d T dT<i>dT</i>为通过微分变换后<b>原坐标系T</b>的变化量，则结合Δ \DeltaΔ，可以计算得到经过微分变换后<b>坐标系新位姿</b>为</p><br><img src="v2-2bf7f8d1b14bc63a72f2cc11179fd711_720w.jpg" ><br><img src="v2-6cea61f86e685ea46921c8a217ace88f_720w.jpg" ><h2>微分运动算子：相对于固定参考坐标系、相对于自身坐标系</h2><br><img src="v2-187c80eda689fff4e9c47ba3e1194b46_720w.jpg" ><p data-pid="_C9hbghk">由式(10)可以计算得到相对于当前坐标系（本身坐标系）的微分算子。</p><p data-pid="vd0PaX8g"><b>上面谈到的都是坐标系的微分变化，这个坐标系可以是任意坐标系，包括机器人末端坐标系。下面的问题就是找出机器人关节的微分运动与机器人末端坐标系的微分运动是如何相关联的。从公式(1)中可以看出，向量D和微分算子Δ \DeltaΔ中元素相同，由此可以得到向量D，再通过雅可比取逆计算，则可得到机器人关节的微分运动。</b></p><p data-pid="QDWkkQIc">至此，已将坐标系的微分运动与机器人的微分运动相互联系了起来。</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
