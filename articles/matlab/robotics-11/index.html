@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>UR机械臂/simscape/puam560正逆解仿真</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">UR机械臂/simscape/puam560正逆解仿真</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br><a href="#UR">UR构型机械臂正逆解推导</a>
+<br><a href="#SIMSCAPE">UR机械臂simscape正逆解仿真</a>
+<br><a href="#PUAM560">工业6轴puam560构型机械臂正逆解推导</a>
+<br><div id="UR"><strong>UR构型机械臂正逆解推导</strong></div>
+<p data-first-child data-pid="EkiXW8GY">代码地址：</p><a target="_blank" href="https://github.com/OpenRobotSL/UR" >https://github.com/OpenRobotSL/UR</a><table data-draft-node="block" data-draft-type="table" data-size="normal" data-row-style="normal"><tbody><tr><td>i</td><td>扭转角（αi-1）</td><td>杆长（ai-1）</td><td>关节偏距（di）</td><td>关节转角（θi）</td></tr><tr><td>1</td><td>0</td><td>0</td><td>89.2</td><td>θ1（0）</td></tr><tr><td>2</td><td>90</td><td>0</td><td>0</td><td>θ2(-90)</td></tr><tr><td>3</td><td>0</td><td>-425</td><td>0</td><td>θ3（0）</td></tr><tr><td>4</td><td>0</td><td>-392</td><td>109.3</td><td>θ4(-90)</td></tr><tr><td>5</td><td>90</td><td>0</td><td>94.75</td><td>θ5（0）</td></tr><tr><td>6</td><td>-90</td><td>0</td><td>82.5</td><td>θ6（0）</td></tr></tbody></table><br><img src="v2-4753986577d5bba069aaa3f3060616f9_720w.jpg" ><br><img src="v2-9789c5a21e14d8adca8ec4fb28615732_720w.jpg" ><br><img src="v2-f9804a403b6129904f5cfdf1ade2b766_720w.jpg" ><br><img src="v2-6aafa2af6806ea6612519d11816e0ba9_720w.jpg" ><br><img src="v2-75fd719862eb8ca89ba416b58fe8d484_720w.jpg" ><br><img src="v2-41686abb97b2ce35881fa990ae2ba5b9_720w.jpg" ><br><img src="v2-1fd893ac675b26c759191cfa74977c57_720w.jpg" ><br><img src="v2-c6dfd227d116f1ad9876b66f87475bf1_720w.jpg" >
+
+
+<br><div id="SIMSCAPE"><strong>UR机械臂simscape正逆解仿真</strong></div>
+
+<p data-first-child data-pid="hI6yxDej">最近在看相关的课程，把作业做一下，还是蛮有意思的。（课程代码所以涉及版权问题，经过同意后我上传代码）</p><p data-pid="3L7FNd90">UR机械臂的物理模型文件是根据SolidWorks插件simscape导出的xml文件，课程直接提供的，博客不便给出，清楚整个建模原理就行。但个人还是觉得urdf文件好理解一些，可以人为控制各个坐标系的方向、位置还有质心的位置，不同机械臂的urdf文件可以自己在SolidWorks中建模然后利用sw2urdf插件直接导出urdf文件，这时就很好控制各个关节坐标系的方向，便于后续正逆运动学问题的解算验证。</p><p data-pid="5dkg8Bhn">xml文件和urdf两者在simscape中的区别可以见上一篇博客<a href="https://blog.csdn.net/qq_26565435/article/details/105399197" class=" wrap external" target="_blank" rel="nofollow noreferrer">Simscape建模笔记</a>。</p><p data-pid="lQQgOO0F">废话不多说，直接上模型，理解其中的建模逻辑即可~</p><p data-pid="ztab17UA">一般情况下，直接<code>smimport(&#39;xxx.xml&#39;)</code>之后（如果是urdf文件，则命令为<code>smimport(&#39;xxx.urdf&#39;)</code>），就会自动在simulink中出现如下simscape模型。模型中各个模块的性质可以参考上一篇博客以及matlab官方文档。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-0a78f7cf1dd94e22f274676362cea9c5_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="e9WMjuFu">为了后面对模型进行正逆运动学分析，需要将每个joint模块，也就是上图中的Revolute模块中的部分性质进行修改，如下图所示。这是为了实现控制，因此需要对其内部属性进行修改，将Torque（转矩）设置为Automatically Computed(自动计算)，Motion（动力）设置为Provided by Input，这表示动力由输入提供，这意味着这个motion口相当于系统的输入口。除此之外，还需要勾选传感器Position和Velocity的信号。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-c9df96e984f0364fe9ead0df0d2e4fac_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="qH96_OKZ">通过这几个步骤之后，很容易就明白这样做的目的，这次作业只是从<b>位置控制模式</b>上进行建模，因此只是将Actuation致动端的Motion模式改成由输入提供，这个时候通过改变Specify Position Target中Value值的单位也就可以确定Motion输入端的单位，更简单来说就是指Motion端输入多少角度（弧度），这个Revolute Joint就会对应地相对零点位置转动多少角度（弧度）；如果是从<b>力矩控制模式</b>上进行建模，则可以把Actuation致动段的Torque模式改成由输入提供。</p><p data-pid="sy4BlTQz">另外，可以发现这个Revolute Joint方框框右边除了坐标变换用的F口之外，又多出了q和w口，这两个口就是咱们前面设定的Sensing传感器中Position和Velocity口，可以直接输出joint实时的位置与速度信号，单位对应于前面设置的角度输入信号。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-01d1846a3bdc20c22ad808e10fff240a_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-03a0310bf848826915d1addbb3e058b3_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="Hr2iFk_F">最后需要将每个Joint模块连接成如上图所示，需要注意的地方是simscape在simulink中建模时的信号类型转换为题。一般simulink中常用的信号是这个环境中的模拟值，而此处simscape模型的输入及输出值则需要是物理量信号，存在一个信号类型的问题。简单从上图中也可以进行分辨，物理信号通常连接的是圆圈，引出的是带点儿红色的线，而simulink中常用的模拟量则连接的是箭头，引出的直接是普通黑线，这两个是无法连接到一块儿的，解决办法就是下图。。。找出各自对应的输入输出模块即可。后面也会涉及到PS-simulink和simulink-PS转换模块的使用。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-e5596b24131fd66505d6d7d95123b350_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-a1664ba465f9387289e246de1616997a_720w.jpg" ><br><img src="v2-9eb1ee6a0ce643417e195a6a5f024460_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="UUvWO8lx">另外有个问题，就是上图中初始角度设定的问题。首先讲一下为啥要有这个初始角度，因为一般机械臂建模时通常是在各个关节变量为0的状态下进行建模（不管是SDH还是MDH下），你就会发现一些机械臂理论建模的初始状态与实际使用中的初始状态不一样，就比如UR机械臂吧，理论建模时初始状态是下图左边这样。。。而实际中你会发现UR臂初始状态是竖直的，也就是下图右边这样。。。所以问题就来了，需要在关节角2和关节角4设置偏置，这也就是上图中初始角Constant设置的原因。。。但是个人认为不需要这么做，只需要将相应Joint中Specify Position Target中Value值改成偏置角即可。。。但是转念一想吧，设置Constant也方便后期修改，甚至在后期将整个系统封装成Mask时也方便设置Mask中的变量，便于用户使用。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-a2fc69a05f8d635e23d72d66048757ba_720w.jpg" ><br><img src="v2-dd028eaab5ce7933175bacef6e382f8e_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="fk4VkY0D">每个Joint都设置一下，然后为了方便起见把每个Joint的输出量弄成Goto，然后将所有的位置Goto弄成一个输出口，将所有的速度Goto弄成一个输出口，看起来美观一些，也减少了模型封装输出口的数量，便于后期处理。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-ae791eef53ff5d28df9dbdb6cf573edc_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="1vmV3Kho">OK，全选所有模块，然后Ctrl+G一下，Bingo~ 你就得到如下封装的robot模块了，里面包含了机械臂的物理模型，看起来清爽明亮又美丽~</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-32990126843971d4971c5c147ec9250a_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="oPalYyfw">添加驱动模块，我选用的是课程提供的永磁同步电机模块，便于后期做位置控制用。需要注意的是，上面robot模块接收的motion信号是simscape的物理量信号，因此你的driver也需要输出相应类型的信号，以此来驱动机械臂关节运动。需要添加下面的simulink-PS模块进行信号类型的转换，对应的还有PS-simulink。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-60f044895be3b35bedd2e3216ca206bc_720w.jpg" ><br><img src="v2-dc8fbbf1b82c4969713d3fc9898d9585_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="FFJsoAVS">先进行正运动学仿真。。。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-4b6c187443919767cccd88a97c4c8014_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-d9b8dfe504b75c3680be6550303cd4db_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-17a34f7405cd53d186df7a1cb772b0b8.gif" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-faf52f8bfeec0d06db6bd52e8ab1ebc6_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-548ee6b1124f80d8215631700024ce25_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="b4iFoge3">再进行逆运动学仿真。。。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-5a607f3ef0ff4a874d0b78bccdd4f8c0_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-a47279c20edc9fc6b9a10e2d8ac7e564_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-ada6d8d11f01c8afa4bae582b334629f.gif" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-a212db110b08a9d4a2bb1145dd0ccd7a_720w.jpg" ><br><img src="v2-35fff025e25275d606a95e96e4bff805_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="KNBhJkiH">UR逆解算法全网遍地都是，主要理解一下simulink+simscape机械臂正逆解仿真的过程即可。。。</p>
+<br><div id="PUAM560"><strong>工业6轴puam560构型机械臂正逆解推导</strong></div>
+<p data-first-child data-pid="VhcChVSl">代码地址</p><a target="_blank" href="https://github.com/OpenRobotSL/PUMA560">https://github.com/OpenRobotSL/PUMA560</a><p data-pid="_oEGvkjn">表 机器人零位时DH参数表（控制参数取theta=0°）</p><table data-draft-node="block" data-draft-type="table" data-size="normal" data-row-style="normal"><tbody><tr><td>连杆序号i</td><td>（连杆长度）（非负数）/mm（沿上一个X 平移Z）</td><td>（扭角）(有±)（绕上一个X转Z）</td><td>（连杆偏置量）(有±)/mm(沿当前Z平移X)</td><td>（转角）(有±) （绕当前Z转X）</td><td>范围</td></tr><tr><td>1</td><td>0</td><td>0°</td><td>0</td><td></td><td>±170°</td></tr><tr><td>2</td><td>L6</td><td>-90°</td><td>0</td><td>-90°</td><td>-160°～ +80°</td></tr><tr><td>3</td><td>L2</td><td>0</td><td>L7</td><td></td><td>-85°～ +90°</td></tr><tr><td>4</td><td>L3</td><td>-90°</td><td>L4</td><td></td><td>±360°</td></tr><tr><td>5</td><td>0</td><td>-90°</td><td>0</td><td></td><td>±120°</td></tr><tr><td>6</td><td>0</td><td>90°</td><td>0</td><td>theta6</td><td>±360°</td></tr><tr><td>7（默认工具）T</td><td>0</td><td>0</td><td>L5</td><td>90°</td><td>-90°~-90°</td></tr><tr><td>8（自定义tool）</td><td>0</td><td>0</td><td>ToolPara1</td><td>90</td><td></td></tr></tbody></table><br><img src="v2-88117491686b53570ae080da0d6de8c9_720w.jpg" ><br><img src="v2-1006267814ad4c6dba655798a47ce6e8_720w.jpg" ><br><img src="v2-92b5899896f72399742d4a7c7f4d33fe_720w.jpg" ><br><img src="v2-e68ece59c2faa5e1445f7ee9a48aec98_720w.jpg" ><br><img src="v2-fcec1b54a466b480ca3dcf521385e546_720w.jpg" ><br><img src="v2-00245ab427add935040ed459f32647e9_720w.jpg" ><br><img src="v2-1f8d780275da0a1b3fe35448d775da85_720w.jpg" ><br><img src="v2-175998be03fc29a15f5625c6ab568fa7_720w.jpg" ><br><img src="v2-bc112943fcd2fc722bad5075b397f8aa_720w.jpg" ><br><img src="v2-b7eca5eb697cd964897554a6069b3c33_720w.jpg" ><br><img src="v2-8586910ce4f8c2d9c75aa8874285a9b8_720w.jpg" ><p data-pid="lRmbOf4a">可解算出theta6</p>
+
+
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
