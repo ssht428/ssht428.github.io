@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>机器人末端六维力与末端工具力映射及拖动</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">机器人末端六维力与末端工具力映射及拖动</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="LoQWa8an">如果使用末端六维力传感器，同时传感器后端有工具，那么传感器感受到的力是作用在传感器原点的，如何反应真实末端收到的力呢（首先补偿掉工具得重力对传感器得影响），首先看一下韩老师的知乎，关于重力补偿和变换 问题，这里给一个非常简单的方法（补偿重力后）</p><a target="_blank" href="https://zhuanlan.zhihu.com/p/93874379" data-draft-node="block" data-draft-type="link-card" data-image="v2-218d69ea663fdd6f099a3340b41a13ce_180x120.jpg" data-image-width="636" data-image-height="419" data-text="韩冰：机器人六维力传感器重力补偿与力变换" class="LinkCard new"><span class="LinkCard-contents"><span class="LinkCard-title loading" data-text="true"></span><span class="LinkCard-desc loading"></span></span><span class="LinkCard-image LinkCard-image--default"></span></a><br><img src="v2-9f43df73f81bd4fe643b44a518abf267_720w.jpg" ><p data-pid="EJEILqJP">S：传感器坐标系</p><p data-pid="d4ybk3tB">T：工具坐标系(包括传感器)</p><p data-pid="l8rtKFHC">通过一个伴随矩阵，实际是通过速度映射求得，具体过程现代机器人学书上都有哈</p><br><img src="v2-8839f51c2920af7051d1279b5e432e20_720w.jpg" ><p data-pid="v3rWNUXf">上面书中写错了 右下角是u22。</p><p data-pid="lLIyehur">作用就是 1坐标系 2坐标系之间得姿态变换是R12 位置平移是 r12  S代表反对称矩阵</p><p data-pid="e2hHLPhX">这样就可以通过这个公式已知传感器坐标系下力-力矩f2/u2 ，求出末端工具坐标系下力-力矩f1/u1。然后f1 u1才是需要末端导纳控制得实际输入外力外力矩。（前提 传感器需要把连杆重力补偿掉）</p>
+<p data-first-child data-pid="f8kfrcyA">导纳我们都写出来了 拖动还远么？</p><p data-pid="cM1AuHWI">原理更简单了，就是外力转位移，或者外力形成速度用雅可比转关节空间。</p><p data-pid="Ey0oeDCj">唯一和导纳的区别就是，位移量改变后，撤掉外力不机械臂还原，保持当前状态就是点到点拖动了。</p><p data-pid="uf3NcPye">这种基于传感器+雅可比速度的方式不需要 逆解 也不需要动力学模式，就是贵了点。。</p><p data-pid="HwIO4ViW">本代码不是工程算法，只是帮助大家理解实现思路，肯定是有很大优化空间的哦。大佬勿看，一眼就知道不咋地哈哈哈。</p><p data-pid="R1cN9Xhz">一开始给一个末端Z方向力，然后撤掉外力，再反向给力哦</p><br><img src="v2-a4249c19d730e32ad12e0e1e6b3b8f46.gif" ><p data-pid="TzNP_E1_">代码</p><a href="https://github.com/OpenRobotSL/RobotForceControl">https://github.com/OpenRobotSL/RobotForceControl</a>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
