@@ -1,0 +1,1103 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Modern Robotics运动学数值解法及SVD算法</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">Modern Robotics运动学数值解法及SVD算法</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<p data-first-child data-pid="18sZmu83">前言 原著之前CSDN已经注销，新CSDN</p><a target="_blank" href="https://link.zhihu.com/?target=https%3A//blog.csdn.net/Galaxy_Robot" data-draft-node="block" data-draft-type="link-card" data-image="v2-1f156f5e999e711f700e747bba6bcdd4_ipico.jpg" data-image-width="120" data-image-height="120" data-text="Galaxy_Robot的博客_CSDN博客-机器人,C语言,我是谁?领域博主" class="LinkCard new"><span class="LinkCard-contents"><span class="LinkCard-title loading" data-text="true"></span><span class="LinkCard-desc loading"></span></span><span class="LinkCard-image LinkCard-image--default"></span></a><p data-pid="Y1pXQpGP">这半个月的业余时间研究了机器人逆运动学的解析解法和迭代数值解法，并用程序实现。由于解析法只适合于特定结构的机器人，不具有通用性，因此这里不讨论解析解，只讨论迭代数值解法。本文相关的程序及研究素材都可以从github下载--<a href="https://link.zhihu.com/?target=https%3A//github.com/libing403/RoboticsAlgorithm" class=" wrap external" target="_blank" rel="nofollow noreferrer">链接</a> 。</p><br><img src="v2-ef25313bdf9045afb1bed4dff94aaf2d.gif" ><br><img src="v2-cdb8b7bf55f087bbceb7d0f3eb4cc695.gif" ><h2>数值逆运动学</h2><p data-pid="O1ZHWSeR">机器人逆运动学的解析解虽然很优美，但是有时候获得解析解很困难，甚至以人类的智慧无法求得解析解，这时候就可以用迭代数值解法。即使存在解析解，数值解法也经常用来提高解的精度。例如PUMA类型的机器人，最后三个轴由于机械制造和装配误差，实际上可能没有相交于一点，肩关节的轴线也可能不垂直。这种情况下，不必抛弃任何可用的解析解，这些解可以作为迭代数值解法的初始值。</p><p data-pid="my0lw4S3">求解非线性方程的根有多种迭代方法，我们将使用一种非线性求根的基本方法，牛顿拉普森法。此外，在不存在精确解的情况下，我们需要寻找最接近的近似解，这就需要优化方法。因此，我们现在讨论非线性求根的牛顿拉普森方法，以及优化的一阶必要条件。</p><h2>牛顿-拉普森方法</h2><br><img src="v2-d62547209d25d4aebb4ead4c8e87a6ea_720w.jpg" ><h2>数值逆运动学算法</h2><br><img src="v2-2931a66a94c18278513e06615ecb29e5_720w.jpg" ><br><img src="v2-06cb790cbd70072be2f1140e6a335684_720w.jpg" ><br><img src="v2-d9c8b3200dfe8a591311df2b13dbd049_720w.jpg" ><br><img src="v2-a148106e6ae4144b32d333babe89f326_720w.jpg" ><br><img src="v2-3c78103375dd99a096b31ed9cf839a89_720w.jpg" ><br><img src="v2-1f436b74c7a28db0a69b073657407471_720w.jpg" ><br><img src="v2-4a5e0a0d4b80d6eaa16d8de4a8e1e317_720w.jpg" ><br><img src="v2-084ac7a000ebe232eb1295f9df319c0a_720w.jpg" ><div class="highlight"><pre><code class="language-c"><span class="cm">/**
+</span><span class="cm"> * @brief           Description: Algorithm module of robotics, according to the
+</span><span class="cm"> *                  book[modern robotics : mechanics, planning, and control].
+</span><span class="cm"> * @file:           RobotAlgorithmModule.h
+</span><span class="cm"> * @author:         Brian
+</span><span class="cm"> * @date:           2019/03/01 12:23
+</span><span class="cm"> * Copyright(c)     2019 Brian. All rights reserved.
+</span><span class="cm"> *                    
+</span><span class="cm"> * Contact          https://blog.csdn.net/Galaxy_Robot
+</span><span class="cm"> * @note:     
+</span><span class="cm"> * @warning:        
+</span><span class="cm">*/</span>
+
+<span class="cp">#ifndef SVDPINV_H_
+</span><span class="cp">#define SVDPINV_H_
+</span><span class="cp">#ifdef __cplusplus
+</span><span class="cp"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="p">{</span>
+<span class="cp">#endif
+</span><span class="cp"></span>
+    <span class="cm">/**
+</span><span class="cm">    *@brief         Computes Matrix transpose.
+</span><span class="cm">    *@param[in]     a           a matrix.
+</span><span class="cm">    *@param[in]     m           rows of matrix a.
+</span><span class="cm">    *@param[in]     n           columns of matrix a.
+</span><span class="cm">    *@param[out]    b           transpose of matrix a.
+</span><span class="cm">    *@note:
+</span><span class="cm">    *@waring:
+</span><span class="cm">    */</span>
+    <span class="kt">void</span> <span class="n">MatrixT</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">b</span><span class="p">);</span>
+
+    <span class="cm">/**
+</span><span class="cm">    *@brief         Computes matrix multiply.
+</span><span class="cm">    *@param[in]     a       First matrix.
+</span><span class="cm">    *@param[in]     m       rows of matrix a.
+</span><span class="cm">    *@param[in]     n       columns of matrix b.
+</span><span class="cm">    *@param[in]     b       Second matrix.
+</span><span class="cm">    *@param[in]     l       columns of matrix b.
+</span><span class="cm">    *@param[out]    c       result of a*b.
+</span><span class="cm">    *@note:
+</span><span class="cm">    *@waring:
+</span><span class="cm">    */</span>
+    <span class="kt">void</span> <span class="nf">MatrixMult</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="k">const</span> <span class="kt">double</span> <span class="o">*</span><span class="n">b</span><span class="p">,</span> <span class="kt">int</span> <span class="n">l</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">c</span><span class="p">);</span>
+
+    <span class="cm">/**
+</span><span class="cm">    *@brief         Given the matrix a,this routine computes its singular value decomposition.
+</span><span class="cm">    *@param[in/out] a       input matrix a or output matrix u.
+</span><span class="cm">    *@param[in]     m       number of rows of matrix a.
+</span><span class="cm">    *@param[in]     n       number of columns of matrix a.
+</span><span class="cm">    *@param[in]     tol     any singular values less than a tolerance are treated as zero.
+</span><span class="cm">    *@param[out]    w       output vector w.
+</span><span class="cm">    *@param[out]    v       output matrix v.
+</span><span class="cm">    *@return        No return value.
+</span><span class="cm">    *@note:         input a must be a  m rows and n columns matrix,w is n-vector,v is a n rows and n columns matrix. 
+</span><span class="cm">    *@waring:
+</span><span class="cm">    */</span>
+    <span class="kt">int</span> <span class="nf">svdcmp</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span><span class="kt">double</span> <span class="n">tol</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">w</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">v</span><span class="p">);</span>
+
+    <span class="cm">/**
+</span><span class="cm">    *@brief         Computes Moore-Penrose pseudoinverse by  Singular Value Decomposition (SVD) algorithm.
+</span><span class="cm">    *@param[in]     a           an arbitrary order matrix.
+</span><span class="cm">    *@param[in]     m           rows.
+</span><span class="cm">    *@param[in]     n           columns.
+</span><span class="cm">    *@param[in]     tol         any singular values less than a tolerance are treated as zero.
+</span><span class="cm">    *@param[out]    b           Moore-Penrose pseudoinverse of matrix a.
+</span><span class="cm">    *@return        0:success,Nonzero:failure.
+</span><span class="cm">    *@retval        0           success.
+</span><span class="cm">    *@retval        1           failure when use malloc to allocate memory.
+</span><span class="cm">    *@note:
+</span><span class="cm">    *@waring:
+</span><span class="cm">    */</span>
+    <span class="kt">int</span> <span class="nf">MatrixPinv</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">double</span> <span class="n">tol</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">b</span><span class="p">);</span>
+
+<span class="cp">#ifdef __cplusplus
+</span><span class="cp"></span><span class="p">}</span>
+<span class="cp">#endif
+</span><span class="cp"></span>
+<span class="cp">#endif//SVDPINV_H_</span></code></pre></div><p data-pid="672hXmTM">实现文件</p><div class="highlight"><pre><code class="language-c"><span class="cm">/**
+</span><span class="cm"> * @brief           Description: Algorithm module of robotics, according to the
+</span><span class="cm"> *                  book[modern robotics : mechanics, planning, and control].
+</span><span class="cm"> * @file:           RobotAlgorithmModule.c
+</span><span class="cm"> * @author:         Brian
+</span><span class="cm"> * @date:           2019/03/01 12:23
+</span><span class="cm"> * Copyright(c)     2019 Brian. All rights reserved.
+</span><span class="cm"> *                    
+</span><span class="cm"> * Contact          https://blog.csdn.net/Galaxy_Robot
+</span><span class="cm"> * @note:     
+</span><span class="cm"> * @warning:        
+</span><span class="cm">*/</span>
+<span class="cp">#include</span> <span class="cpf">&#34;RobotAlgorithmModule.h&#34;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#define SIGN(a,b) ((b) &gt;= 0.0 ? fabs(a) : -fabs(a))
+</span><span class="cp">#define MAX(a,b) (a&gt;b?a:b)
+</span><span class="cp">#define MIN(a,b) (a&lt;b?a:b)
+</span><span class="cp"></span>
+<span class="cm">/**
+</span><span class="cm">*@brief         Computes (a^2+b^2)^(1/2),
+</span><span class="cm">*@param[in]     a
+</span><span class="cm">*@param[in]     b
+</span><span class="cm">*@note:
+</span><span class="cm">*@waring:
+</span><span class="cm">*/</span>
+<span class="kt">double</span> <span class="nf">pythag</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span> <span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">b</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">double</span> <span class="n">absa</span><span class="p">,</span> <span class="n">absb</span><span class="p">;</span>
+    <span class="n">absa</span> <span class="o">=</span> <span class="n">fabs</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+    <span class="n">absb</span> <span class="o">=</span> <span class="n">fabs</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">absa</span> <span class="o">&gt;</span> <span class="n">absb</span><span class="p">)</span> <span class="k">return</span> <span class="n">absa</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">absb</span> <span class="o">/</span> <span class="n">absa</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">absb</span> <span class="o">/</span> <span class="n">absa</span><span class="p">));</span>
+    <span class="k">else</span> <span class="k">return</span> <span class="p">(</span><span class="n">absb</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="o">?</span> <span class="mf">0.0</span> <span class="o">:</span> <span class="n">absb</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">absa</span> <span class="o">/</span> <span class="n">absb</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">absa</span> <span class="o">/</span> <span class="n">absb</span><span class="p">)));</span>
+
+<span class="p">}</span>
+<span class="cm">/**
+</span><span class="cm">*@brief         Given the matrix a,this routine computes its singular value decomposition.
+</span><span class="cm">*@param[in/out] a       input matrix a or output matrix u.
+</span><span class="cm">*@param[in]     m       number of rows of matrix a.
+</span><span class="cm">*@param[in]     n       number of columns of matrix a.
+</span><span class="cm">*@param[in]     tol     any singular values less than a tolerance are treated as zero.
+</span><span class="cm">*@param[out]    w       output vector w.
+</span><span class="cm">*@param[out]    v       output matrix v.    
+</span><span class="cm">*@return        No return value.
+</span><span class="cm">*@note:         input a must be a  m rows and n columns matrix,w is n-vector,v is a n rows and n columns matrix.
+</span><span class="cm">*@waring:
+</span><span class="cm">*/</span>
+<span class="kt">int</span> <span class="nf">svdcmp</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">double</span> <span class="n">tol</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">w</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
+<span class="p">{</span>
+
+    <span class="kt">int</span> <span class="n">flag</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">its</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">jj</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">nm</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">anorm</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">rv1</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">rv1</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">=</span> <span class="n">anorm</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="c1">//Householder reduction to bidiagonal form.
+</span><span class="c1"></span>    <span class="p">{</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span>
+        <span class="n">rv1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span><span class="o">*</span><span class="n">g</span><span class="p">;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">s</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">&lt;</span><span class="n">m</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span><span class="n">scale</span> <span class="o">+=</span> <span class="n">fabs</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">scale</span><span class="o">!=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">/=</span> <span class="n">scale</span><span class="p">;</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">];</span>
+                <span class="p">}</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">];</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="o">-</span><span class="n">SIGN</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">f</span><span class="p">);</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">f</span><span class="o">*</span><span class="n">g</span> <span class="o">-</span> <span class="n">s</span><span class="p">;</span>
+                <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span> <span class="o">-</span> <span class="n">g</span><span class="p">;</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                    <span class="p">{</span>
+                        <span class="n">s</span> <span class="o">+=</span> <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">];</span>
+                    <span class="p">}</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">s</span> <span class="o">/</span> <span class="n">h</span><span class="p">;</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                    <span class="p">{</span>
+                        <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">f</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">];</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">scale</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span><span class="o">*</span><span class="n">g</span><span class="p">;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">s</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">m</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">!=</span><span class="n">n</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">k</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">scale</span> <span class="o">+=</span> <span class="n">fabs</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">]);</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">scale</span><span class="o">!=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">k</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">/=</span> <span class="n">scale</span><span class="p">;</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">];</span>
+                <span class="p">}</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="o">-</span><span class="n">SIGN</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">f</span><span class="p">);</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">f</span><span class="o">*</span><span class="n">g</span> <span class="o">-</span> <span class="n">s</span><span class="p">;</span>
+                <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span> <span class="o">-</span> <span class="n">g</span><span class="p">;</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">k</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">rv1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">/</span> <span class="n">h</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                    <span class="p">{</span>
+                        <span class="n">s</span> <span class="o">+=</span> <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">];</span>
+                    <span class="p">}</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                    <span class="p">{</span>
+                        <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">s</span><span class="o">*</span><span class="n">rv1</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">k</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="n">scale</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">anorm</span> <span class="o">=</span> <span class="n">MAX</span><span class="p">(</span><span class="n">anorm</span><span class="p">,</span> <span class="p">(</span><span class="n">fabs</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">fabs</span><span class="p">(</span><span class="n">rv1</span><span class="p">[</span><span class="n">i</span><span class="p">])));</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">--</span><span class="p">)</span><span class="c1">//Accumulation of right-hand transformations.
+</span><span class="c1"></span>    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">g</span><span class="o">!=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="c1">//Double division to avoid possible underflow.
+</span><span class="c1"></span>                <span class="p">{</span>
+                    <span class="n">v</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">l</span><span class="p">])</span> <span class="o">/</span> <span class="n">g</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span><span class="n">k</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                    <span class="p">{</span>
+                        <span class="n">s</span> <span class="o">+=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">];</span>
+                    <span class="p">}</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span><span class="n">k</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                    <span class="p">{</span>
+                        <span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">s</span><span class="o">*</span><span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">];</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">rv1</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">MIN</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">--</span><span class="p">)</span><span class="c1">//Accumulation of left-hand transformations.
+</span><span class="c1"></span>    <span class="p">{</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">g</span><span class="o">!=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">g</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">];</span>
+                <span class="p">}</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">g</span><span class="p">;</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">f</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">];</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">g</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="o">++</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">k</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">;</span><span class="n">k</span><span class="o">--</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="cm">/* Diagonalization of the bidiagonal form: Loop over
+</span><span class="cm">        singular values, and over allowed iterations. */</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">its</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">its</span><span class="o">&lt;</span><span class="mi">30</span><span class="p">;</span><span class="n">its</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">l</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span><span class="n">l</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">;</span><span class="n">l</span><span class="o">--</span><span class="p">)</span><span class="c1">//Test for splitting.
+</span><span class="c1"></span>            <span class="p">{</span>
+                <span class="n">nm</span> <span class="o">=</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>     
+                <span class="k">if</span> <span class="p">(</span><span class="n">l</span><span class="o">==</span><span class="mi">0</span> <span class="o">||</span> <span class="n">fabs</span><span class="p">(</span><span class="n">rv1</span><span class="p">[</span><span class="n">l</span><span class="p">])</span><span class="o">&lt;=</span> <span class="n">tol</span><span class="o">*</span><span class="n">anorm</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                    <span class="k">break</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">fabs</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">nm</span><span class="p">])</span> <span class="o">&lt;=</span><span class="n">tol</span><span class="o">*</span><span class="n">anorm</span><span class="p">)</span><span class="k">break</span><span class="p">;</span>
+
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">flag</span><span class="p">)</span><span class="c1">//Cancellation of rv1[l], if l &gt; 0.
+</span><span class="c1"></span>            <span class="p">{</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">l</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">s</span><span class="o">*</span><span class="n">rv1</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+                    <span class="n">rv1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">rv1</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">fabs</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="o">*</span><span class="n">anorm</span><span class="p">)</span><span class="k">break</span><span class="p">;</span>
+                    <span class="n">g</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+                    <span class="n">h</span> <span class="o">=</span> <span class="n">pythag</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">);</span>
+                    <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span><span class="p">;</span>
+                    <span class="n">h</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">h</span><span class="p">;</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">g</span><span class="o">*</span><span class="n">h</span><span class="p">;</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="o">-</span><span class="n">f</span><span class="o">*</span><span class="n">h</span><span class="p">;</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+                    <span class="p">{</span>
+                        <span class="n">y</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">nm</span><span class="p">];</span>
+                        <span class="n">z</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">];</span>
+                        <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="o">*</span><span class="n">c</span> <span class="o">+</span> <span class="n">z</span><span class="o">*</span><span class="n">s</span><span class="p">;</span>
+                        <span class="n">a</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="o">*</span><span class="n">c</span> <span class="o">-</span> <span class="n">y</span><span class="o">*</span><span class="n">s</span><span class="p">;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">l</span><span class="o">==</span><span class="n">k</span><span class="p">)</span><span class="c1">//Convergence
+</span><span class="c1"></span>            <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">z</span><span class="o">&lt;</span><span class="mf">0.0</span><span class="p">)</span><span class="c1">//Singular value is made nonnegative..
+</span><span class="c1"></span>                <span class="p">{</span>
+                    <span class="n">w</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">z</span><span class="p">;</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+                    <span class="p">{</span>
+                        <span class="n">v</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">k</span><span class="p">];</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="c1">//if (its==29)
+</span><span class="c1"></span>            <span class="c1">//{
+</span><span class="c1"></span>            <span class="c1">//  printf(&#34;no convergence in 30 svdcmp iterations\n&#34;);
+</span><span class="c1"></span>            <span class="c1">//}
+</span><span class="c1"></span>            <span class="n">x</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">l</span><span class="p">];</span> <span class="c1">//Shift from bottom 2-by-2 minor.
+</span><span class="c1"></span>            <span class="n">nm</span> <span class="o">=</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">nm</span><span class="p">];</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">rv1</span><span class="p">[</span><span class="n">nm</span><span class="p">];</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">rv1</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">g</span> <span class="o">-</span> <span class="n">h</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">g</span> <span class="o">+</span> <span class="n">h</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">y</span><span class="p">);</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">pythag</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">h</span><span class="o">*</span><span class="p">((</span><span class="n">y</span> <span class="o">/</span> <span class="p">(</span><span class="n">f</span> <span class="o">+</span> <span class="n">SIGN</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">f</span><span class="p">)))</span> <span class="o">-</span> <span class="n">h</span><span class="p">))</span> <span class="o">/</span> <span class="n">x</span><span class="p">;</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">s</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="n">l</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;=</span><span class="n">nm</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="c1">//Next QR transformation:
+</span><span class="c1"></span>            <span class="p">{</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">rv1</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">s</span><span class="o">*</span><span class="n">g</span><span class="p">;</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">g</span><span class="p">;</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">pythag</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">h</span><span class="p">);</span>
+                <span class="n">rv1</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="p">;</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">z</span><span class="p">;</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">h</span> <span class="o">/</span> <span class="n">z</span><span class="p">;</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">c</span> <span class="o">+</span> <span class="n">g</span><span class="o">*</span><span class="n">s</span><span class="p">;</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">*</span><span class="n">c</span> <span class="o">-</span> <span class="n">x</span><span class="o">*</span><span class="n">s</span><span class="p">;</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">y</span><span class="o">*</span><span class="n">s</span><span class="p">;</span>
+                <span class="n">y</span> <span class="o">*=</span> <span class="n">c</span><span class="p">;</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">jj</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">jj</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span><span class="n">jj</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">jj</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">];</span>
+                    <span class="n">z</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">jj</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">];</span>
+                    <span class="n">v</span><span class="p">[</span><span class="n">jj</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">c</span> <span class="o">+</span> <span class="n">z</span><span class="o">*</span><span class="n">s</span><span class="p">;</span>
+                    <span class="n">v</span><span class="p">[</span><span class="n">jj</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="o">*</span><span class="n">c</span> <span class="o">-</span> <span class="n">x</span><span class="o">*</span><span class="n">s</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">pythag</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">h</span><span class="p">);</span>
+                <span class="n">w</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="p">;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="c1">//Rotation can be arbitrary if z = 0.
+</span><span class="c1"></span>                <span class="p">{</span>
+                    <span class="n">z</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">z</span><span class="p">;</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">f</span><span class="o">*</span><span class="n">z</span><span class="p">;</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">h</span><span class="o">*</span><span class="n">z</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">g</span> <span class="o">+</span> <span class="n">s</span><span class="o">*</span><span class="n">y</span><span class="p">;</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="n">s</span><span class="o">*</span><span class="n">g</span><span class="p">;</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">jj</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">jj</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span><span class="n">jj</span><span class="o">++</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">jj</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">];</span>
+                    <span class="n">z</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">jj</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">];</span>
+                    <span class="n">a</span><span class="p">[</span><span class="n">jj</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="o">*</span><span class="n">c</span> <span class="o">+</span> <span class="n">z</span><span class="o">*</span><span class="n">s</span><span class="p">;</span>
+                    <span class="n">a</span><span class="p">[</span><span class="n">jj</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="o">*</span><span class="n">c</span> <span class="o">-</span> <span class="n">y</span><span class="o">*</span><span class="n">s</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="n">rv1</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+            <span class="n">rv1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">;</span>
+            <span class="n">w</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">rv1</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="cm">/**
+</span><span class="cm">*@brief         Computes Moore-Penrose pseudoinverse by  Singular Value Decomposition (SVD) algorithm.
+</span><span class="cm">*@param[in]     a           an arbitrary order matrix.
+</span><span class="cm">*@param[in]     m           rows.
+</span><span class="cm">*@param[in]     n           columns.
+</span><span class="cm">*@param[in]     tol         any singular values less than a tolerance are treated as zero.
+</span><span class="cm">*@param[out]    b           Moore-Penrose pseudoinverse of matrix a.
+</span><span class="cm">*@return        0:success,Nonzero:failure.
+</span><span class="cm">*@retval        0           success.
+</span><span class="cm">*@retval        1           failure when use malloc to allocate memory.
+</span><span class="cm">*@note:     
+</span><span class="cm">*@waring:
+</span><span class="cm">*/</span>
+<span class="kt">int</span> <span class="nf">MatrixPinv</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">m</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">double</span> <span class="n">tol</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">b</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">;</span>
+
+    <span class="kt">double</span> <span class="o">*</span><span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">n</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">u</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">w</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">u</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">n</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">u</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">vw</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">n</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">vw</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">u</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">uT</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">n</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">uT</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">u</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">vw</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="o">*</span><span class="n">n</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="n">svdcmp</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span><span class="n">w</span><span class="p">,</span> <span class="n">v</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">vw</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">w</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">MatrixT</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">uT</span><span class="p">);</span>
+    <span class="n">MatrixMult</span><span class="p">(</span><span class="n">vw</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">uT</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">u</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">vw</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">uT</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div><br><img src="v2-3359b82b668fb505b2d93acb999d0810_720w.jpg" ><div class="highlight"><pre><code class="language-c"><span class="cm">/**
+</span><span class="cm"> * @brief           Description: Test Demos for robot algorithm modules.
+</span><span class="cm"> * @file:           TestDemo.c
+</span><span class="cm"> * @author:         Brian
+</span><span class="cm"> * @date:           2019/03/01 12:23
+</span><span class="cm"> * Copyright(c)     2019 Brian. All rights reserved.
+</span><span class="cm"> *                    
+</span><span class="cm"> * Contact          https://blog.csdn.net/Galaxy_Robot
+</span><span class="cm"> * @note:     
+</span><span class="cm"> * @warning:        
+</span><span class="cm">*/</span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&#34;RobotAlgorithmModule.h&#34;</span><span class="cp">
+</span><span class="cp"></span><span class="kt">void</span> <span class="nf">test_svdcmp</span><span class="p">();</span>
+<span class="kt">void</span> <span class="nf">test_MatrixPinv</span><span class="p">();</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">//void test_svdcmp();
+</span><span class="c1"></span>    <span class="n">test_MatrixPinv</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">test_svdcmp</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">double</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span>
+        <span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span>
+        <span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span>
+        <span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">16</span>
+    <span class="p">};</span>
+    <span class="kt">double</span> <span class="n">w</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">2.2e-15</span><span class="p">;</span>
+    <span class="n">svdcmp</span><span class="p">((</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">a</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span><span class="n">w</span><span class="p">,</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">v</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;svdcmp,u:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%lf   &#34;</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;w:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%lf   &#34;</span><span class="p">,</span> <span class="n">w</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;v:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%lf   &#34;</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="n">vT</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="c1">//验证分解是否正确
+</span><span class="c1"></span>    <span class="n">MatrixT</span><span class="p">((</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">v</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">vT</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">k</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">;</span><span class="n">k</span><span class="o">++</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span><span class="n">w</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">vT</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;uwvT:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%lf   &#34;</span><span class="p">,</span> <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">test_MatrixPinv</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">double</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span>
+        <span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span>
+        <span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span>
+        <span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">16</span>
+    <span class="p">};</span>
+    <span class="kt">double</span> <span class="n">b</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">2.22e-15</span><span class="p">;</span>
+    <span class="n">MatrixPinv</span><span class="p">((</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">a</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">tol</span><span class="p">,(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;MatrixPinv(a):</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%lf  &#34;</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div><p data-pid="Yaeh5cPY">一般机器人逆运动学数值解法实现</p><p data-pid="4SO3uZdF">有了前面实现的计算伪逆的算法，那么接下来就可以基于旋量理论和牛顿拉普算法，实现一般机器人逆运动学数值解法。基于前面数值逆运动算法的分析，下面使用C语言实现，主要有两个函数，其中的依赖函数可以在以前的博客找到。代码不断更新迭代，完整的最新源码参见github--<a href="https://link.zhihu.com/?target=https%3A//github.com/libing403/LearningNotes/tree/master/Robotics/RoboticsAlgorithm" class=" wrap external" target="_blank" rel="nofollow noreferrer">链接</a> 。</p><ul><li data-pid="9QoZx1Zn">IKinBodyNR(JointNum, (double *)Blist, M, T, thetalist0, eomg, ev, maxiter, thetalist);</li><li data-pid="aVdJWXyC">IKinSpaceNR(JointNum, (double *)Slist, M, T, thetalist0, eomg, ev, maxiter, thetalist);</li></ul><p data-pid="pruGSzgA">这两个函数的参数区别在于输入的螺旋轴单位矢量Blist是在末端物体坐标系下的表达，Slist是在固定坐标系下表达，其他参数含义相同。内部实现的区别在于IKinBodyNR内部使用物体坐标系下的雅可比，IKinSpaceNR内部使用固定坐标系下的雅可比. </p><p data-pid="F17hRPXM">函数声明</p><div class="highlight"><pre><code class="language-c"><span class="cm">/**
+</span><span class="cm"> * @brief           Description: Algorithm module of robotics, according to the
+</span><span class="cm"> *                  book[modern robotics : mechanics, planning, and control].
+</span><span class="cm"> * @file:           RobotAlgorithmModule.h
+</span><span class="cm"> * @author:         Brian
+</span><span class="cm"> * @date:           2019/03/01 12:23
+</span><span class="cm"> * Copyright(c)     2019 Brian. All rights reserved.
+</span><span class="cm"> *                    
+</span><span class="cm"> * Contact          https://blog.csdn.net/Galaxy_Robot
+</span><span class="cm"> * @note:     
+</span><span class="cm"> * @warning:        
+</span><span class="cm">*/</span>
+<span class="cp">#ifndef RobotALGORITHMMODULE_H_
+</span><span class="cp">#define RobotALGORITHMMODULE_H_
+</span><span class="cp">#ifdef __cplusplus
+</span><span class="cp"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="p">{</span>
+<span class="cp">#endif
+</span><span class="cp"></span>    <span class="cp">#define         DEBUGMODE           1           </span><span class="c1">//打印调试信息
+</span><span class="c1"></span>
+    <span class="cp">#define         PI                  3.14159265358979323846
+</span><span class="cp"></span>    <span class="c1">//if the norm of vector is near zero(&lt; 1.0E-6),regard as zero.
+</span><span class="c1"></span>    <span class="cp">#define         ZERO_VALUE          1.0E-6      
+</span><span class="cp"></span>
+    <span class="cm">/**
+</span><span class="cm">    *@brief         Description:use an iterative Newton-Raphson root-finding method.
+</span><span class="cm">    *@param[in]     JointNum        Number of joints.
+</span><span class="cm">    *@param[in]     Blist           The joint screw axes in the Body frame when the manipulator
+</span><span class="cm">    *                               is at the home position, in the format of a matrix with the
+</span><span class="cm">    *                               screw axes as the columns.
+</span><span class="cm">    *@param[in]     M               The home configuration of the end-effector.
+</span><span class="cm">    *@param[in]     T               The desired end-effector configuration Tsd.
+</span><span class="cm">    *@param[in]     thetalist0      An initial guess of joint angles that are close to satisfying Tsd.
+</span><span class="cm">    *@param[in]     eomg            A small positive tolerance on the end-effector orientation error.
+</span><span class="cm">    *                               The returned joint angles must give an end-effector orientation error less than eomg.
+</span><span class="cm">    *@param[in]     ev              A small positive tolerance on the end-effector linear position error. The returned
+</span><span class="cm">    *                               joint angles must give an end-effector position error less than ev.
+</span><span class="cm">    *@param[in]     maxiter         The maximum number of iterations before the algorithm is terminated.
+</span><span class="cm">    *@param[out]    thetalist       Joint angles that achieve T within the specified tolerances.
+</span><span class="cm">    *@return        0:success,Nonzero:failure
+</span><span class="cm">    *@retval        0               success.
+</span><span class="cm">    *@retval        1               The maximum number of iterations reach before the algorithm is terminated.
+</span><span class="cm">    *@retval        2               failure to allocate memory for Jacobian matrix.
+</span><span class="cm">    *@note:
+</span><span class="cm">    *@waring:
+</span><span class="cm">    */</span>
+    <span class="kt">int</span> <span class="n">IKinBodyNR</span><span class="p">(</span><span class="kt">int</span> <span class="n">JointNum</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">Blist</span><span class="p">,</span> <span class="kt">double</span> <span class="n">M</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="kt">double</span>  <span class="n">T</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="kt">double</span> <span class="o">*</span><span class="n">thetalist0</span><span class="p">,</span> <span class="kt">double</span> <span class="n">eomg</span><span class="p">,</span> <span class="kt">double</span> <span class="n">ev</span><span class="p">,</span> <span class="kt">int</span> <span class="n">maxiter</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">thetalist</span><span class="p">);</span>
+
+
+    <span class="cm">/**
+</span><span class="cm">    *@brief         Description:use an iterative Newton-Raphson root-finding method.
+</span><span class="cm">    *@param[in]     JointNum        Number of joints.
+</span><span class="cm">    *@param[in]     Slist           The joint screw axes in the space frame when the manipulator
+</span><span class="cm">    *                               is at the home position, in the format of a matrix with the
+</span><span class="cm">    *                               screw axes as the columns.
+</span><span class="cm">    *@param[in]     M               The home configuration of the end-effector.
+</span><span class="cm">    *@param[in]     T               The desired end-effector configuration Tsd.
+</span><span class="cm">    *@param[in]     thetalist0      An initial guess of joint angles that are close to satisfying Tsd.
+</span><span class="cm">    *@param[in]     eomg            A small positive tolerance on the end-effector orientation error.
+</span><span class="cm">    *                               The returned joint angles must give an end-effector orientation error less than eomg.
+</span><span class="cm">    *@param[in]     ev              A small positive tolerance on the end-effector linear position error. The returned
+</span><span class="cm">    *                               joint angles must give an end-effector position error less than ev.
+</span><span class="cm">    *@param[in]     maxiter         The maximum number of iterations before the algorithm is terminated.
+</span><span class="cm">    *@param[out]    thetalist       Joint angles that achieve T within the specified tolerances.
+</span><span class="cm">    *@return        0:success,Nonzero:failure
+</span><span class="cm">    *@retval        0
+</span><span class="cm">    *@note:
+</span><span class="cm">    *@waring:
+</span><span class="cm">    */</span>
+    <span class="kt">int</span> <span class="nf">IKinSpaceNR</span><span class="p">(</span><span class="kt">int</span> <span class="n">JointNum</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">Slist</span><span class="p">,</span> <span class="kt">double</span> <span class="n">M</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="kt">double</span> <span class="n">T</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="kt">double</span> <span class="o">*</span><span class="n">thetalist0</span><span class="p">,</span> <span class="kt">double</span> <span class="n">eomg</span><span class="p">,</span> <span class="kt">double</span> <span class="n">ev</span><span class="p">,</span> <span class="kt">int</span> <span class="n">maxiter</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">thetalist</span><span class="p">);</span>
+
+<span class="cp">#ifdef __cplusplus
+</span><span class="cp"></span><span class="p">}</span>
+<span class="cp">#endif
+</span><span class="cp"></span>
+<span class="cp">#endif//RobotALGORITHMMODULE_H_</span></code></pre></div><p data-pid="ky5NeN9J">实现代码如下</p><div class="highlight"><pre><code class="language-c"><span class="cm">/**
+</span><span class="cm"> * @brief           Description: Algorithm module of robotics, according to the
+</span><span class="cm"> *                  book[modern robotics : mechanics, planning, and control].
+</span><span class="cm"> * @file:           RobotAlgorithmModule.c
+</span><span class="cm"> * @author:         Brian
+</span><span class="cm"> * @date:           2019/03/01 12:23
+</span><span class="cm"> * Copyright(c)     2019 Brian. All rights reserved.
+</span><span class="cm"> *                    
+</span><span class="cm"> * Contact          https://blog.csdn.net/Galaxy_Robot
+</span><span class="cm"> * @note:     
+</span><span class="cm"> * @warning:        
+</span><span class="cm">*/</span>
+
+<span class="cp">#include</span> <span class="cpf">&#34;RobotAlgorithmModule.h&#34;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cm">/**
+</span><span class="cm">*@brief         Description:use an iterative Newton-Raphson root-finding method.
+</span><span class="cm">*@param[in]     JointNum        Number of joints.
+</span><span class="cm">*@param[in]     Blist           The joint screw axes in the Body frame when the manipulator
+</span><span class="cm">*                               is at the home position, in the format of a matrix with the
+</span><span class="cm">*                               screw axes as the columns.
+</span><span class="cm">*@param[in]     M               The home configuration of the end-effector.
+</span><span class="cm">*@param[in]     T               The desired end-effector configuration Tsd.
+</span><span class="cm">*@param[in]     thetalist0      An initial guess of joint angles that are close to satisfying Tsd.
+</span><span class="cm">*@param[in]     eomg            A small positive tolerance on the end-effector orientation error.
+</span><span class="cm">*                               The returned joint angles must give an end-effector orientation error less than eomg.
+</span><span class="cm">*@param[in]     ev              A small positive tolerance on the end-effector linear position error. The returned
+</span><span class="cm">*                               joint angles must give an end-effector position error less than ev.
+</span><span class="cm">*@param[in]     maxiter         The maximum number of iterations before the algorithm is terminated.
+</span><span class="cm">*@param[out]    thetalist       Joint angles that achieve T within the specified tolerances.
+</span><span class="cm">*@return        0:success,Nonzero:failure
+</span><span class="cm">*@retval        0               success.
+</span><span class="cm">*@retval        1               The maximum number of iterations reach before the algorithm is terminated.
+</span><span class="cm">*@retval        2               failure to allocate memory for Jacobian matrix.
+</span><span class="cm">*@note:
+</span><span class="cm">*@waring:
+</span><span class="cm">*/</span>
+<span class="kt">int</span> <span class="nf">IKinBodyNR</span><span class="p">(</span><span class="kt">int</span> <span class="n">JointNum</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">Blist</span><span class="p">,</span> <span class="kt">double</span> <span class="n">M</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="kt">double</span> <span class="n">T</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="kt">double</span> <span class="o">*</span><span class="n">thetalist0</span><span class="p">,</span> <span class="kt">double</span> <span class="n">eomg</span><span class="p">,</span> <span class="kt">double</span> <span class="n">ev</span><span class="p">,</span> <span class="kt">int</span> <span class="n">maxiter</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">thetalist</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">Tsb</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">iTsb</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">Tbd</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">se3Mat</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+
+    <span class="kt">double</span> <span class="n">Vb</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span>
+    <span class="kt">int</span> <span class="n">ErrFlag</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">Jb</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">JointNum</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">Jb</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">pJb</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">JointNum</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">pJb</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">Jb</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">dtheta</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">JointNum</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dtheta</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">Jb</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">pJb</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">MatrixCopy</span><span class="p">(</span><span class="n">thetalist0</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">);</span>
+    <span class="n">FKinBody</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span> <span class="n">Blist</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">,</span> <span class="n">Tsb</span><span class="p">);</span>
+    <span class="n">TransInv</span><span class="p">(</span><span class="n">Tsb</span><span class="p">,</span> <span class="n">iTsb</span><span class="p">);</span>
+    <span class="n">Matrix4Mult</span><span class="p">(</span><span class="n">iTsb</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">Tbd</span><span class="p">);</span>
+    <span class="n">MatrixLog6</span><span class="p">(</span><span class="n">Tbd</span><span class="p">,</span> <span class="n">se3Mat</span><span class="p">);</span>
+    <span class="n">se3ToVec</span><span class="p">(</span><span class="n">se3Mat</span><span class="p">,</span> <span class="n">Vb</span><span class="p">);</span>
+    <span class="n">ErrFlag</span> <span class="o">=</span> <span class="n">VecNorm2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Vb</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">eomg</span> <span class="o">||</span> <span class="n">VecNorm2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Vb</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">ev</span><span class="p">;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="cp">#if(DEBUGMODE)
+</span><span class="cp"></span>    <span class="c1">///////////////////Debug///////////
+</span><span class="c1"></span>    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;iteration:%4d  thetalist:  &#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">k</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">JointNum</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%4.6lf</span><span class="se">\t</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">[</span><span class="n">k</span><span class="p">]);</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="c1">////////////////////////////////////
+</span><span class="c1"></span><span class="cp">#endif
+</span><span class="cp"></span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">ErrFlag</span> <span class="o">&amp;&amp;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">maxiter</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">JacobianBody</span><span class="p">(</span><span class="n">JointNum</span><span class="p">,</span> <span class="n">Blist</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">,</span> <span class="n">Jb</span><span class="p">);</span>
+        <span class="n">MatrixPinv</span><span class="p">(</span><span class="n">Jb</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span> <span class="mf">2.2E-15</span><span class="p">,</span> <span class="n">pJb</span><span class="p">);</span>
+        <span class="n">MatrixMult</span><span class="p">(</span><span class="n">pJb</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span><span class="mi">6</span> <span class="p">,</span> <span class="n">Vb</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtheta</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">JointNum</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">thetalist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">thetalist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">dtheta</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+        <span class="n">FKinBody</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span> <span class="n">Blist</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">,</span> <span class="n">Tsb</span><span class="p">);</span>
+        <span class="n">TransInv</span><span class="p">(</span><span class="n">Tsb</span><span class="p">,</span> <span class="n">iTsb</span><span class="p">);</span>
+        <span class="n">Matrix4Mult</span><span class="p">(</span><span class="n">iTsb</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Tbd</span><span class="p">);</span>
+        <span class="n">MatrixLog6</span><span class="p">(</span><span class="n">Tbd</span><span class="p">,</span> <span class="n">se3Mat</span><span class="p">);</span>
+        <span class="n">se3ToVec</span><span class="p">(</span><span class="n">se3Mat</span><span class="p">,</span> <span class="n">Vb</span><span class="p">);</span>
+        <span class="n">ErrFlag</span> <span class="o">=</span> <span class="n">VecNorm2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Vb</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">eomg</span> <span class="o">||</span> <span class="n">VecNorm2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Vb</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">ev</span><span class="p">;</span>
+<span class="cp">#if (DEBUGMODE)
+</span><span class="cp"></span>        <span class="c1">///////////////////////DEBUG///////////
+</span><span class="c1"></span>        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;iteration:%4d  thetalist:  &#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">JointNum</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%4.6lf</span><span class="se">\t</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">[</span><span class="n">k</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="c1">//////////////////////////////////////
+</span><span class="c1"></span><span class="cp">#endif
+</span><span class="cp"></span>
+    <span class="p">}</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">Jb</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">pJb</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">dtheta</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">ErrFlag</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+
+<span class="cm">/**
+</span><span class="cm">*@brief         Description:use an iterative Newton-Raphson root-finding method.
+</span><span class="cm">*@param[in]     JointNum        Number of joints.
+</span><span class="cm">*@param[in]     Slist           The joint screw axes in the space frame when the manipulator
+</span><span class="cm">*                               is at the home position, in the format of a matrix with the
+</span><span class="cm">*                               screw axes as the columns.
+</span><span class="cm">*@param[in]     M               The home configuration of the end-effector.
+</span><span class="cm">*@param[in]     T               The desired end-effector configuration Tsd.
+</span><span class="cm">*@param[in]     thetalist0      An initial guess of joint angles that are close to satisfying Tsd.
+</span><span class="cm">*@param[in]     eomg            A small positive tolerance on the end-effector orientation error. 
+</span><span class="cm">*                               The returned joint angles must give an end-effector orientation error less than eomg.
+</span><span class="cm">*@param[in]     ev              A small positive tolerance on the end-effector linear position error. The returned 
+</span><span class="cm">*                               joint angles must give an end-effector position error less than ev.
+</span><span class="cm">*@param[in]     maxiter         The maximum number of iterations before the algorithm is terminated.
+</span><span class="cm">*@param[out]    thetalist       Joint angles that achieve T within the specified tolerances.
+</span><span class="cm">*@return        0:success,Nonzero:failure
+</span><span class="cm">*@retval        0
+</span><span class="cm">*@note:
+</span><span class="cm">*@waring:
+</span><span class="cm">*/</span>
+<span class="kt">int</span> <span class="nf">IKinSpaceNR</span><span class="p">(</span><span class="kt">int</span> <span class="n">JointNum</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">Slist</span><span class="p">,</span> <span class="kt">double</span> <span class="n">M</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="kt">double</span> <span class="n">T</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="kt">double</span> <span class="o">*</span><span class="n">thetalist0</span><span class="p">,</span> <span class="kt">double</span> <span class="n">eomg</span><span class="p">,</span> <span class="kt">double</span> <span class="n">ev</span><span class="p">,</span> <span class="kt">int</span> <span class="n">maxiter</span><span class="p">,</span><span class="kt">double</span> <span class="o">*</span><span class="n">thetalist</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">Tsb</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">iTsb</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">Tbd</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">AdT</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">6</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">se3Mat</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">Vb</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">Vs</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span>
+    <span class="kt">int</span> <span class="n">ErrFlag</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">Js</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">JointNum</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">Js</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">pJs</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">JointNum</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">pJs</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">Js</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">dtheta</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">JointNum</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dtheta</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">Js</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">pJs</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">MatrixCopy</span><span class="p">(</span><span class="n">thetalist0</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">);</span>
+    <span class="n">FKinSpace</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span> <span class="n">Slist</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">,</span> <span class="n">Tsb</span><span class="p">);</span>
+    <span class="n">TransInv</span><span class="p">(</span><span class="n">Tsb</span><span class="p">,</span> <span class="n">iTsb</span><span class="p">);</span>
+    <span class="n">Matrix4Mult</span><span class="p">(</span><span class="n">iTsb</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Tbd</span><span class="p">);</span>
+    <span class="n">MatrixLog6</span><span class="p">(</span><span class="n">Tbd</span><span class="p">,</span> <span class="n">se3Mat</span><span class="p">);</span>
+    <span class="n">se3ToVec</span><span class="p">(</span><span class="n">se3Mat</span><span class="p">,</span> <span class="n">Vb</span><span class="p">);</span>
+    <span class="n">Adjoint</span><span class="p">(</span><span class="n">Tsb</span><span class="p">,</span> <span class="n">AdT</span><span class="p">);</span>
+    <span class="n">MatrixMult</span><span class="p">((</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">AdT</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">Vb</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Vs</span><span class="p">);</span>
+    <span class="n">ErrFlag</span> <span class="o">=</span> <span class="n">VecNorm2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Vs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">eomg</span> <span class="o">||</span> <span class="n">VecNorm2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Vs</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">ev</span><span class="p">;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="cp">#if(DEBUGMODE)
+</span><span class="cp"></span>    <span class="c1">///////////////////Debug///////////
+</span><span class="c1"></span>    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;iteration:%4d  thetalist:  &#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">k</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">JointNum</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%4.6lf</span><span class="se">\t</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">[</span><span class="n">k</span><span class="p">]);</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="c1">////////////////////////////////////
+</span><span class="c1"></span><span class="cp">#endif
+</span><span class="cp"></span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">ErrFlag</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">maxiter</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">JacobianSpace</span><span class="p">(</span><span class="n">JointNum</span><span class="p">,</span> <span class="n">Slist</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">,</span> <span class="n">Js</span><span class="p">);</span>
+        <span class="n">MatrixPinv</span><span class="p">(</span><span class="n">Js</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span> <span class="mf">2.2E-15</span><span class="p">,</span> <span class="n">pJs</span><span class="p">);</span>
+        <span class="n">MatrixMult</span><span class="p">(</span><span class="n">pJs</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">Vs</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtheta</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">JointNum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">thetalist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">thetalist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">dtheta</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+        <span class="n">FKinSpace</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">JointNum</span><span class="p">,</span> <span class="n">Slist</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">,</span> <span class="n">Tsb</span><span class="p">);</span>
+        <span class="n">TransInv</span><span class="p">(</span><span class="n">Tsb</span><span class="p">,</span> <span class="n">iTsb</span><span class="p">);</span>
+        <span class="n">Matrix4Mult</span><span class="p">(</span><span class="n">iTsb</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Tbd</span><span class="p">);</span>
+        <span class="n">MatrixLog6</span><span class="p">(</span><span class="n">Tbd</span><span class="p">,</span> <span class="n">se3Mat</span><span class="p">);</span>
+        <span class="n">se3ToVec</span><span class="p">(</span><span class="n">se3Mat</span><span class="p">,</span> <span class="n">Vb</span><span class="p">);</span>
+        <span class="n">Adjoint</span><span class="p">(</span><span class="n">Tsb</span><span class="p">,</span> <span class="n">AdT</span><span class="p">);</span>
+        <span class="n">MatrixMult</span><span class="p">((</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">AdT</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">Vb</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Vs</span><span class="p">);</span>
+        <span class="n">ErrFlag</span> <span class="o">=</span> <span class="n">VecNorm2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Vs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">eomg</span> <span class="o">||</span> <span class="n">VecNorm2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Vs</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">ev</span><span class="p">;</span>
+<span class="cp">#if (DEBUGMODE)
+</span><span class="cp"></span>        <span class="c1">///////////////////////DEBUG///////////
+</span><span class="c1"></span>        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;iteration:%4d  thetalist:  &#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">JointNum</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%4.6lf</span><span class="se">\t</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">[</span><span class="n">k</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="c1">//////////////////////////////////////
+</span><span class="c1"></span><span class="cp">#endif
+</span><span class="cp"></span>
+    <span class="p">}</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">Js</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">pJs</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">dtheta</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">ErrFlag</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div><h2>Example1: 2R机械臂逆解</h2><br><img src="v2-7d70ba75f2ee91b0a85d604b2721b88e_b.png" ><br><img src="v2-487807ee7b3c51fafe025e3667248903_720w.jpg" ><br><img src="v2-3992a39764050a2c01c975b0649ab708_720w.jpg" ><p data-pid="juw9TnPh">该例子调用数值逆解算法IKinBodyNR求解的程序如下</p><div class="highlight"><pre><code class="language-c"><span class="cm">/**
+</span><span class="cm"> * @brief           Description: Test Demos for robot algorithm modules.
+</span><span class="cm"> * @file:           TestDemo.c
+</span><span class="cm"> * @author:         Brian
+</span><span class="cm"> * @date:           2019/03/01 12:23
+</span><span class="cm"> * Copyright(c)     2019 Brian. All rights reserved.
+</span><span class="cm"> *                    
+</span><span class="cm"> * Contact          https://blog.csdn.net/Galaxy_Robot
+</span><span class="cm"> * @note:     
+</span><span class="cm"> * @warning:        
+</span><span class="cm">*/</span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&#34;RobotAlgorithmModule.h&#34;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="nf">test_IKinBodyNR</span><span class="p">();</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">test_IKinBodyNR</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="nf">test_IKinBodyNR</span><span class="p">()</span>
+<span class="p">{</span>
+
+    <span class="kt">int</span> <span class="n">JointNum</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">Blist</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">};</span>
+    <span class="kt">double</span> <span class="n">M</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span>
+    <span class="p">{</span>
+        <span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span>
+    <span class="p">};</span>
+    <span class="kt">double</span> <span class="n">T</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="o">-</span><span class="mf">0.866</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.366</span><span class="p">,</span>
+        <span class="mf">0.866</span><span class="p">,</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.366</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span>
+    <span class="p">};</span>
+    <span class="kt">double</span> <span class="n">thetalist0</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span><span class="p">,</span><span class="mf">0.5</span> <span class="p">};</span>
+    <span class="kt">double</span> <span class="n">eomg</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">ev</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">thetalist</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+    <span class="kt">int</span> <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">ret</span><span class="o">=</span><span class="n">IKinBodyNR</span><span class="p">(</span><span class="n">JointNum</span><span class="p">,</span> <span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="p">)</span><span class="n">Blist</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">thetalist0</span><span class="p">,</span> <span class="n">eomg</span><span class="p">,</span> <span class="n">ev</span><span class="p">,</span> <span class="n">maxiter</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;IKinBody error %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">ret</span><span class="p">);</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;solution thetalist:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">JointNum</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%lf  &#34;</span><span class="p">,</span> <span class="n">thetalist</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div><p data-pid="jPpOz94n">结果输出如下图，经过4次迭代就可以求得期望位姿（构型）对应的关节角度分别为0.523589rad(30度),1.570829rad(90度)。这与手工计算的值也是一致的。</p><br><img src="v2-4985364671b17c043fb81b9652470177_720w.jpg" ><h2>Example2: UR3机械臂逆解</h2><p data-pid="02E63L8b">如图所示是UR3机械臂的自由度分布和尺寸。</p><p data-pid="0tYfJjX7">UR3尺寸示意图：</p><br><img src="v2-2effed228ed48457c5e322dc6dc05db3_720w.jpg" ><p data-pid="-eBTaGyQ">下面把前面实现的算法应用在六轴UR3机械臂的逆解。我们分为以下几步来做</p><ul><li data-pid="ozDl9tFY">首先是在测量机械臂在初始状态时各个轴线在基座坐标系的表达，</li><li data-pid="kFxRrmDl">其次是建立任务坐标系，工具坐标系等，确定运动轨迹的描述，</li><li data-pid="y8MaeKrB">然后把轨迹的数据输入到逆解算法，计算出各个关节的位置，</li><li data-pid="dNnHqDod">根据逆解的关节数据进行运动仿真，看末端是否走出了期望的轨迹。</li></ul><h3>（1）初始状态螺旋轴表示</h3><br><img src="v2-94586f3c6e8454b77432f7b63a0cbc65_720w.jpg" ><h3>（2）轨迹点描述</h3><p data-pid="7KCn1F-J">UR3初始状态示意图：</p><br><img src="v2-dd45d60edbb2012120e318b8424a5a36_720w.jpg" ><br><img src="v2-d5b9b7c8ea95a6ed5236477826dc8ab1_720w.jpg" ><br><img src="v2-8024d747b80efb2d1d7139e756560f26_720w.jpg" ><h3>（3）逆解关节位置</h3><p data-pid="WHje53oV">我们调用IKinSpaceNR()函数来逆解关节，还需要把上面的参数和坐标转换一下，使得与逆解函数接受的参数含义一致。</p><p data-pid="cLq3XTne">用matlab处理一下，</p><div class="highlight"><pre><code class="language-matlab"><span class="n">clc</span>
+<span class="n">clear</span>
+<span class="c">%Slist</span>
+<span class="n">w1</span><span class="p">=[</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">;</span><span class="mi">1</span><span class="p">];</span>
+<span class="n">w2</span><span class="p">=[</span><span class="mi">0</span><span class="p">;</span><span class="mi">1</span><span class="p">;</span><span class="mi">0</span><span class="p">];</span>
+<span class="n">w3</span><span class="p">=[</span><span class="mi">0</span><span class="p">;</span><span class="mi">1</span><span class="p">;</span><span class="mi">0</span><span class="p">];</span>
+<span class="n">w4</span><span class="p">=[</span><span class="mi">0</span><span class="p">;</span><span class="mi">1</span><span class="p">;</span><span class="mi">0</span><span class="p">];</span>
+<span class="n">w5</span><span class="p">=[</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">;</span><span class="mi">1</span><span class="p">];</span>
+<span class="n">w6</span><span class="p">=[</span><span class="mi">0</span><span class="p">;</span><span class="mi">1</span><span class="p">;</span><span class="mi">0</span><span class="p">];</span>
+<span class="n">q1</span><span class="p">=[</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">];</span>
+<span class="n">q2</span><span class="p">=[</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">;</span><span class="mf">151.900</span><span class="p">];</span>
+<span class="n">q3</span><span class="p">=[</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">;</span><span class="mf">395.55</span><span class="p">];</span>
+<span class="n">q4</span><span class="p">=[</span><span class="mi">213</span><span class="p">;</span><span class="mi">0</span><span class="p">;</span><span class="mf">395.55</span><span class="p">];</span>
+<span class="n">q5</span><span class="p">=[</span><span class="mi">213</span><span class="p">;</span><span class="mf">110.4</span><span class="p">;</span><span class="mf">478.95</span><span class="p">];</span>
+<span class="n">q6</span><span class="p">=[</span><span class="mi">213</span><span class="p">;</span><span class="mf">110.4</span><span class="p">;</span><span class="mf">478.95</span><span class="p">];</span>
+<span class="n">S1</span><span class="p">=[</span><span class="n">w1</span><span class="p">;</span><span class="nb">cross</span><span class="p">(</span><span class="o">-</span><span class="n">w1</span><span class="p">,</span><span class="n">q1</span><span class="p">)];</span>
+<span class="n">S2</span><span class="p">=[</span><span class="n">w2</span><span class="p">;</span><span class="nb">cross</span><span class="p">(</span><span class="o">-</span><span class="n">w2</span><span class="p">,</span><span class="n">q2</span><span class="p">)];</span>
+<span class="n">S3</span><span class="p">=[</span><span class="n">w3</span><span class="p">;</span><span class="nb">cross</span><span class="p">(</span><span class="o">-</span><span class="n">w3</span><span class="p">,</span><span class="n">q3</span><span class="p">)];</span>
+<span class="n">S4</span><span class="p">=[</span><span class="n">w4</span><span class="p">;</span><span class="nb">cross</span><span class="p">(</span><span class="o">-</span><span class="n">w4</span><span class="p">,</span><span class="n">q4</span><span class="p">)];</span>
+<span class="n">S5</span><span class="p">=[</span><span class="n">w5</span><span class="p">;</span><span class="nb">cross</span><span class="p">(</span><span class="o">-</span><span class="n">w5</span><span class="p">,</span><span class="n">q5</span><span class="p">)];</span>
+<span class="n">S6</span><span class="p">=[</span><span class="n">w6</span><span class="p">;</span><span class="nb">cross</span><span class="p">(</span><span class="o">-</span><span class="n">w6</span><span class="p">,</span><span class="n">q6</span><span class="p">)];</span>
+<span class="n">Slist</span><span class="p">=[</span><span class="n">S1</span><span class="p">,</span><span class="n">S2</span><span class="p">,</span><span class="n">S3</span><span class="p">,</span><span class="n">S4</span><span class="p">,</span><span class="n">S5</span><span class="p">,</span><span class="n">S6</span><span class="p">];</span>
+<span class="c">%初始构型</span>
+<span class="n">M</span><span class="p">=[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span> <span class="p">,</span> <span class="mi">0</span> <span class="p">,</span><span class="mi">213</span><span class="p">;</span>
+    <span class="mi">0</span> <span class="p">,</span><span class="mi">1</span> <span class="p">,</span><span class="mi">0</span> <span class="p">,</span><span class="mf">267.8</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">478.95</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+<span class="c">% M=[1,0 , 0 ,327.5853;</span>
+<span class="c">%     0 ,1 ,0 ,332.8;</span>
+<span class="c">%     0,0,1,364.9;</span>
+<span class="c">%     0,0,0,1];</span>
+<span class="c">%期望构型</span>
+<span class="n">TwA</span><span class="p">=[</span><span class="nb">cos</span><span class="p">(</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="o">-</span><span class="nb">sin</span><span class="p">(</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">0</span><span class="p">,</span><span class="mi">125</span><span class="p">;</span>
+    <span class="nb">sin</span><span class="p">(</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="nb">cos</span><span class="p">(</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">0</span><span class="p">,</span><span class="mi">75</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">60</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+<span class="n">TwB</span><span class="p">=[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">85</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="nb">cos</span><span class="p">(</span><span class="o">-</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="o">-</span><span class="nb">sin</span><span class="p">(</span><span class="o">-</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">75</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="nb">sin</span><span class="p">(</span><span class="o">-</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="nb">cos</span><span class="p">(</span><span class="o">-</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">100</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+<span class="n">TwC</span><span class="p">=[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">65</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="nb">cos</span><span class="p">(</span><span class="o">-</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="o">-</span><span class="nb">sin</span><span class="p">(</span><span class="o">-</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">75</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="nb">sin</span><span class="p">(</span><span class="o">-</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="nb">cos</span><span class="p">(</span><span class="o">-</span><span class="nb">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">100</span><span class="p">;</span>
+    <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+ <span class="c">%基坐标系{s}到任务坐标系{w}的变换</span>
+  <span class="n">Tsw</span><span class="p">=[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">75</span><span class="p">;</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">300</span><span class="p">;</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">;</span>
+        <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+    <span class="n">TsA</span><span class="p">=</span> <span class="n">Tsw</span><span class="o">*</span><span class="n">TwA</span><span class="p">;</span>
+    <span class="n">TsB</span><span class="p">=</span><span class="n">Tsw</span><span class="o">*</span><span class="n">TwB</span><span class="p">;</span>
+    <span class="n">TsC</span><span class="p">=</span><span class="n">Tsw</span><span class="o">*</span><span class="n">TwC</span><span class="p">;</span>
+
+<span class="c">%参数结果</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Slist</span><span class="p">);</span>
+<span class="n">display</span><span class="p">(</span><span class="n">M</span><span class="p">);</span>
+<span class="n">display</span><span class="p">(</span><span class="n">TsA</span><span class="p">);</span>
+<span class="n">display</span><span class="p">(</span><span class="n">TsB</span><span class="p">);</span>
+<span class="n">display</span><span class="p">(</span><span class="n">TsC</span><span class="p">);</span></code></pre></div><p data-pid="rn2LRNYI">各参数结果如下</p><div class="highlight"><pre><code class="language-matlab"><span class="n">Slist</span> <span class="p">=</span>
+         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>
+         <span class="mi">0</span>    <span class="mf">1.0000</span>    <span class="mf">1.0000</span>    <span class="mf">1.0000</span>         <span class="mi">0</span>    <span class="mf">1.0000</span>
+    <span class="mf">1.0000</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">1.0000</span>         <span class="mi">0</span>
+         <span class="mi">0</span> <span class="o">-</span><span class="mf">151.9000</span> <span class="o">-</span><span class="mf">395.5500</span> <span class="o">-</span><span class="mf">395.5500</span>  <span class="mf">110.4000</span> <span class="o">-</span><span class="mf">478.9500</span>
+         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span> <span class="o">-</span><span class="mf">213.0000</span>         <span class="mi">0</span>
+         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>  <span class="mf">213.0000</span>         <span class="mi">0</span>  <span class="mf">213.0000</span>
+
+<span class="n">M</span> <span class="p">=</span>
+    <span class="mf">1.0000</span>         <span class="mi">0</span>         <span class="mi">0</span>  <span class="mf">213.0000</span>
+         <span class="mi">0</span>    <span class="mf">1.0000</span>         <span class="mi">0</span>  <span class="mf">267.8000</span>
+         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">1.0000</span>  <span class="mf">478.9500</span>
+         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">1.0000</span>
+
+<span class="n">TsA</span> <span class="p">=</span>
+    <span class="mf">0.0000</span>   <span class="o">-</span><span class="mf">1.0000</span>         <span class="mi">0</span>   <span class="mf">50.0000</span>
+    <span class="mf">1.0000</span>    <span class="mf">0.0000</span>         <span class="mi">0</span>  <span class="mf">375.0000</span>
+         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">1.0000</span>  <span class="mf">160.0000</span>
+         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">1.0000</span>
+
+<span class="n">TsB</span> <span class="p">=</span>
+    <span class="mf">1.0000</span>         <span class="mi">0</span>         <span class="mi">0</span>   <span class="mf">10.0000</span>
+         <span class="mi">0</span>    <span class="mf">0.0000</span>    <span class="mf">1.0000</span>  <span class="mf">375.0000</span>
+         <span class="mi">0</span>   <span class="o">-</span><span class="mf">1.0000</span>    <span class="mf">0.0000</span>  <span class="mf">200.0000</span>
+         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">1.0000</span>
+<span class="n">TsC</span> <span class="p">=</span>
+    <span class="mf">1.0000</span>         <span class="mi">0</span>         <span class="mi">0</span>  <span class="o">-</span><span class="mf">10.0000</span>
+         <span class="mi">0</span>    <span class="mf">0.0000</span>    <span class="mf">1.0000</span>  <span class="mf">375.0000</span>
+         <span class="mi">0</span>   <span class="o">-</span><span class="mf">1.0000</span>    <span class="mf">0.0000</span>  <span class="mf">200.0000</span>
+         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>    <span class="mf">1.0000</span></code></pre></div><p data-pid="2wuqwezi">设置误差 姿态误差eomg = 1.0E-4，位置误差 ev = 1.0E-3，调用逆解函数，计算得到ABC这3点对应的3组关节变量如下</p><p data-pid="WpkpKhMA">A点对应的关节量迭代过程及结果</p><br><img src="v2-99a13586ede6fb7cb50bbb7d2b0dde17_720w.jpg" ><p data-pid="YD1DGf4A">B点对应的关节量迭代过程及结果</p><br><img src="v2-7658982c8910188ad463fd05ad3ed07d_720w.jpg" ><p data-pid="qEq8LXF9">C点对应的关节量迭代过程及结果</p><br><img src="v2-e6de00ee53a9e950eeec1415f3c539e2_720w.jpg" ><h3>（4）运动仿真</h3><p data-pid="8emvBb_8">使用3D模型进行运动仿真，从初始位置运动到A点</p><br><img src="v2-fadf7ec28ee43f463199897849154f10.gif" ><p data-pid="Ynzwm8oF">从初始位置运动到B点</p><br><img src="v2-8fce4bf1296f22e9495794e7d4e54892.gif" ><p data-pid="eLmpyNrP">从初始位置运动到C点</p><br><img src="v2-88f633066566ea312df6658fbd443f4c.gif" ><br><img src="v2-8721a86249c728fac964faf558229ec6_720w.jpg" ><p data-pid="O6F0oPEy">参考文献</p><p data-pid="UWmXYIW3">Kenvin M. Lynch , Frank C. Park, Modern Robotics Mechanics,Planning , and Control. May 3, 2017</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
