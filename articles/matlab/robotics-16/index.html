@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>传统规划中的抖动原因</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">传统规划中的抖动原因</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/367717375 "> https://zhuanlan.zhihu.com/p/367717375  </a> 
+<p data-first-child data-pid="a8ZTA_RH">先从基础说起</p><p data-pid="9jU3m9yk">对于一个多项式，当求导次数越高，对最后一个量进行控制的时候，就可以得到品质越好的轨迹。</p><p data-pid="9adV2gYu">pos vel acc jerk snap tauque等，但是导数增加 会产生两个问题：1，控制频率提高，算法有可能造成抖动。2，响应速度降低。</p><p data-pid="5gLmlD4E">比较典型的案例</p><p data-pid="h1EpBzvB">1：3次多项式，5次多项式，会发现虽然5次曲线非常平滑，启动停止比3次顺滑不少，但是总体波动性要大于3次。</p><p data-pid="fP4GCTGv">这里直接引了“古月居”，“胡老师”的几句话，下图是5次多</p><blockquote data-pid="l5ZwUdOm"> 有一个很重要的问题就是加速度的抖动，应该就是传说中的“龙格现象”，这种抖动已经远远超过了机器人的加速度限制</blockquote><br><img src="v2-7bd8e9d96f8b1c2a754c29790aacc9a4_720w.jpg" ><p data-pid="B1ywg4Rr">下图为三次，可以看出</p><blockquote data-pid="5d6ObKUP">我们就对三次样条所产生的效果大致明白了，从位置曲线上来看，确实平滑了，速度的上升阶段接近于匀速，在最上边的匀速段稍有抖动，机器速度呈一阶线性变化。</blockquote><br><img src="v2-aaf52562f2392c33a499cb5f7b8ca3bd_720w.jpg" ><p data-pid="YaE_PPxC">2：S速度与T速度</p><p data-pid="6oAuGbvF">下图为T</p><blockquote data-pid="rMmFLa12">梯形速度曲线，也称为直线加减速或T型加减速。其算法十分简易，规划周期耗时短，有利于缩减系统的连续运行时间，从而提高系统的运动控制速度，实施起来比较容易，应用广泛。<br/>但它采用的是匀加减速，使得在加、减速阶段的起点和终点处加速度存在突变，加速度曲线不连续，使其加速、匀速和减速过程不能实现平滑过渡，存在跳跃现象，导致关节电机进行插补时产生较大的冲击</blockquote><br><img src="v2-e10a747593e69ca2b8f4ba9d42cebcf3_720w.jpg" ><p data-pid="Nb8otju8">下图为S</p><blockquote data-pid="UrSbj0uM">比T更加平滑，加速度连续。<br/>但无法达到给定最大加速度时，通过减小最大加速度约束来规划轨迹，这使得所得的轨迹通常不是最优，即在指定的参数范围内，不是时间最短的轨迹。无法达到给定最大加速度时，通过减小最大加速度约束来规划轨迹，这使得所得的轨迹通常不是最优，即在指定的参数范围内，不是时间最短的轨迹。在给定的位移较小，无法达到给定的始末速度时，该算法不能进行处理。这需要用户进行额外的处理，重新给定参数，使得轨迹存在。同时响应速度比较低。</blockquote><br><img src="v2-1b1be0f8866e07f56c7ead5a30cbdb1c_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="kPyFbbeE">以上都是基于离线规划，也就是需要靠初始状态和目标状态，计算出确定表达式来进行规划。所有参数都是一次性 预先算出然后进行插补，伪实时规划。这也是大部分机器人规划中的问题，说实时规划，其实还是离线规划参数，然后同步下发而已。</p><p data-pid="88cjqHKU">但是实际上没有考虑动态过程，如果考虑了动态过程，那么就要实时规划，所有参数都是基于状态实时产生的，这也造成了下文中说到的问题。</p><p data-pid="5IchwIqe">下面就属于动态规划</p><br><img src="v2-a09c4b85fdf58f31d1a10f5fc734d576_720w.jpg" >
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
