@@ -1,0 +1,56 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>关节/笛卡尔空间同步运动demo问题介绍</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">关节/笛卡尔空间同步运动demo问题介绍</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/369018909 ">  https://zhuanlan.zhihu.com/p/369018909 </a> 
+<p data-first-child data-pid="jOK9_3n7">最近整理完规划内容，就继续回到机器人控制上去了，再写就跑偏了。。。这部分算是完结了</p><hr/><p data-pid="wxiUgRLX">很早之前就做了同步运动，传统思路就是 基于速度预规划，基于时间同步重规划。</p><p data-pid="RgXWf9Cg">这种存在比较多的问题：</p><p data-pid="Km-Te4q_">（1）路径拼接要求比较严格，往往需要解析的计算各种过渡曲线参数，初末速度，加速度连续等。如果涉及到N条指令，那么前向后前递归修正逻辑相对复杂，当然可以把问题简单化，但是精度，速度可能无法得到提高。</p><p data-pid="MmPGlF98">（2）这种传统规划往往在动态修改期望目标的时候实时性不高，需要缓存数据，延迟周期重规划，在实时插补前，就要预先规划出各种信息。</p><p data-pid="dMWpsFJJ">（3）受限制于人为设置参数，参数设置不合理，比如末速度不合理造成的规划失败，修改了期望参数等造成拼接抖动。总之来说就是存在修改期望的可能，这对上面（1）会造成影响。</p><p data-pid="nK-y6O6g">只是简单说一下常见的问题，其实很有很多问题，都是需要在工程上解决的，比如动态调节参数等。</p><p data-pid="LxebC3AK">传统解决方案：</p><p data-pid="mcU8hpzX">（1）速度前瞻，主流方案，需要用到数据队列进行缓存，特别像动态窗口滤波，优势是精度，速度，动态性能找到一个平衡点；</p><p data-pid="7HmNbBAJ">（2）离线一次性（多次分段）规划，比如安川，发那科等示教器读取内存卡方案，他们就是一次性把所有命令导入，然后解析完成后离线运动，这种精度更高，加工场景比较多用。</p><p data-pid="h5G1Ew8-">（3）全部用t参数 基于给定时间规划，优点当然是完全可以动态实时且同步，缺点运动性能不可控，码垛搬运倒是可以试试。</p><p data-pid="T32p5suC">（4）决策规划，这种那是相当复杂，暂时不介绍了，看不懂呀。大白话就是if else判断。</p><p data-pid="VsRSocbn">（5）最优时间规划，这个说起来用到了高阶系统，有不少介绍，这里就不多说了，优势是时间相对最优，因为只要有一个关节拖后腿，那就只能说相对最优。缺点要过程约束算法比较复杂，而且有时轨迹满足约束了，但是抖动比较大。</p><p data-pid="Voo97Lez">下面是改造S基于数据同步规划，各轴之间在全局上参数上耦合，在局部插补上无耦合的规划，保证了全局同步性，而且局部动态实时性比较高，同样也适用于笛卡尔空间。针对有无函数轨迹都可以适用。</p><p data-pid="XKlVU9jT">下图是7关节空间同步规划，动态修改了4次位置，最后一次是在70S左右的时候全部终点改为0，效果还是可以的，下图分别为位置，速度，加速度。</p>
+<br><a href="https://www.zhihu.com/zvideo/1371423577384828929"> https://www.zhihu.com/zvideo/1371423577384828929 </a> 
+<br><iframe src="https://www.zhihu.com/zvideo/1371423577384828929" frameBorder="0" width="900" height="500" scrolling="auto"></iframe>
+<p data-pid="yS9hI-vd">下面是笛卡尔同步，左侧是位置，右侧是姿态。中间时刻修改了末端位姿态。</p>
+<br><a href="https://www.zhihu.com/zvideo/1371425396798316544"> https://www.zhihu.com/zvideo/1371425396798316544 </a> 
+<br><iframe src="https://www.zhihu.com/zvideo/1371425396798316544" frameBorder="0" width="900" height="500" scrolling="auto"></iframe>
+
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
