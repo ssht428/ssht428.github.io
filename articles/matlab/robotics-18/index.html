@@ -1,0 +1,153 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>SCARA MATLAB仿真代码</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">SCARA MATLAB仿真代码</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/370339148 "> https://zhuanlan.zhihu.com/p/370339148  </a> 
+<p data-first-child data-pid="aon6Pe3Y">SCARA 标准DH与改进DH 全部代码 测试 在github上</p><a href="https://github.com/OpenRobotSL/SCARA-MATLAB">https://github.com/OpenRobotSL/SCARA-MATLAB</a><p data-pid="Ccnq1_KE">标准DH</p><div class="highlight"><pre><code class="language-matlab"><span class="n">clear</span> <span class="n">all</span>
+<span class="n">clc</span> 
+<span class="c">%DH = [THETA D A ALPHA SIGMA]</span>
+<span class="n">L1</span> <span class="p">=</span> <span class="n">Link</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.25</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">L2</span> <span class="p">=</span> <span class="n">Link</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">,</span><span class="nb">pi</span><span class="p">,</span><span class="mi">0</span><span class="p">]);</span>
+<span class="c">%设置第三个关节为平移关节（改变sigma值为1），并设置关节限位0-2（移动范围）</span>
+<span class="n">L3</span> <span class="p">=</span> <span class="n">Link</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span> <span class="n">L3</span><span class="p">.</span><span class="n">qlim</span> <span class="p">=</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">2</span><span class="p">];</span>
+<span class="n">L4</span> <span class="p">=</span> <span class="n">Link</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">scara</span><span class="p">=</span><span class="n">SerialLink</span><span class="p">([</span><span class="n">L1</span> <span class="n">L2</span> <span class="n">L3</span> <span class="n">L4</span><span class="p">],</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;SCARA&#39;</span><span class="p">);</span>
+<span class="c">%scara.plot([0 0 0 0], &#39;workspace&#39;,[-0.31 0.31 -0.31 0.31 -0.31 0.31])   %显示机器人，初始q1至q4都为0</span>
+<span class="n">scara</span><span class="p">.</span><span class="n">plotopt</span><span class="p">={</span><span class="s">&#39;workspace&#39;</span><span class="p">,[</span><span class="o">-</span><span class="mf">0.5</span> <span class="mf">0.5</span> <span class="o">-</span><span class="mf">0.5</span> <span class="mf">0.5</span> <span class="o">-</span><span class="mf">0.5</span> <span class="mf">0.5</span><span class="p">]};</span><span class="c">%必须加这个必然无法画图</span>
+<span class="n">scara</span><span class="p">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">scara</span><span class="p">.</span><span class="n">teach</span> <span class="c">%打开各关节的驱动，用于调节各关节变量值,必须加L3.qlim</span></code></pre></div><p data-pid="bvBKwOos">逆解</p><div class="highlight"><pre><code class="language-matlab"><span class="k">function</span><span class="w"> </span>theta<span class="p">=</span><span class="nf">scara_ikine</span><span class="p">(</span>T<span class="p">)</span><span class="w">
+</span><span class="w"> </span><span class="n">d1</span><span class="p">=</span><span class="mi">0</span><span class="p">;</span>
+ <span class="n">L1</span><span class="p">=</span><span class="mf">0.25</span><span class="p">;</span>
+ <span class="n">L2</span><span class="p">=</span><span class="mf">0.15</span><span class="p">;</span>
+ <span class="c">%d3=0; 神缩量</span>
+ <span class="n">px</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span><span class="n">py</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span><span class="n">pz</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+ <span class="n">nx</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="n">ny</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+ <span class="n">c2</span><span class="p">=(</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="o">-</span><span class="n">L1</span>^<span class="mi">2</span><span class="o">-</span><span class="n">L2</span>^<span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">L1</span><span class="o">*</span><span class="n">L2</span><span class="p">);</span>
+ <span class="n">s2</span><span class="p">=</span><span class="nb">real</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c2</span>^<span class="mi">2</span><span class="p">));</span>
+ <span class="n">q2</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span><span class="n">c2</span><span class="p">);</span>
+ 
+ <span class="n">s1</span><span class="p">=((</span><span class="n">L1</span><span class="o">+</span><span class="n">L2</span><span class="o">*</span><span class="n">c2</span><span class="p">)</span><span class="o">*</span><span class="n">py</span><span class="o">-</span><span class="n">L2</span><span class="o">*</span><span class="n">s2</span><span class="o">*</span><span class="n">px</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="p">);</span>
+ <span class="n">c1</span><span class="p">=((</span><span class="n">L1</span><span class="o">+</span><span class="n">L2</span><span class="o">*</span><span class="n">c2</span><span class="p">)</span><span class="o">*</span><span class="n">px</span><span class="o">+</span><span class="n">L2</span><span class="o">*</span><span class="n">s2</span><span class="o">*</span><span class="n">py</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="p">);</span>
+ <span class="n">q1</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">c1</span><span class="p">);</span>
+ 
+ <span class="n">q3</span><span class="p">=</span><span class="n">d1</span><span class="o">-</span><span class="n">pz</span><span class="p">;</span>
+ 
+ <span class="n">c4</span><span class="p">=</span><span class="n">nx</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">q2</span><span class="p">)</span><span class="o">+</span><span class="n">ny</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">q2</span><span class="p">);</span>
+ <span class="n">s4</span><span class="p">=</span><span class="n">nx</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">q2</span><span class="p">)</span><span class="o">-</span><span class="n">ny</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">q2</span><span class="p">);</span>
+ <span class="n">q4</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">s4</span><span class="p">,</span><span class="n">c4</span><span class="p">);</span>
+ <span class="n">theta1</span><span class="p">=[</span><span class="n">q1</span> <span class="p">,</span><span class="n">q2</span> <span class="p">,</span><span class="n">q3</span> <span class="p">,</span><span class="n">q4</span><span class="p">];</span>
+ <span class="c">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+ <span class="n">c2</span><span class="p">=(</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="o">-</span><span class="n">L1</span>^<span class="mi">2</span><span class="o">-</span><span class="n">L2</span>^<span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">L1</span><span class="o">*</span><span class="n">L2</span><span class="p">);</span>
+ <span class="n">s2</span><span class="p">=</span><span class="o">-</span><span class="nb">real</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c2</span>^<span class="mi">2</span><span class="p">));</span>
+
+ <span class="n">q2</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span><span class="n">c2</span><span class="p">);</span>
+ 
+ <span class="n">s1</span><span class="p">=((</span><span class="n">L1</span><span class="o">+</span><span class="n">L2</span><span class="o">*</span><span class="n">c2</span><span class="p">)</span><span class="o">*</span><span class="n">py</span><span class="o">-</span><span class="n">L2</span><span class="o">*</span><span class="n">s2</span><span class="o">*</span><span class="n">px</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="p">);</span>
+ <span class="n">c1</span><span class="p">=((</span><span class="n">L1</span><span class="o">+</span><span class="n">L2</span><span class="o">*</span><span class="n">c2</span><span class="p">)</span><span class="o">*</span><span class="n">px</span><span class="o">+</span><span class="n">L2</span><span class="o">*</span><span class="n">s2</span><span class="o">*</span><span class="n">py</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="p">);</span>
+ <span class="n">q1</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span><span class="n">c1</span><span class="p">);</span>
+ 
+ <span class="n">q3</span><span class="p">=</span><span class="n">d1</span><span class="o">-</span><span class="n">pz</span><span class="p">;</span>
+ 
+ <span class="n">c4</span><span class="p">=</span><span class="n">nx</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">q2</span><span class="p">)</span><span class="o">+</span><span class="n">ny</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">q2</span><span class="p">);</span>
+ <span class="n">s4</span><span class="p">=</span><span class="n">nx</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">q2</span><span class="p">)</span><span class="o">-</span><span class="n">ny</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">q2</span><span class="p">);</span>
+ <span class="n">q4</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">s4</span><span class="p">,</span><span class="n">c4</span><span class="p">);</span>
+ 
+ <span class="n">theta2</span><span class="p">=[</span><span class="n">q1</span> <span class="p">,</span><span class="n">q2</span> <span class="p">,</span><span class="n">q3</span> <span class="p">,</span><span class="n">q4</span><span class="p">];</span>
+<span class="c">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="n">theta</span><span class="p">=[</span><span class="n">theta1</span><span class="p">;</span><span class="n">theta2</span><span class="p">];</span>
+<span class="k">end</span></code></pre></div><p class="ztext-empty-paragraph"><br/></p><p data-pid="4XpWTGIV">改进DH</p><div class="highlight"><pre><code class="language-matlab"><span class="n">clear</span> <span class="n">all</span><span class="p">;</span>
+<span class="n">clc</span><span class="p">;</span>
+<span class="c">%        theta    d           a-1        alpha-1    phi,0转动1移动</span>
+<span class="n">L</span><span class="p">(</span><span class="mi">1</span><span class="p">)=</span><span class="n">Link</span><span class="p">([</span><span class="mi">0</span>       <span class="mi">0</span>     <span class="mi">0</span>          <span class="mi">0</span>           <span class="mi">0</span>          <span class="p">],</span><span class="s">&#39;modified&#39;</span><span class="p">);</span> 
+<span class="n">L</span><span class="p">(</span><span class="mi">2</span><span class="p">)=</span><span class="n">Link</span><span class="p">([</span><span class="mi">0</span>       <span class="mi">0</span>     <span class="mf">0.25</span>          <span class="mi">0</span>         <span class="mi">0</span>     <span class="p">],</span><span class="s">&#39;modified&#39;</span><span class="p">);</span>
+<span class="n">L</span><span class="p">(</span><span class="mi">3</span><span class="p">)=</span><span class="n">Link</span><span class="p">([</span><span class="mi">0</span>       <span class="mi">0</span>     <span class="mf">0.15</span>     <span class="nb">pi</span>           <span class="mi">1</span>         <span class="p">],</span><span class="s">&#39;modified&#39;</span><span class="p">);</span>
+<span class="n">L</span><span class="p">(</span><span class="mi">4</span><span class="p">)=</span><span class="n">Link</span><span class="p">([</span><span class="mi">0</span>       <span class="mi">0</span>     <span class="mi">0</span>        <span class="mi">0</span>            <span class="mi">0</span>        <span class="p">],</span><span class="s">&#39;modified&#39;</span><span class="p">);</span>
+                 
+<span class="n">scara</span><span class="p">=</span><span class="n">SerialLink</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;SCARA&#39;</span><span class="p">);</span><span class="n">L</span><span class="p">(</span><span class="mi">3</span><span class="p">).</span><span class="n">qlim</span> <span class="p">=</span> <span class="p">[</span><span class="mi">0</span> <span class="mf">0.5</span><span class="p">];</span>
+<span class="c">%scara.plot([0 0 0 0], &#39;workspace&#39;,[-0.31 0.31 -0.31 0.31 -0.31 0.31])   %显示机器人，初始q1至q4都为0</span>
+<span class="n">scara</span><span class="p">.</span><span class="n">plotopt</span><span class="p">={</span><span class="s">&#39;workspace&#39;</span><span class="p">,[</span><span class="o">-</span><span class="mf">0.5</span> <span class="mf">0.5</span> <span class="o">-</span><span class="mf">0.5</span> <span class="mf">0.5</span> <span class="o">-</span><span class="mf">0.5</span> <span class="mf">0.5</span><span class="p">]};</span><span class="c">%必须加这个必然无法画图</span>
+<span class="n">scara</span><span class="p">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">scara</span><span class="p">.</span><span class="n">teach</span> <span class="c">%打开各关节的驱动，用于调节各关节变量值,必须加L3.qlim</span>
+<span class="n">T</span><span class="p">=</span><span class="n">scara</span><span class="p">.</span><span class="n">fkine</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">function</span><span class="w"> </span>theta<span class="p">=</span><span class="nf">nijie</span><span class="p">(</span>T<span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="n">l1</span><span class="p">=</span><span class="mf">0.25</span><span class="p">;</span>
+<span class="n">l2</span><span class="p">=</span><span class="mf">0.15</span><span class="p">;</span>
+<span class="n">nx</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">ny</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">nz</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">ox</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">oy</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">oz</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">ax</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+<span class="n">ay</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+<span class="n">az</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+<span class="n">px</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">py</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">pz</span><span class="p">=</span><span class="n">T</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+<span class="nb">angle</span><span class="p">=[];</span>
+<span class="c">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="n">r</span><span class="p">=</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="p">);</span>        
+<span class="n">A</span><span class="p">=(</span><span class="n">l1</span>^<span class="mi">2</span><span class="o">-</span><span class="n">l2</span>^<span class="mi">2</span><span class="o">+</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="o">*</span><span class="n">r</span><span class="p">);</span>
+<span class="n">fi</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">px</span><span class="p">,</span><span class="n">py</span><span class="p">);</span>
+<span class="n">q1</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">A</span>^<span class="mi">2</span><span class="p">))</span><span class="o">-</span><span class="n">fi</span><span class="p">;</span>
+<span class="n">q2</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">fi</span><span class="p">),</span><span class="n">r</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">fi</span><span class="p">)</span><span class="o">-</span><span class="n">l1</span><span class="p">);</span>
+<span class="n">d3</span><span class="p">=</span><span class="o">-</span><span class="n">pz</span><span class="p">;</span>
+<span class="n">q4</span><span class="p">=</span><span class="o">-</span><span class="nb">atan2</span><span class="p">(</span><span class="o">-</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="o">*</span><span class="n">nx</span><span class="o">+</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="o">*</span><span class="n">ny</span><span class="p">,</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="o">*</span><span class="n">nx</span><span class="o">+</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="o">*</span><span class="n">ny</span><span class="p">)</span><span class="o">+</span><span class="n">q2</span><span class="p">;</span>
+  <span class="n">theta1</span><span class="p">=[</span><span class="n">q1</span><span class="p">,</span><span class="n">q2</span><span class="p">,</span><span class="n">d3</span><span class="p">,</span><span class="n">q4</span><span class="p">];</span>
+<span class="c">%%%%%%%%%%%%%%%%%        </span>
+<span class="n">r</span><span class="p">=</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="p">);</span>        
+<span class="n">A</span><span class="p">=(</span><span class="n">l1</span>^<span class="mi">2</span><span class="o">-</span><span class="n">l2</span>^<span class="mi">2</span><span class="o">+</span><span class="n">px</span>^<span class="mi">2</span><span class="o">+</span><span class="n">py</span>^<span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="o">*</span><span class="n">r</span><span class="p">);</span>
+<span class="n">fi</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">px</span><span class="p">,</span><span class="n">py</span><span class="p">);</span>
+<span class="n">q1</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="o">-</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">A</span>^<span class="mi">2</span><span class="p">))</span><span class="o">-</span><span class="n">fi</span><span class="p">;</span>
+<span class="n">q2</span><span class="p">=</span><span class="nb">atan2</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">fi</span><span class="p">),</span><span class="n">r</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="o">+</span><span class="n">fi</span><span class="p">)</span><span class="o">-</span><span class="n">l1</span><span class="p">);</span>
+<span class="n">d3</span><span class="p">=</span><span class="o">-</span><span class="n">pz</span><span class="p">;</span>
+<span class="n">q4</span><span class="p">=</span><span class="o">-</span><span class="nb">atan2</span><span class="p">(</span><span class="o">-</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="o">*</span><span class="n">nx</span><span class="o">+</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="o">*</span><span class="n">ny</span><span class="p">,</span><span class="nb">cos</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="o">*</span><span class="n">nx</span><span class="o">+</span><span class="nb">sin</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="o">*</span><span class="n">ny</span><span class="p">)</span><span class="o">+</span><span class="n">q2</span><span class="p">;</span>             
+ <span class="n">theta2</span><span class="p">=[</span><span class="n">q1</span><span class="p">,</span><span class="n">q2</span><span class="p">,</span><span class="n">d3</span><span class="p">,</span><span class="n">q4</span><span class="p">];</span>
+<span class="c">%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+ <span class="n">theta</span><span class="p">=[</span><span class="n">theta1</span><span class="p">;</span><span class="n">theta2</span><span class="p">];</span>
+<span class="k">end</span></code></pre>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
