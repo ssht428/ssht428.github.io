@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>入门直线圆弧姿态规划matlab demo</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">入门直线圆弧姿态规划matlab demo</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href=" https://zhuanlan.zhihu.com/p/375617837"> https://zhuanlan.zhihu.com/p/375617837  </a> 
+<br><a href="#TOTG">时间最优轨迹（资料）</a>
+<br><a href="https://github.com/OpenRobotSL/dynamic_newton"> 牛顿欧拉动力学C++ DEMO </a> 
+<p data-first-child data-pid="C-Q4gMi7">代码在GIT里面。</p><a target="_blank" href="https://github.com/OpenRobotSL/Line_Circle_Slerp" >https://github.com/OpenRobotSL/Line_Circle_Slerp</a><p data-pid="yDsyscxc">速度规划</p><a target="_blank" href="https://github.com/OpenRobotSL/TrajectoryPlanning">https://github.com/OpenRobotSL/TrajectoryPlanning</a><p data-pid="LO5kQ3W7">直线圆弧姿态方法是一样的。</p><p data-pid="n4l-Zmpo">框架是：建立直线圆弧姿态方程，归一化参数，建立出位移与坐标关系。通过对位移量（距离）进行规划，得到相应坐标，那么线速度角速度就是满足速度规划要求的运动。</p><p data-pid="4wb4n4lN">同样通过对位移量（始终为正数）进行实时规划会更加简单，不用考虑反转+-0切换等问题。比较适合机械臂基础指令运动。</p><p data-pid="A-VKu9CL">大家可自行修改实现下连续更改位移量进行规划（GIT没有给出DEMO），比我之前做的更加稳定，当然也有很大缺点，约束不严格同步不好做等。</p><br><img src="v2-a79cdeddaba57e0149e64d69c5ace17f_720w.jpg">
+<h2> 机械臂人机交互中过约束问题 </h2>
+<p>留坑。。。。问题描述：传统离线规划不具备实时响应能力。实时规划又是基于约束来做的，如果人机交互中出现过约束后如何在线实时处理?</p><p data-pid="8TISjAP4">下图举例，过约束后最短时间恢复原有约束运动状态</p><br><img src="v2-cdad3bc735ef37864bc358eda1842b15_720w.jpg">
+<h2> 连续变约束规划问题 </h2>
+<p data-first-child data-pid="Zh0tWVkB">问题描述：</p><p data-pid="5KiqaWey">传统规划存在问题，当超出约束后规划失败，或者出现，加速度、速度，跳变。</p><p data-pid="0krDDSes">比如a0=10，但是amax=5，此时规划最大a只能到5，从10如何变到5？</p><p data-pid="1bgjrzDd">标准S只支持初始化a=0，那么必然会出现跳变or失败。</p><p data-pid="gVKTHJSB">改进S支持a~=0,但是换向比较麻烦。</p><p data-pid="E2kp_vR8">当在运行过程中改变约束后，如果还满足限制，那么速度不是最优，因为达不到新约束下的极限。</p><p data-pid="xPsMcGtb">由此引申出改进算法</p><p data-pid="yuEt59rS">下图：1解决过约束问题，2解决时变约束问题，3解决初始状态可任意问题</p><p data-pid="ykymKUUb">解决过约束相当于你开车 路过学校路段，发现超速了，那么就要进行减速，满足交通规则，必要情况遇见，斑马线（急停按钮），可急停。</p><p data-pid="YN7vpqnF">解决时变约束问题相当于 你开车，上了高速，或者从高速下车，那么就要按照当前限速最大来跑。这里变约束很大概率与负载相关，引申出很多关节负载约束算法。</p><p data-pid="MyiyPV3O">解决初始状态问题相当于 开车前方路线被堵住，而需要绕道，那么如何实现不停车，打转向灯绕路问题。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-a86668f55c9e9a7396fd8126d0985938_720w.jpg">
+<h2> 变时间（动力学）最优规划问题测试 </h2>
+<p data-first-child data-pid="11523yLk">目前算法测试 到 最后两个算法</p><p data-pid="1KiBxZcQ">一个是时间强约束算法，一个是实时动力学约束时间最优算法</p><p data-pid="-MqVCTP7">难度也是最高得两个实时规划算法，比之前所有算法难度是高不少，每多一个约束规划考虑的因素并不是线性增加。目前实时动力学框架基本完成，测试有点问题。</p><p data-pid="kovsj1jK">动力学简单说下，需要用到目标函数求最小时间，约束就是实时动力学，难点在构造目标函数和路径转化能量上。进而求出最优控制量，进行关节运动控制。</p><p data-pid="RicIXgkt">对于时间做为强约束，因为按照理论来讲速度规划存在一个最小时间，那么理论讲，如果约束不变，增加时间，理论是可行得。但是实际会存在精度问题等规划失败，实时误差补偿等问题也是要考虑得，这部分在数控规划中基本有比较成熟得解决方案，我之前也做过相关数控规划DEMO。</p><p data-pid="vQ_WJdRO">基于上面简单原理，通过拉长时间使规划成功。</p><p data-pid="JWuKfDB6">下面分别是T=30s T=18s 下 所有约束一致，初始，结束状态，持续约束状态等。</p><p data-pid="UjUdDrtg">可以看到可以成功。</p><br><img src="v2-e00ab7517e998d769e542440951af049_720w.jpg">
+<br><img src="v2-c199efbcafeac9bfcb930da0b0089298_720w.jpg">
+<h2> 连续多点最优速度规划 </h2>
+<p data-first-child data-pid="uVBCkGxc">最近论文盲审，没有时间写东西，之后陆陆续续介绍我论文中用到的一些工程方法</p><p data-pid="dEXd8mC1">下图为关节空间连续10个路径点的同步最优速度规划，这里的最优速度指的是保证前后两条指令运动相对平滑，不至于出现速度较大震荡，从速度曲线来康，基本保证了多轴在每一个运动段都尽量是匀速，无法保证的则至少保证速度不会出现震荡变化。</p><p data-pid="nc0bsNOU">具体原理：待补坑，论文盲审中。</p><br><img src="v2-ee6723a8df82744ed89ccbb632cde558_720w.jpg"><br><img src="v2-704e05af786af27efdfdfafb44dd7739_720w.jpg"><br><img src="v2-f2f833ec32f9e9990ed508d99e4b170d_720w.jpg"><br><img src="v2-dc71fbb77224b1e4f3f6efd019bc56f6_720w.jpg">
+<h2> 运动学库 综合测试问题 </h2>
+<p data-first-child data-pid="Z86aZOAP">结合之前几个简单介绍的 规划问题，做了个动态测试。效果还是可以的。</p><p data-pid="BGsiHWXp">第一段是超出约束如何柔性回归约束区间。</p><p data-pid="dimAuwNY">第二段在要求时间最优状态下到目标位置，也就是以最大极限状态运行。</p><p data-pid="2AiF_cNh">第三段，时间做为强约束，迫使速度加速度等修改来符合时间规划要求。</p><br><img src="v2-fb22dd522df0e33bd012252aec63179e_720w.jpg"><p data-pid="LnpwTCte">在做此类规划问题的时候，核心点是通过对目标位置的不断计算，生成当前状态下最优规划量，不断通过加速度，速度，位置公式 计算新的状态与目标状态误差，辅助人为添加约束条件，就可产生目标下最优解。</p>
+<h2> 时间圆整，误差精度问题分析 </h2>
+<p data-first-child data-pid="3N2GQr9B">前排提示：没有任何一种算法是通用算法，必须针对使用场景来做适配，所以本文会通过最周两个图说明这一点~！</p><p data-pid="nk8cJb_k">首先给出一组规划数据</p><p data-pid="fAbUG8VZ">as=-1;vs=1;p0=1;  初始约束</p><p data-pid="oS_lfAnu">ve=-1;ae=1;pe=-5; 终止约束</p><p data-pid="iUVPLIE0">vlimit=[-100,100]； 速度约束</p><p data-pid="N-eve0T4">alimit=[-11,10]; 加速度约束</p><p data-pid="20NSKQDE"> jerklimit=[-50,50]; 加加速度约束</p><p data-pid="9u_BJ68d">timelimit=1.6956s; 时间约束</p><p data-pid="yxm1Vf5K">对于我们常用上层控制器来说，一般最低控制周期也就是1KHZ，如果是国外机械臂一般最高 也就提供125-250HZ频率。</p><p data-pid="j13Oh0R6">按照1KHZ 也就是0.001S来进行插补看。会存在2个比较明显得问题。</p><p data-pid="fnG5sfdr">1：</p><p data-pid="u6E354yf">timelimit=1.6956s 貌似缺少6*1e-4 这一项。因为dt=1ms 无法获取。</p><p data-pid="Fh4GIn1v">2：</p><p data-pid="n35nYOYA">由于我们要严格保证整个过程都满足约束，所以会出现当我们要到达速度，加速度极限得时候，如果此时vt=99.9999,而at=10, 那么如果按照dt=0.001  ,  dv=a*dt=0.01.</p><p data-pid="ZDD7v3oz">vt+1=100.0099 超越速度极限。</p><p data-pid="pgDHLH_J">对于问题1，按照时间累加 t=t+dt直接把最后一个插补周期时间改成t=timelimit=1.6956s</p><p data-pid="Co-HDJfy">的确可以保证末端满足，但是无法保证中间过程满足。也就是问题2</p><p data-pid="44WjmmJK">对于问题2，如果保证中间过程满足，当v&gt;vmax,强制v=vmax，那么相当于修改了位移，速度叠加，那么dt没变，就会造成误差累积，因为p=p+v*dt  v=v+a*dt,直接影响后面积分。</p><p data-pid="XaVJ-ail">由此引申出第三个问题，插补步数是否严格执行多少s，就有多少步数，10s 为10/dt步</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="vfYm-lHr">首先对于timelimit=1.6956s</p><p data-pid="jhXx9c4e">原始不考虑补偿，一共1695步数，少了6那一步，所以位移没到最后期望-5</p><br><img src="v2-0056f4899e6a765fe18353bb38e979bf_720w.jpg" ><p data-pid="IhsRIx_D">如果采用插补时间赋值，控制末端误差，发现末端误差消掉了，但是步数没变，其实还是缺少6那一步，同时会造成速度突变，你想想 如果误差为0.0009 相当于最后走了两个步长。</p><br><img src="v2-d35b4666618ef6e579c8849a19ef45a1_720w.jpg" ><p data-pid="npl08GPQ">再来看下中间过程约束，已经超了加速度约束。</p><br><img src="v2-40ca4b6c3776f97be0bd578f7a1d7f28_720w.jpg" ><hr/><p data-pid="CL14DHWk">那么为了解决以上问题，需要多个方面进行控制和补偿，由此提出一种伪在线补偿技术，由用户设置松约束和硬约束</p><p data-pid="VurrfeDp">1 解决速度超限问题，不会超过-10得速度约束，因为时间为软约束，时间变化保过程</p><br><img src="v2-042953b374336ecf7a962c20f2e4c4df_720w.jpg" ><br><img src="v2-ce6ba144c0ae112b55c3f7baa307497d_720w.jpg" ><p data-pid="JBGHf7Np">2，过程变化保时间, timelimit=1.6956s; 补偿一步插补变成1.696，同时不影响末端位移和速度。</p><br><img src="v2-283daaba1e52a2c15a6c9d8825b026c2_720w.jpg" ><br><img src="v2-a39f22564c68cdd942e5b59921a82b96_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="Sz8KmWSR">以下就是两种情况，保时间适用于节拍控制，保过程适用于最优控制</p><p data-pid="rnlIpwxt">最终保时间得优化曲线</p><br><img src="v2-02ed27674c5d657683444f110d85e291_720w.jpg" ><p data-pid="w4h7sZSc">最终保过程得优化曲线</p><br><img src="v2-20d386f7acf04d7373512514a75827a4_720w.jpg" >
+<br><div id="TOTG"><strong>时间最优轨迹（资料）</strong></div>
+<p data-first-child data-pid="ujY4sOjP">TOTG算法——Time-Optimal Trajectory Generation</p><p data-pid="PHNoRwP7">论文及源码地址：<a href="https://www.golems.org/projects/traj.html" >https://www.golems.org/projects/traj.html</a></p><blockquote data-pid="kNCE08ro">As a side note, the algorithm described in “Time-Optimal Trajectory Generation for Path<br/>Following with Bounded Acceleration and Velocity” by Tobias Kunz and Mike Stilman is available as C++ code at <a href="https://github.com/tobiaskunz/trajectories" >https://github.com/tobiaskunz/trajectories</a>. It has no dependencies except Eigen and is thus very easy to integrate. I used it as alternative to IPTP and was very content with computation time and resulting trajectories.</blockquote><h3>IPTP算法——Iterative Parabolic Time Parameterization</h3><p data-pid="nDcPSMo1">算法原理：<a href="https://github.com/quangounet/TOPP" >TOPP</a>（后有改进版本<a href="https://github.com/hungpham2511/toppra" >TOPP-RA</a>），链接中有源码及论文地址。</p><h3>IPTP算法另一种<a href="https://github.com/ros-planning/moveit/pull/382" >Improved IPTP by fitting a cubic spline</a></h3><p data-pid="u9oQbOjR">源码地址：<a href="https://github.com/ros-planning/moveit/tree/master/moveit_core/trajectory_processing/src" >https://github.com/ros-planning/moveit/tree/master/moveit_core/trajectory_processing/src</a><br/>目前没有找到论文，有个算法描述：</p><blockquote data-pid="IpCQNkxb">This class sets the timestamps of a trajectory to enforce velocity, acceleration constraints.Initial/final velocities and accelerations may be specified in the trajectory.Velocity and acceleration limits are specified in the model.<br/>This algorithm repeatedly fits a cubic spline, adjusts the timing intervals,and repeats until all constraints are satisfied.When finished, each trajectory waypoint will have the time set,as well as the velocities and accelerations for each joint.Since we fit to a cubic spline, the position, velocity, and acceleration will be continuous and within bounds.The jerk will be discontinuous.<br/>To match the velocity and acceleration at the endpoints,the second and second-last point locations need to move.By default, two extra points are added to leave the original trajectory unaffected.If points are not added, the trajectory could potentially be faster,but the 2nd and 2nd-last points should be re-checked for collisions.<br/>Migration notes: If migrating from Iterative Parabolic Time Parameterization,be aware that the velocity and acceleration limits are more strictly enforcedusing this technique.This means that time-parameterizing the same trajectory with the samevelocity and acceleration limits, will result in a longer trajectory.If this is a problem, try retuning (increasing) the limits.</blockquote><p data-pid="hsSQr0Ne">此类设置轨迹的时间戳以强制执行速度，加速度约束。可以在轨迹中指定初始/最终速度和加速度。在模型中指定速度和加速度极限。</p><p data-pid="NCBxOGmb">该算法反复拟合三次样条，调整时间间隔，并重复执行直到满足所有约束。完成后，每个轨迹航路点都会设置时间以及每个关节的速度和加速度。样条曲线，位置，速度和加速度将是连续的并且在范围之内。</p><p data-pid="F1DHgqhQ">为了使端点处的速度和加速度匹配，倒数第二个和第二个点的位置需要移动。默认情况下，会添加两个额外的点以使原始轨迹不受影响(这个地方就是三次样条插值的第四种情况：指定初始、最终速度和加速度)。如果不添加点，则轨迹可能会更快，但应该再次检查倒数第二和倒数第二点。</p><p data-pid="sNPBbJH9">迁移注意事项：如果要从迭代抛物线时间参数化进行迁移，请注意，使用此技术会更严格地强制执行速度和加速度限制，这意味着对具有相同速度和加速度限制的同一轨迹进行时间参数化将导致更长的轨迹。这是一个问题，请尝试调整（增加）限制。</p><p data-pid="WHJ4EL6s">质量很高的相关博客：<a href="https://blog.csdn.net/Kalenee/article/details/95889898">ROS进阶——运动规划分析</a><br/><a href="https://github.com/ros-planning/moveit/pull/1365"> 这个链接</a>有三种算法实现效果的简单对比。</p>
+
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
