@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>自写串联机械臂通用逆运动学算法（类IKFAST思路）</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">自写串联机械臂通用逆运动学算法（类IKFAST思路）</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href=" https://zhuanlan.zhihu.com/p/391599810"> https://zhuanlan.zhihu.com/p/391599810  </a> 
+<p data-first-child data-pid="oSiooYms">最近在看一些基础东西的时候突然想到之前没解决的问题，一直在思考ikfast得实现方法或者逻辑，看了不少介绍分析都没有很明确的解释。</p><p data-pid="YeuU7ku6">所以汇总了下有了一些想法，试着按照最多人理解的根据URDF也就是模型来生成算法，那么就说明并不是传统意义上的解析法（啥公式通用啊）和数值法（虽然依赖模型，但是通用啊一套公式，人家可是每次都是不同配置呀）。结合波士顿动力之前的讲座，他们运用的结构模型约束，感觉就是这类问题，所以方向就大体也定了从机械结构数学来分析。</p><p data-pid="vsb51Qni">于是我基本按照这种想法进行求解和配置。</p><p data-pid="gkWGneRY">先说明，解析精度高最快不通用。数值不稳定不加优化大概率失败实时性差。IKFAST很多时候慢非最优无解，KDL就是普通数值毛病，trackik有误差。</p><p data-pid="-RIvlCzi">经过苦逼2天尝试，至少6-7轴目前稳定，任意机械臂状态下都可以找到解。用franka panda测试效果还不错，1MS稳定求解，算法内置各种优化方案比较通用比如冗余等，最优解等，这样速度会降低一些没有一个准确时间。目前有个比较大的缺点，比如UR，工业构型，理论是有8组以上的解，但是用自写算法，只返回一组最优的，如果增加配置约束，需要时间比较长才能求解出其他解，暂时没有想法解决，通过工程倒是可以提速，但是没意义还不如直接解析。</p><p data-pid="ZHE2wNml">之后稳定封装出来哈。暂时不开源源码和原理。(UR,IIWA,FRANKA,PUMA,SWAYER,KINOVA6-7dof5DOF,4DOF,测试没问题，但是结构七里八拐，DOF越多时间越慢，理论是支持人体双足，四足这种 单条链条结构)</p><p data-pid="6hLxtgrn">FRANKA PANDA 7DOF</p><a target="_blank" href="https://www.zhihu.com/zvideo/1400960683140333568">https://www.zhihu.com/zvideo/1400960683140333568</a><p data-pid="mTCoAQNf">优化求解，初始期望是连杆干涉得，求解后找到一个不碰撞得构型</p><br><img src="v2-c7bc9c0da297baa1eb44fc96c20f19ef_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-18bcdb1b59cced2be5b0197a95990854_720w.jpg" ><p data-pid="T4_wI1J6">Swayer 7DOF</p><br><img src="v2-72e48c7f0d14337a626b336c2e2e9cb9_720w.jpg" ><p data-pid="7xovlBTc">5DOF 大部分四足用的机械臂，这个ik fast问题会很多 目前自写求解比较稳定</p><br><img src="v2-0f7de6ee7117fd4bfb706e0d68cb4131_720w.jpg" ><p data-pid="iDmKyCfB">Kinova 6DOF</p><br><img src="v2-5f092ab02c66cd95f1a425d7539feb1d_720w.jpg" >
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
