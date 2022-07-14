@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>驱动器控制模式功能简介（CSP，CSV，CST等）</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">驱动器控制模式功能简介（CSP，CSV，CST等）</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/359332250 ">  https://zhuanlan.zhihu.com/p/359332250 </a> 
+<h2 data-first-child>周期同步位置模式（csp）</h2><p data-pid="myba3TYr">周期同步位置模式下，上位控制器完成位置指令规划，然后将规划好的目标位置 607Ah 上以周期性同步的方式发送给伺服驱动器，位置、速度、转矩控制由伺服驱动器内部完成<br/></p><br><img src="v2-e0d133712a1ab9f642cc26828adc6914_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h2>周期同步速度模式（csv）</h2><p data-pid="y630JC_d">周期同步速度模式下，上位控制器将计算好的目标速度 60FF 周期性同步的发送给伺服驱动器，速度、转矩调节由伺服内部执行。<br/></p><br><img src="v2-32acaada18143b79e2bee2099c23b1c8_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h2>周期同步转矩模式（cst）</h2><p data-pid="igc3_o0l">此模式下，上位控制器将计算好的目标转矩 6071h 周期性同步的发送给伺服驱动器，转矩调节由伺服内部执行。当速度达到限幅值后将进入调速阶段<br/></p><br><img src="v2-bb548273338cab386f89b5be76057cbf_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h2>轮廓位置模式（pp）</h2><p data-pid="-3ZwUNtt">此模式主要用于点对点定位应用。此模式下，上位机给目标位置 ( 绝对或者相对 )、位置曲线的速度、加减速及减速度，伺服内部的轨迹发生器将根据设置生成目标位置曲线指令，驱动器内部完成位置控制，速度控制，转矩控制<br/></p><br><img src="v2-472a4a3535f64a07478f24a3b4042e00_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h2>轮廓速度模式（pv）</h2><p data-pid="EZ-CGxjn">此模式下，上位控制器将目标速度、加速度、减速度发送给伺服驱动器，速度、转矩调节由伺服内部执行<br/></p><br><img src="v2-8861ed84b8b2a6c8d67fc5c485867d10_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h2>轮廓转矩模式（pt）</h2><p data-pid="-jvO42OI">此模式下，上位控制器将目标转矩 6071h、转矩斜坡常数 6087h 发送给伺服驱动器，转矩调节由伺服内部执行。当速度达到限幅值将进入调速阶段。<br/></p><br><img src="v2-e71d745c91620f1556607fd9b5c7e318_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h2>原点回归模式 (hm)</h2><p data-pid="tZBD7kyM">原点回零模式用于寻找机械原点，并定位机械原点与机械零点的位置关系。<br/></p><br><img src="v2-f35b4bc0916a4536970acd0443cecb5a_720w.jpg" >
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
