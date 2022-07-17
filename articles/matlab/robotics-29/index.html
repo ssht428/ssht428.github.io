@@ -1,0 +1,215 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>四足机器人建模/动态蜘蛛四足仿真</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">四足机器人建模/动态蜘蛛四足仿真</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/290641155 "> https://zhuanlan.zhihu.com/p/290641155  </a> 
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/312004092 "> https://zhuanlan.zhihu.com/p/312004092  </a> 
+<p data-first-child data-pid="RI4davJU">      首先！不建议用matlab做足式机器人仿真。。。学点理论还是可以的。。</p><p data-pid="dnHOXEL9">我们的目标是制造一个四条腿行走的机器人。我们从创建一个三轴机器人开始</p><p data-pid="FH6X5Gc1">我们用胳膊作为腿，为这条腿规划一条适合行走的轨迹，还有</p><p data-pid="hVUAyoU1">然后实例化这条腿的四个实例来创建行走机器人。</p><p data-pid="L49Z3dkK">       在运动学上，机器人腿很像机器人手臂。 对于这种应用，三个关节串联机械手是足够的，因为脚与地面有点接触，方向不重要。 确定Denavit-Hartenberg参数，即使是这样一个简单的机器人，也是一个涉及的过程，零角偏移需要在一个单独的步骤中确定。 第一关节将是髋关节运动，向前和向后，这是围绕z轴或Rz(Q1)旋转)。 第二个关节是髋关节上下运动，这是围绕x轴，Rx(Q2)旋转)。 这些构成球形髋关节，因为旋转轴相交。 膝盖由L1在y方向或Ty(L1)翻译)。 第三个关节是膝关节运动，朝向和远离身体，这是Rx(Q3)。 脚由L2在z方向或Tz(L2)翻译)。 因此，该机器人从臀部到脚趾的变换序列是Rz(Q1)Rx(Q2)Ty(L1)Rx(Q3)Tz(L2)。</p><br><img src="v2-031fbfe5ae5bc50fdba4d129e4613770_720w.jpg" ><p data-pid="0VfHuIip">下面式命令</p><div class="highlight"><pre><code class="language-text">&gt;&gt; s = &#39;Rz(q1) Rx(q2) Ty(L1) Rx(q3) Tz(L2)&#39;;
+&gt;&gt; dh = DHFactor(s) 
+DH(q1+90, 0, 0, 90).DH(q2, 0, L1, 0).DH(q3-90, 0, -L2, 0) 
+.Rz(+90).Rx(-90).Rz(-90)
+ &gt;&gt; dh.tool 
+ans = 
+trotz(pi/2)* trotx(-pi/2)*trotz(-pi/2)
+&gt;&gt; dh.command(&#39;leg&#39;) 
+ans = 
+SerialLink([0, 0, 0, pi/2, 0; 0, 0, L1, 0, 0; 0, 0, -L2, 0, 0; ], 
+ &#39;name&#39;, &#39;leg&#39;, &#39;base&#39;, eye(4,4), 
+ &#39;tool&#39;, trotz(pi/2)*trotx(-pi/2)*trotz(-pi/2), 
+ &#39;offset&#39;, [pi/2 0 -pi/2 ])
+&gt;&gt; L1 = 0.1; L2 = 0.1; 
+&gt;&gt; leg = eval( dh.command(&#39;leg&#39;) ) </code></pre></div><p data-pid="R3kH-lBn">建模完毕</p><br><img src="v2-d5df84a4ff93b814edd0d9e44614386e_720w.jpg" ><div class="highlight"><pre><code class="language-text">%对于零关节角度，脚处于
+&gt;&gt; transl( leg.fkine([0,0,0]) ) 
+ans = 
+ 0 0.1000 0.1000 
+%画出零位机器人
+&gt;&gt; leg.plot([0,0,0], &#39;nobase&#39;, &#39;noshadow&#39;, &#39;notiles&#39;) 
+&gt;&gt; set(gca, &#39;Zdir&#39;, &#39;reverse&#39;); view(137,48);</code></pre></div><br><img src="v2-d09dc9b839693742b4aaae02018ab62a_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="ez5X0p9j">四条腿开始</p><div class="highlight"><pre><code class="language-text">clear all
+%leg length 
+L1=0.1;L2=0.1;
+%form a leg 
+leg=SerialLink([0, 0, 0, pi/2; 0, 0, L1, 0; 0, 0, -L2, 0 ],...
+    &#39;name&#39;, &#39;leg&#39;, &#39;base&#39;, eye(4,4),&#39;tool&#39;, ...
+    trotz(pi/2)*trotx(-pi/2)*trotz(-pi/2),&#39;offset&#39;, [pi/2  0  -pi/2]);
+% %diplay the leg 
+%leg.plot([0 0 0],&#39;nobase&#39;,&#39;noshadow&#39;);
+% set(gca,&#39;Zdir&#39;,&#39;reverse&#39;);view(137,48);
+%body wide and length
+W = 0.1; L = 0.2;
+%form a body
+legs(1) = SerialLink(leg, &#39;name&#39;, &#39;leg1&#39;);
+legs(2) = SerialLink(leg, &#39;name&#39;, &#39;leg2&#39;, &#39;base&#39;, transl(-L, 0, 0));
+legs(3) = SerialLink(leg, &#39;name&#39;, &#39;leg3&#39;, &#39;base&#39;, transl(-L, -W, 0)*trotz(pi));
+legs(4) = SerialLink(leg, &#39;name&#39;, &#39;leg4&#39;, &#39;base&#39;, transl(0, -W, 0)*trotz(pi));
+% create a fixed size axis for the robot, and set z positive downward
+clf;
+axis([-0.3 0.1 -0.4 0.2 -0.15 0.05]); set(gca,&#39;Zdir&#39;, &#39;reverse&#39;)
+hold on
+for i=1:4
+    hold on
+    legs(i).plot([0 -pi/6 0],&#39;nobase&#39;,&#39;noshadow&#39;);
+end
+%画身体立方体
+plotcube([0.2 0.1 -0.01],[ -0.2  -0.1  0],.8,[1 0 0]);</code></pre></div><p class="ztext-empty-paragraph"><br/></p><div class="highlight"><pre><code class="language-text">function plotcube(varargin)
+% PLOTCUBE - Display a 3D-cube in the current axes
+%
+%   PLOTCUBE(EDGES,ORIGIN,ALPHA,COLOR) displays a 3D-cube in the current axes
+%   with the following properties:
+%   * EDGES : 3-elements vector that defines the length of cube edges
+%   * ORIGIN: 3-elements vector that defines the start point of the cube
+%   * ALPHA : scalar that defines the transparency of the cube faces (from 0
+%             to 1)
+%   * COLOR : 3-elements vector that defines the faces color of the cube
+%
+% Example:
+%   &gt;&gt; plotcube([5 5 5],[ 2  2  2],.8,[1 0 0]);
+%   &gt;&gt; plotcube([5 5 5],[10 10 10],.8,[0 1 0]);
+%   &gt;&gt; plotcube([5 5 5],[20 20 20],.8,[0 0 1]);
+
+% Default input arguments
+inArgs = { ...
+  [10 56 100] , ... % Default edge sizes (x,y and z)
+  [10 10  10] , ... % Default coordinates of the origin point of the cube
+  .7          , ... % Default alpha value for the cube&#39;s faces
+  [1 0 0]       ... % Default Color for the cube
+  };
+
+% Replace default input arguments by input values
+inArgs(1:nargin) = varargin;
+
+% Create all variables
+[edges,origin,alpha,clr] = deal(inArgs{:});
+
+XYZ = { ...
+  [0 0 0 0]  [0 0 1 1]  [0 1 1 0] ; ...
+  [1 1 1 1]  [0 0 1 1]  [0 1 1 0] ; ...
+  [0 1 1 0]  [0 0 0 0]  [0 0 1 1] ; ...
+  [0 1 1 0]  [1 1 1 1]  [0 0 1 1] ; ...
+  [0 1 1 0]  [0 0 1 1]  [0 0 0 0] ; ...
+  [0 1 1 0]  [0 0 1 1]  [1 1 1 1]   ...
+  };
+
+XYZ = mat2cell(...
+  cellfun( @(x,y,z) x*y+z , ...
+    XYZ , ...
+    repmat(mat2cell(edges,1,[1 1 1]),6,1) , ...
+    repmat(mat2cell(origin,1,[1 1 1]),6,1) , ...
+    &#39;UniformOutput&#39;,false), ...
+  6,[1 1 1]);
+
+
+cellfun(@patch,XYZ{1},XYZ{2},XYZ{3},...
+  repmat({clr},6,1),...
+  repmat({&#39;FaceAlpha&#39;},6,1),...
+  repmat({alpha},6,1)...
+  );
+
+view(3);  </code></pre></div><br><img src="v2-816de489f81b1eb02b42a79aedfeb55d_720w.jpg" >
+<br><br><strong>动态蜘蛛四足仿真</strong
+<pre><code class="language-text">L1 = 0.1; L2 = 0.1;
+
+
+links(1) = Link([    0       0    0   pi/2 ], &#39;standard&#39;);
+links(2) = Link([    0       0    L1   0   ], &#39;standard&#39;);
+links(3) = Link([    0       0   -L2   0   ], &#39;standard&#39;);
+
+
+leg = SerialLink(links, &#39;name&#39;, &#39;leg&#39;, &#39;offset&#39;, [pi/2   0  -pi/2]);
+
+
+xf = 5; xb = -xf;   
+y = 5;              
+zu = 2; zd = 5;     
+
+segments = [xf y zd; xb y zd; xb y zu; xf y zu] * 0.01;
+
+
+segments = [segments; segments];
+tseg = [3 0.25 0.5 0.25]&#39;;
+tseg = [1; tseg; tseg];
+x = mstraj(segments, [], tseg, segments(1,:), 0.01, 0.1);
+
+
+xcycle = x(100:500,:);
+qcycle = leg.ikine( transl(xcycle), [], [1 1 1 0 0 0], &#39;pinv&#39; );
+
+W = 0.1; L = 0.2;
+
+
+plotopt = {&#39;noraise&#39;, &#39;nobase&#39;, &#39;noshadow&#39;, &#39;nowrist&#39;, &#39;nojaxes&#39;, &#39;delay&#39;, 0};
+
+
+legs(1) = SerialLink(leg, &#39;name&#39;, &#39;leg1&#39;);
+legs(2) = SerialLink(leg, &#39;name&#39;, &#39;leg2&#39;, &#39;base&#39;, transl(-L, 0, 0));
+legs(3) = SerialLink(leg, &#39;name&#39;, &#39;leg3&#39;, &#39;base&#39;, transl(-L, -W, 0)*trotz(pi));
+legs(4) = SerialLink(leg, &#39;name&#39;, &#39;leg4&#39;, &#39;base&#39;, transl(0, -W, 0)*trotz(pi));
+
+
+clf; axis([-0.3 0.1 -0.2 0.2 -0.15 0.05]); set(gca,&#39;Zdir&#39;, &#39;reverse&#39;)
+hold on
+
+
+
+for i=1:4
+    legs(i).plot(qcycle(1,:), plotopt{:});
+end
+hold off
+
+
+k = 1;
+
+for i=1:500
+    legs(1).animate( gait(qcycle, k, 0,   0));
+    legs(2).animate( gait(qcycle, k, 100, 0));
+    legs(3).animate( gait(qcycle, k, 200, 1));
+    legs(4).animate( gait(qcycle, k, 300, 1));
+    drawnow
+    k = k+1;
+
+end</code></pre><p data-pid="ORyEbS4j">没写注释- -大家自己学习吧 最近忙论文比较懒0 0</p><br><img src="v2-dd8d6cd7a168463bd4e0a5702bafa712_720w.gif">
+
+
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
