@@ -1,0 +1,116 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>手眼标定程序</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">手眼标定程序</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/311987500 "> https://zhuanlan.zhihu.com/p/311987500  </a> 
+<p data-first-child data-pid="6TLWRNbo">1.用Matlab进行相机标定；</p><p data-pid="ugN_bBfB">2.将机器人末端位姿存储在res中；</p><p data-pid="Ana1potj">3.运行手眼标定程序。</p><div class="highlight"><pre><code class="language-text">clearvars -except  cameraParams  estimationErrors  REs ;  clc;
+%% 
+img_num = 18;
+RobotEffectorPose;      %机器人末端位姿
+%% 
+TE = estimationErrors.ExtrinsicsErrors.TranslationVectorsError;
+Tex = mean(TE(:,1));   Tey = mean(TE(:,2));  Tez = mean(TE(:,3));
+errorT = [Tex,Tey,Tez];
+%% 求末端和摄像机转轴kl, kr.
+kl=[]; kr=[]; theta_r=[]; theta_l=[];
+for i = 1:img_num-2
+    %% 求摄像机转轴Kr
+    Rr1 = cameraParams.RotationMatrices(:,:,i);
+    Tr1 = cameraParams.TranslationVectors(i,:)+errorT;
+    Rr2 = cameraParams.RotationMatrices(:,:,i+1);
+    Tr2 = cameraParams.TranslationVectors(i+1,:)+errorT;
+    Rr3 = cameraParams.RotationMatrices(:,:,i+2);
+    Tr3 = cameraParams.TranslationVectors(i+2,:)+errorT;
+    Rrt1 = [Rr1&#39; (Tr1/1000)&#39;;0,0,0,1]/[Rr2&#39; (Tr2/1000)&#39;;0,0,0,1];
+    Rrt2 = [Rr2&#39; (Tr2/1000)&#39;;0,0,0,1]/[Rr3&#39; (Tr3/1000)&#39;;0,0,0,1];
+    [fr1, thetar1] = InvRot(Rrt1);
+    [fr2, thetar2] = InvRot(Rrt2);
+    kr = [kr,fr1,fr2,cross(fr1,fr2)];  theta_r = [theta_r;thetar1;thetar2];
+    %% 求末端转轴Kl
+    Re1 = REs(4*i-3:4*i,:);
+    Re2 = REs(4*(i+1)-3:4*(i+1),:); 
+    Re3 = REs(4*(i+2)-3:4*(i+2),:); 
+    Ret1 = Re1\Re2;
+    Ret2 = Re2\Re3;
+    Rlt1 = Ret1(1:3,1:3);
+    Rlt2 = Ret2(1:3,1:3);
+    [fl1, thetal1] = InvRot(Rlt1);
+    [fl2, thetal2] = InvRot(Rlt2);
+    kl = [kl,fl1,fl2,cross(fl1,fl2)];  theta_l = [theta_l;thetal1;thetal2];
+end
+%% 求手眼矩阵旋转关系
+Rm = kl*pinv(kr);      %-----------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 求手眼关系平移向量
+Prs=[]; Pls=[];
+for i = 1:img_num-1
+%% （E-Rli)*Pm = Pli-Rm*Pri ----------构造右端    
+    %% 末端平移向量
+    TRl1 = REs(4*i-3:4*i,:); 
+    TRl2 = REs(4*(i+1)-3:4*(i+1),:);   
+    Rl = TRl1\TRl2;
+    Pli = Rl(1:3,4);            %--------------Pli
+    %% 相机外参平移向量
+    TRr1 = cameraParams.RotationMatrices(:,:,i);
+    TTr1 = cameraParams.TranslationVectors(i,:)+errorT;
+    TRr2 = cameraParams.RotationMatrices(:,:,i+1);
+    TTr2 = cameraParams.TranslationVectors(i+1,:)+errorT;
+    TRlt = [TRr1&#39; (TTr1/1000)&#39;;0,0,0,1]/[TRr2&#39; (TTr2/1000)&#39;;0,0,0,1];
+    Pri = TRlt(1:3,4);
+    Pr = Pli - Rm*Pri;
+    Prs = [Prs;Pr];    %--------------存储
+%% （E-Rli)*Pm = Pli-Rm*Pri ----------构造左端 
+    E=[1,0,0;0,1,0;0,0,1];
+    Rli = Rl(1:3,1:3);
+    Pl = E - Rli;
+    Pls = [Pls;Pl];   %--------------存储
+end
+%% 求手眼矩阵平移向量
+Pm = pinv(Pls)*Prs;  %-----------------------------------------
+H_E = [Rm,Pm;0,0,0,1]
+%clearvars -except  cameraParams  estimationErrors  H_E ;</code></pre>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
