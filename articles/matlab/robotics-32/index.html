@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>matlab的滤波函数filter与filtfilt比较</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">matlab的滤波函数filter与filtfilt比较</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href=" https://zhuanlan.zhihu.com/p/269583408"> https://zhuanlan.zhihu.com/p/269583408  </a> 
+<h2 data-first-child>matlab的滤波函数filter与filtfilt比较</h2><h2>摘要</h2><p data-pid="gmgQHpuX">滤波器应用非常广泛，例如根据位置数据对机器人速度和加速度进行估计时，差分运算会放大噪声，滤波环节是必不可少的。 filter滤波器称为一维数字滤波器。filtfilt滤波器称为零相位数字滤波。其滤波算法是基于filter而来的。只是filtfilt实现了零相位。其基本实现过程为先让信号用filter滤波，再将信号时域反转再次通过filter滤波，这样两次滤波后相位实现了零相位。filter滤波有明显的延迟，filtfilt几乎没有延迟。</p><h2>filter与filtfilt函数比较</h2><p data-pid="IV3r-CMY">（1）设置三种频率(10Hz,20Hz,30Hz)构成的信号y1</p><div class="highlight"><pre><code class="language-matlab"><span class="n">f1</span><span class="p">=</span><span class="mi">10</span><span class="p">;</span>
+<span class="n">f2</span><span class="p">=</span><span class="mi">20</span><span class="p">;</span>
+<span class="n">f3</span><span class="p">=</span><span class="mi">30</span><span class="p">;</span>
+<span class="n">Fs</span><span class="p">=</span><span class="mi">150</span><span class="p">;</span>
+<span class="n">t</span><span class="p">=</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="o">/</span><span class="n">Fs</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">y1</span><span class="p">=</span><span class="mi">5</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nb">pi</span><span class="o">*</span><span class="n">f1</span><span class="o">*</span><span class="n">t</span><span class="p">)</span><span class="o">+</span><span class="mi">10</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nb">pi</span><span class="o">*</span><span class="n">f2</span><span class="o">*</span><span class="n">t</span><span class="p">)</span><span class="o">+</span><span class="mi">8</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nb">pi</span><span class="o">*</span><span class="n">f3</span><span class="o">*</span><span class="n">t</span><span class="p">);</span></code></pre></div><p data-pid="uYIkGVn3">（2）设计滤波参数，分别用filter滤波器和filtfilt滤波器把30Hz的信号滤掉。</p><div class="highlight"><pre><code class="language-matlab"><span class="c">%滤波</span>
+<span class="n">fp</span><span class="p">=</span><span class="mi">25</span><span class="p">;</span><span class="c">%滤掉频率超过25Hz的信号</span>
+<span class="n">fs</span><span class="p">=</span><span class="mi">40</span><span class="p">;</span>
+<span class="n">wp</span><span class="p">=</span><span class="mi">2</span><span class="o">*</span><span class="n">fp</span><span class="o">/</span><span class="n">Fs</span><span class="p">;</span><span class="n">ws</span><span class="p">=</span><span class="mi">2</span><span class="o">*</span><span class="n">fs</span><span class="o">/</span><span class="n">Fs</span><span class="p">;</span><span class="n">rp</span><span class="p">=</span><span class="mf">0.1</span><span class="p">;</span><span class="n">rs</span><span class="p">=</span><span class="mi">60</span><span class="p">;</span>   <span class="c">%DF指标（低通滤波器的通、阻带边界频）</span>
+<span class="p">[</span><span class="n">N</span><span class="p">,</span><span class="n">wp</span><span class="p">]=</span><span class="n">ellipord</span><span class="p">(</span><span class="n">wp</span><span class="p">,</span><span class="n">ws</span><span class="p">,</span><span class="n">rp</span><span class="p">,</span><span class="n">rs</span><span class="p">);</span> <span class="c">%调用ellipord计算椭圆DF阶数N和通带截止频率wp</span>
+<span class="p">[</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">]=</span><span class="n">ellip</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="n">rp</span><span class="p">,</span><span class="n">rs</span><span class="p">,</span><span class="n">wp</span><span class="p">);</span>      <span class="c">%调用ellip计算椭圆带通DF系统函数系数向量B和A</span>
+<span class="n">y2</span><span class="p">=</span><span class="n">filter</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">y1</span><span class="p">);</span> <span class="c">%滤波</span>
+<span class="n">y3</span><span class="p">=</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">y1</span><span class="p">);</span></code></pre></div><p data-pid="D5ZS6Km3">（3）绘制滤波效果图和FFT频谱分析图，对比滤波效果。 </p><br><img src="v2-f976c29641ed64eda9fa45bb70bc39f0_720w.jpg" ><p data-pid="kY2gl4Rx"> 如图所示，第1个时域图可以发现经过filter滤波的信号比原始信号明显有延迟，而经过filtfilt滤波后的信号几乎没有延迟。第2频谱图可以发现，按照设计的参数，两个滤波器都能把频率为30Hz的信号滤除了。 以上分析的完整matlab代码如下：</p><div class="highlight"><pre><code class="language-matlab"><span class="c">%滤波器比较</span>
+<span class="c">%%</span>
+<span class="c">%产生原始信号</span>
+<span class="n">close</span> <span class="n">all</span>
+<span class="n">f1</span><span class="p">=</span><span class="mi">10</span><span class="p">;</span>
+<span class="n">f2</span><span class="p">=</span><span class="mi">20</span><span class="p">;</span>
+<span class="n">f3</span><span class="p">=</span><span class="mi">30</span><span class="p">;</span>
+<span class="n">Fs</span><span class="p">=</span><span class="mi">150</span><span class="p">;</span>
+<span class="n">t</span><span class="p">=</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="o">/</span><span class="n">Fs</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">y1</span><span class="p">=</span><span class="mi">5</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nb">pi</span><span class="o">*</span><span class="n">f1</span><span class="o">*</span><span class="n">t</span><span class="p">)</span><span class="o">+</span><span class="mi">10</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nb">pi</span><span class="o">*</span><span class="n">f2</span><span class="o">*</span><span class="n">t</span><span class="p">)</span><span class="o">+</span><span class="mi">8</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nb">pi</span><span class="o">*</span><span class="n">f3</span><span class="o">*</span><span class="n">t</span><span class="p">);</span> 
+<span class="c">%%</span>
+<span class="c">%滤波</span>
+<span class="n">fp</span><span class="p">=</span><span class="mi">25</span><span class="p">;</span><span class="c">%滤掉频率超过25Hz的信号</span>
+<span class="n">fs</span><span class="p">=</span><span class="mi">40</span><span class="p">;</span>
+<span class="n">wp</span><span class="p">=</span><span class="mi">2</span><span class="o">*</span><span class="n">fp</span><span class="o">/</span><span class="n">Fs</span><span class="p">;</span><span class="n">ws</span><span class="p">=</span><span class="mi">2</span><span class="o">*</span><span class="n">fs</span><span class="o">/</span><span class="n">Fs</span><span class="p">;</span><span class="n">rp</span><span class="p">=</span><span class="mf">0.1</span><span class="p">;</span><span class="n">rs</span><span class="p">=</span><span class="mi">60</span><span class="p">;</span>   <span class="c">%DF指标（低通滤波器的通、阻带边界频）</span>
+<span class="p">[</span><span class="n">N</span><span class="p">,</span><span class="n">wp</span><span class="p">]=</span><span class="n">ellipord</span><span class="p">(</span><span class="n">wp</span><span class="p">,</span><span class="n">ws</span><span class="p">,</span><span class="n">rp</span><span class="p">,</span><span class="n">rs</span><span class="p">);</span> <span class="c">%调用ellipord计算椭圆DF阶数N和通带截止频率wp</span>
+<span class="p">[</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">]=</span><span class="n">ellip</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="n">rp</span><span class="p">,</span><span class="n">rs</span><span class="p">,</span><span class="n">wp</span><span class="p">);</span>      <span class="c">%调用ellip计算椭圆带通DF系统函数系数向量B和A</span>
+<span class="n">y2</span><span class="p">=</span><span class="n">filter</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">y1</span><span class="p">);</span> <span class="c">%滤波</span>
+<span class="n">y3</span><span class="p">=</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">y1</span><span class="p">);</span>
+<span class="c">%%</span>
+<span class="c">%FFT频谱分析，分析滤波前后的频率成分</span>
+<span class="n">N</span><span class="p">=</span><span class="nb">length</span><span class="p">(</span><span class="n">y1</span><span class="p">);</span>
+<span class="n">nfft</span><span class="p">=</span><span class="mi">2</span>^<span class="nb">nextpow2</span><span class="p">(</span><span class="n">N</span><span class="p">);</span>
+<span class="n">fft_y1</span><span class="p">=</span><span class="n">fft</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span><span class="n">nfft</span><span class="p">)</span><span class="o">/</span><span class="n">nfft</span><span class="p">;</span>
+<span class="n">fft_y2</span><span class="p">=</span><span class="n">fft</span><span class="p">(</span><span class="n">y2</span><span class="p">,</span><span class="n">nfft</span><span class="p">)</span><span class="o">/</span><span class="n">nfft</span><span class="p">;</span>
+<span class="n">fft_y3</span><span class="p">=</span><span class="n">fft</span><span class="p">(</span><span class="n">y3</span><span class="p">,</span><span class="n">nfft</span><span class="p">)</span><span class="o">/</span><span class="n">nfft</span><span class="p">;</span>
+<span class="n">f</span><span class="p">=</span><span class="n">Fs</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="nb">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">nfft</span><span class="o">/</span><span class="mi">2</span><span class="p">);</span>
+<span class="c">%%</span>
+<span class="c">%绘图对比</span>
+<span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fig1</span><span class="p">=</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">);</span>
+<span class="n">hold</span> <span class="n">on</span>
+<span class="n">fig2</span><span class="p">=</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="s">&#39;g&#39;</span><span class="p">);</span>
+<span class="n">fig3</span><span class="p">=</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">y3</span><span class="p">,</span><span class="s">&#39;b&#39;</span><span class="p">);</span>
+<span class="n">legend</span><span class="p">([</span><span class="n">fig1</span><span class="p">,</span> <span class="n">fig2</span><span class="p">,</span><span class="n">fig3</span><span class="p">],</span><span class="s">&#39;原信号&#39;</span><span class="p">,</span> <span class="s">&#39;filter滤波&#39;</span><span class="p">,</span><span class="s">&#39;filtfilt滤波&#39;</span><span class="p">);</span>
+<span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;t(s)&#39;</span><span class="p">);</span>
+<span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">);</span>
+<span class="n">title</span><span class="p">(</span><span class="s">&#39;滤波延时比较&#39;</span><span class="p">)</span>
+<span class="n">grid</span> <span class="n">on</span>
+<span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fft_fig1</span><span class="p">=</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="nb">abs</span><span class="p">(</span><span class="n">fft_y1</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nfft</span><span class="o">/</span><span class="mi">2</span><span class="p">)),</span><span class="s">&#39;r&#39;</span><span class="p">);</span>
+<span class="n">hold</span> <span class="n">on</span>
+<span class="n">fft_fig2</span><span class="p">=</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="nb">abs</span><span class="p">(</span><span class="n">fft_y2</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nfft</span><span class="o">/</span><span class="mi">2</span><span class="p">)),</span><span class="s">&#39;g&#39;</span><span class="p">);</span>
+<span class="n">fft_fig3</span><span class="p">=</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="nb">abs</span><span class="p">(</span><span class="n">fft_y3</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nfft</span><span class="o">/</span><span class="mi">2</span><span class="p">)),</span><span class="s">&#39;b&#39;</span><span class="p">);</span>
+<span class="n">legend</span><span class="p">([</span><span class="n">fft_fig1</span> <span class="p">,</span><span class="n">fft_fig2</span><span class="p">,</span><span class="n">fft_fig3</span><span class="p">],</span><span class="s">&#39;原信号&#39;</span><span class="p">,</span> <span class="s">&#39;filter滤波&#39;</span><span class="p">,</span><span class="s">&#39;filtfilt滤波&#39;</span><span class="p">);</span>
+<span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Frequency(Hz)&#39;</span><span class="p">);</span>
+<span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Magnitude&#39;</span><span class="p">);</span>
+<span class="n">title</span><span class="p">(</span><span class="s">&#39;滤波幅值比较&#39;</span><span class="p">)</span>
+<span class="n">grid</span> <span class="n">on</span></code></pre></div><p data-pid="6Yj6rfcs">## 参考资料 <a href="https://link.zhihu.com/?target=https%3A//blog.csdn.net/Autumn_He/article/details/80197279" class=" wrap external" target="_blank" rel="nofollow noreferrer"> matlab filter函数滤波器系数设计</a></p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
