@@ -1,0 +1,1368 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>五自由度机械臂建模</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">五自由度机械臂建模</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br><a href="#five">五自由度机械臂建模</a>
+<br><a href="#moveit">MoveIt!五自由度手臂pick_and_place抓取规划演示</a>
+<br><a href="#ros-moveit">使用ROS MoveIt！控制diy五自由度机械臂</a>
+<br><div id="five"><strong>五自由度机械臂建模</strong></div>
+
+
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/267134725 "> https://zhuanlan.zhihu.com/p/267134725  </a> 
+<p data-first-child data-pid="DAhxUPhi">五自由度机械臂建模</p><h3>学习代码都记录在<a href="https://github.com/xuuyann/RobotLearningCode">个人github</a>上，欢迎关注~</h3><blockquote data-pid="pyX21Wke">Matlab机器人工具箱版本9.10</blockquote><p data-pid="jZs8BLZL">机械臂还是原来的机械臂，之前用ROS做底层驱动，不需要写正逆运动学和相关算法就能得到一些简单的仿真轨迹，详情可见我之前的博客：<br/><a href="https://blog.csdn.net/qq_26565435/article/details/89817289">六自由度机械臂ROS+Rviz+Arbotix控制器仿真</a><br/><a href="https://blog.csdn.net/qq_26565435/article/details/89856591">使用MoveIt！+Arbotix控制六自由度机械臂</a><br/><a href="https://blog.csdn.net/qq_26565435/article/details/90449047">MoveIt！入门：RobotModel、RobotState</a><br/><a href="https://blog.csdn.net/qq_26565435/article/details/90712752" >MoveIt!五自由度机械臂pick_and_place抓取规划演示</a><br/><a href="https://blog.csdn.net/qq_26565435/article/details/91039170">使用ROS MoveIt!控制真实五自由度机械臂</a><br/>下面我搞一搞这个底层部分：</p><h3>标准D-H法建模</h3><p data-pid="bN9TmqkT">由于该机械臂只有五个自由度，并且D-H法只能实现绕Z轴的旋转和沿X轴的位移，而该臂第四个关节和第五个关节坐标系必须先绕着Z轴旋转90度，然后再绕X轴旋转90度，这是常规D-H法无法实现的。这里可以在第四个关节和第五个关节中设置一个虚拟关节，以此来过渡一下，解决上述问题。建模如下：<br/></p><br><img src="v2-cf040573cd161ed92f0d0094a103e4a4_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><table data-draft-node="block" data-draft-type="table" data-size="normal" data-row-style="normal"><tbody><tr><th>i</th><th>αi</th><th>ai</th><th>di</th><th>θi</th></tr></tbody></table><p class="ztext-empty-paragraph"><br/></p><h3>正运动学Matlab</h3><div class="highlight"><pre><code class="language-text">% Standard DH
+% five_dof robot
+% 在关节4和关节5之间增加一个虚拟关节，便于逆运动学计算
+clear;
+clc;
+th(1) = 0; d(1) = 0; a(1) = 0; alp(1) = pi/2;
+th(2) = 0; d(2) = 0; a(2) = 0.104;alp(2) = 0;
+th(3) = 0; d(3) = 0; a(3) = 0.096; alp(3) = 0;
+th(4) = 0; d(4) = 0; a(4) = 0; alp(4) = 0;
+th(5) = pi/2; d(5) = 0; a(5) = 0; alp(5) = pi/2;
+th(6) = 0; d(6) = 0; a(6) = 0; alp(6) = 0;
+th(7) = 0; d(7) = 0.163; a(7) = 0.028; alp(7) = 0;
+% DH parameters  th     d    a    alpha  sigma
+L1 = Link([th(1), d(1), a(1), alp(1), 0]);
+L2 = Link([th(2), d(2), a(2), alp(2), 0]);
+L3 = Link([th(3), d(3), a(3), alp(3), 0]);
+L4 = Link([th(4), d(4), a(4), alp(4), 0]);
+L5 = Link([th(5), d(5), a(5), alp(5), 0]); 
+L6 = Link([th(6), d(6), a(6), alp(6), 0]);
+L7 = Link([th(7), d(7), a(7), alp(7), 0]);
+robot = SerialLink([L1, L2, L3, L4, L5, L6, L7]); 
+robot.name=&#39;MyRobot-5-dof&#39;;
+robot.display() 
+theta = [0 0 0 0 90 0 0]*pi/180;
+robot.teach();
+robot.plot(theta); 
+t = robot.fkine(theta)    %末端执行器位姿
+ik_T = five_dof_ikine(t)</code></pre></div><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-b621ce11b7d008d68456a6936d371bfe_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h3>逆运动学推导</h3><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-f1d9026ab60654cffcb28db58b029d4a_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-2f3e536315dca02a6b47ded4bb5387d3_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-38519fbe77406291d944efa81db45c65_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-ef49aa08620f6e8f27525ec34367687f_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h3>逆运动学Matlab</h3><div class="highlight"><pre><code class="language-text">function ik_T = five_dof_ikine(fk_T)
+a2 = 0.104; a3 = 0.096; ae = 0.028; de = 0.163; % ae和de即为a7、d7
+
+nx = fk_T(1, 1); ox = fk_T(1, 2); ax = fk_T(1, 3); px = fk_T(1, 4);
+ny = fk_T(2, 1); oy = fk_T(2, 2); ay = fk_T(2, 3); py = fk_T(2, 4);
+nz = fk_T(3, 1); oz = fk_T(3, 2); az = fk_T(3, 3); pz = fk_T(3, 4);
+
+% theta1
+theta1 = atan2(py - ny*ae - ay*de, px - nx*ae - ax*de);
+% theta5
+theta5 = atan2(sin(theta1)*nx - cos(theta1)*ny, sin(theta1)*ox - cos(theta1)*oy);
+% theta3有两个解
+m = px - nx*ae - ax*de;
+n = py - ny*ae - ay*de;
+t = pz - nz*ae - az*de;
+c3 = (power(cos(theta1), 2)*power(m, 2) + power(sin(theta1), 2)*power(n, 2) + 2*sin(theta1)*cos(theta1)*m*n + power(t, 2) - power(a2, 2) - power(a3, 2)) / (2*a2*a3);
+theta3_1 = atan2(sqrt(1-power(c3, 2)), c3);
+theta3_2 = atan2(-sqrt(1-power(c3, 2)), c3);
+% theta2有两个解
+% 对应theta3_1
+c2_1 = ((a3*cos(theta3_1) + a2)*(cos(theta1)*m + sin(theta1)*n) + a3*sin(theta3_1)*t) / (power(a3*cos(theta3_1) + a2, 2) + power(a3, 2)*power(sin(theta3_1), 2));
+s2_1 = ((a3*cos(theta3_1) + a2)*t - a3*sin(theta3_1)*(cos(theta1)*m + sin(theta1)*n)) / (power(a3*cos(theta3_1) + a2, 2) + power(a3, 2)*power(sin(theta3_1), 2));
+% 对应theta3_2
+c2_2 = ((a3*cos(theta3_2) + a2)*(cos(theta1)*m + sin(theta1)*n) + a3*sin(theta3_2)*t) / (power(a3*cos(theta3_2) + a2, 2) + power(a3, 2)*power(sin(theta3_2), 2));
+s2_2 = ((a3*cos(theta3_2) + a2)*t - a3*sin(theta3_2)*(cos(theta1)*m + sin(theta1)*n)) / (power(a3*cos(theta3_2) + a2, 2) + power(a3, 2)*power(sin(theta3_2), 2));
+theta2_1 = atan2(s2_1, c2_1);
+theta2_2 = atan2(s2_2, c2_2);
+% theta4有两个解
+theta4_1 = atan2(az, cos(theta1)*ax + sin(theta1)*ay) - theta3_1 - theta2_1;
+theta4_2 = atan2(az, cos(theta1)*ax + sin(theta1)*ay) - theta3_2 - theta2_2;
+
+ik_T = [theta1, theta2_1, theta3_1, theta4_1, theta5;
+        theta1, theta2_2, theta3_2, theta4_2, theta5];
+end</code></pre></div><h3>验证</h3><p data-pid="PQP2GSbU">theta = [0 45 120 60 90 45 0]*pi/180;<br/>正运动学计算结果：<br/></p><br><img src="v2-2e087a0ff2cd9a4d276a0a22d44abcba_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-4a3106b0efec6001f1c1c1517ed7151f_720w.jpg" ><p data-pid="OuXOSTE2"><br/>逆运动学计算结果：<br/></p><br><img src="v2-bc47e28c016bceb6db4c87ed07c8e2d5_b.png" ><p data-pid="YsUmYLI9"><br/>带入计算得：<br/>theta = [3.141592653589793 0.400142386223488 2.094395102393196 -3.279935652014131 pi/2 -2.356194490192346 0];<br/></p><br><img src="v2-a6e107a72c06201418c5c95b87195e86_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-6cc4cc20e16b62e8adedbef09463b339_720w.jpg" ><p data-pid="wfW0sLBB"><br/>theta = [3.141592653589793 2.356194490192346 -2.094395102393196 -1.047197551196598 pi/2 -2.356194490192346 0];<br/></p><br><img src="v2-0276797d9aeeebc62108a353880a9def_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-f40e8e3c89fb1949aa10b7ceb6f4ad3a_720w.jpg" ><p data-pid="jKkYh-Bp"><br/>运算结果一致。</p><h2>下面是C程序实现代码</h2><p data-pid="YyoO-wmL">由于正运动学涉及到矩阵计算，因此我写了个简单的矩阵计算程序，如下：</p><div class="highlight"><pre><code class="language-text">/*
+ * MyMatrix.h
+ *
+ *  Created on: Jul 13, 2019
+ *      Author: xuuyann
+ */
+
+#ifndef HEADER_MYMATRIX_H_
+#define HEADER_MYMATRIX_H_
+
+typedef struct MNode *PtrToMNode;
+struct MNode
+{
+	int row;
+	int column;
+	float **data;
+};
+typedef PtrToMNode Matrix;
+// 创建一个矩阵
+Matrix Create_Matrix(int row, int column);
+// 初始化矩阵
+void Init_Matrix(Matrix mat);
+// 给矩阵每个元素赋值
+void SetData_Matrix(Matrix mat, float data[]);
+// 打印矩阵
+void Show_Matrix(Matrix mat);
+// 矩阵加减法
+Matrix AddorSub_Matrix(Matrix mat_1, Matrix mat_2, int flag);
+// 转置
+Matrix Trans_Matrix(Matrix mat);
+// 矩阵乘法
+Matrix Mult_Matrix(Matrix mat_1, Matrix mat_2);
+// 单位矩阵
+Matrix eye(int n);
+// 取出矩阵某行某列的元素
+float PickInMat(Matrix mat, int r, int c);
+
+
+#endif /* HEADER_MYMATRIX_H_ */
+/*
+ * MyMatrix.c
+ *
+ *  Created on: Jul 13, 2019
+ *      Author: xuuyann
+ */
+
+#include &#34;../header/MyMatrix.h&#34;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;math.h&gt;
+
+void Init_Matrix(Matrix mat)
+{
+	int i, j;
+	for (i = 0; i &lt; mat-&gt;row; i++){
+		for (j = 0; j &lt; mat-&gt;column; j++){
+			mat-&gt;data[i][j] = 0;
+		}
+	}
+}
+
+Matrix Create_Matrix(int row, int col)
+{
+	Matrix mat;
+	mat = (Matrix)malloc(sizeof(struct MNode));
+	if (row &lt;= 0 || col &lt;= 0){
+		printf(&#34;ERROR, in creat_Matrix the row or col &lt;= 0\n&#34;);
+		exit(1);
+	}
+	if (row &gt; 0 &amp;&amp; col &gt;0){
+		mat-&gt;row = row;
+		mat-&gt;column = col;
+		mat-&gt;data = (float **)malloc(row*sizeof(float *));
+		if (mat-&gt;data == NULL){
+			printf(&#34;ERROR, in creat_Matrix the mat-&gt;data == NULL\n&#34;);
+			exit(1);
+		}
+		int i;
+		for (i = 0; i &lt; row; i++ ){
+			*(mat-&gt;data + i) = (float *)malloc(col*sizeof(float));
+			if (mat-&gt;data[i] == NULL){
+				printf(&#34;ERROR, in create_Matrix the mat-&gt;data[i] == NULL\n&#34;);
+				exit(1);
+			}
+		}
+		Init_Matrix(mat);
+	}
+	return mat;
+}
+
+void Show_Matrix(Matrix mat)
+{
+	int i, j;
+	for (i = 0; i &lt; mat-&gt;row; i++){
+		for (j = 0; j &lt; mat-&gt;column; j++)
+			printf(&#34;%.6f\t&#34;, mat-&gt;data[i][j]);
+		printf(&#34;\n&#34;);
+	}
+}
+
+void SetData_Matrix(Matrix mat, float data[])
+{
+	int i, j;
+	for (i = 0; i &lt; mat-&gt;row; i++){
+		for (j = 0; j &lt; mat-&gt;column; j++){
+			mat-&gt;data[i][j] = data[i*mat-&gt;column + j];
+		}
+	}
+}
+
+//flag = 0, add; flag = 1, sub
+Matrix AddorSub_Matrix(Matrix mat_1, Matrix mat_2, int flag)
+{
+	Matrix rst_mat;
+	if (mat_1-&gt;column != mat_2-&gt;column){
+		printf(&#34;ERROR in AddorSub, column !=\n&#34;);
+		exit(1);
+	}
+	if (mat_1-&gt;row != mat_2-&gt;row){
+		printf(&#34;ERROR in AddorSub, row !=\n&#34;);
+		exit(1);
+	}
+	int i, j;
+	rst_mat = Create_Matrix(mat_1-&gt;row, mat_1-&gt;column);
+	for (i = 0; i &lt; mat_1-&gt;row; i++){
+		for (j = 0; j &lt; mat_1-&gt;column; j++)
+			rst_mat-&gt;data[i][j] = mat_1-&gt;data[i][j] + pow(-1, flag)*mat_2-&gt;data[i][j];
+	}
+	return rst_mat;
+}
+
+//转置
+Matrix Trans_Matrix(Matrix mat)
+{
+	Matrix mat_;
+	int i, j;
+	mat_ = Create_Matrix(mat-&gt;row, mat-&gt;column);
+	for (i = 0; i &lt; mat-&gt;row; i ++){
+		for (j = 0; j &lt; mat-&gt;column; j++)
+			mat_-&gt;data[i][j] = mat-&gt;data[i][j];
+	}
+	return mat_;
+}
+
+Matrix Mult_Matrix(Matrix mat_1, Matrix mat_2)
+{
+	Matrix rst_mat;
+	int i, j, m;
+	if (mat_1-&gt;column != mat_2-&gt;row){
+		printf(&#34;ERROR in Mult_Matrix, column != row\n&#34;);
+		exit(1);
+	}else{
+		rst_mat = Create_Matrix(mat_1-&gt;row, mat_2-&gt;column);
+		for (i = 0; i &lt; mat_1-&gt;row; i++){
+			for (j = 0; j &lt; mat_2-&gt;column; j++){
+				for (m = 0; m &lt; mat_1-&gt;column; m++)
+					rst_mat-&gt;data[i][j] += mat_1-&gt;data[i][m] * mat_2-&gt;data[m][j];
+			}
+		}
+	}
+	return rst_mat;
+}
+
+Matrix eye(int n)
+{
+	Matrix E;
+	int i, j;
+	if (n &lt;= 0){
+		printf(&#34;ERROR in eye\n&#34;);
+		exit(1);
+	}
+	E = Create_Matrix(n, n);
+	for (i = 0; i &lt; n; i++){
+		for (j = 0; j &lt; n; j++){
+			if (i == j)
+				E-&gt;data[i][j] = 1;
+			else
+				E-&gt;data[i][j] = 0;
+		}
+	}
+	return E;
+}
+
+float PickInMat(Matrix mat, int r, int c)
+{
+	float rst;
+	rst = mat-&gt;data[r - 1][c - 1];
+	return rst;
+}
+/*
+ * five_dof_kinematic.h
+ *
+ *  Created on: Jul 13, 2019
+ *      Author: xuuyann
+ */
+
+#ifndef FIVEDOFKINEMATIC_H_
+#define FIVEDOFKINEMATIC_H_
+
+#include &#34;../header/MyMatrix.h&#34;
+#define PI 3.141592653
+typedef struct DH_Node *PtrToDHNode;
+struct DH_Node
+{
+	// theta
+	float th1;
+	float th2;
+	float th3;
+	float th4;
+	float th5;
+	float th6;
+	float th7;
+	// d
+	float d1;
+	float d2;
+	float d3;
+	float d4;
+	float d5;
+	float d6;
+	float d7;
+	// a
+	float a1;
+	float a2;
+	float a3;
+	float a4;
+	float a5;
+	float a6;
+	float a7;
+	// alpha
+	float alp1;
+	float alp2;
+	float alp3;
+	float alp4;
+	float alp5;
+	float alp6;
+	float alp7;
+};
+typedef PtrToDHNode Input_data;
+
+// 初始化ＤＨ参数
+void Init_DH(Input_data DH_para);
+// 正运动学推导
+Matrix five_dof_fkine(Input_data DH_para, float theta[]);
+// 逆运动学推导
+Matrix five_dof_ikine(Input_data DH_para, Matrix fk_T);
+
+
+#endif /* HEADER_FIVE_DOF_KINEMATIC_H_ */
+/*
+ * FiveDofKinemate.c
+ *
+ *  Created on: Jul 13, 2019
+ *      Author: xuuyann
+ */
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;math.h&gt;
+#include &#34;../header/FiveDofKinematic.h&#34;
+#include &#34;../header/MyMatrix.h&#34;
+
+/*               theta,   d,     a,    alpha                     */
+float DH[7][4] = {{0,     0,     0,     PI/2},
+				  {0,     0,     0.104, 0},
+				  {0,     0,     0.096, 0},
+				  {0,     0,     0,     0},
+				  {PI/2,  0,     0,     PI/2},
+				  {0,     0,     0,     0},
+				  {0,     0.163, 0.028, 0}};
+
+void Init_DH(Input_data DH_para)
+{
+	DH_para-&gt;th1 = DH[0][0];
+	DH_para-&gt;th2 = DH[1][0];
+	DH_para-&gt;th3 = DH[2][0];
+	DH_para-&gt;th4 = DH[3][0];
+	DH_para-&gt;th5 = DH[4][0];
+	DH_para-&gt;th6 = DH[5][0];
+	DH_para-&gt;th7 = DH[6][0];
+	DH_para-&gt;d1 = DH[0][1];
+	DH_para-&gt;d2 = DH[1][1];
+	DH_para-&gt;d3 = DH[2][1];
+	DH_para-&gt;d4 = DH[3][1];
+	DH_para-&gt;d5 = DH[4][1];
+	DH_para-&gt;d6 = DH[5][1];
+	DH_para-&gt;d7 = DH[6][1];
+	DH_para-&gt;a1 = DH[0][2];
+	DH_para-&gt;a2 = DH[1][2];
+	DH_para-&gt;a3 = DH[2][2];
+	DH_para-&gt;a4 = DH[3][2];
+	DH_para-&gt;a5 = DH[4][2];
+	DH_para-&gt;a6 = DH[5][2];
+	DH_para-&gt;a7 = DH[6][2];
+	DH_para-&gt;alp1 = DH[0][3];
+	DH_para-&gt;alp2 = DH[1][3];
+	DH_para-&gt;alp3 = DH[2][3];
+	DH_para-&gt;alp4 = DH[3][3];
+	DH_para-&gt;alp5 = DH[4][3];
+	DH_para-&gt;alp6 = DH[5][3];
+	DH_para-&gt;alp7 = DH[6][3];
+}
+
+// 正运动学推导
+Matrix five_dof_fkine(Input_data DH_para, float theta[])
+{
+	Matrix rst, Ti;
+	rst = eye(4);
+	Ti = Create_Matrix(4, 4);
+	float a[7] = {DH_para-&gt;a1, DH_para-&gt;a2, DH_para-&gt;a3, DH_para-&gt;a4, DH_para-&gt;a5, DH_para-&gt;a6, DH_para-&gt;a7};
+	float d[7] = {DH_para-&gt;d1, DH_para-&gt;d2, DH_para-&gt;d3, DH_para-&gt;d4, DH_para-&gt;d5, DH_para-&gt;d6, DH_para-&gt;d7};
+	float alp[7] = {DH_para-&gt;alp1, DH_para-&gt;alp2, DH_para-&gt;alp3, DH_para-&gt;alp4, DH_para-&gt;alp5, DH_para-&gt;alp6, DH_para-&gt;alp7};
+	float th[7] = {theta[0], theta[1], theta[2], theta[3], DH_para-&gt;th5, theta[4], DH_para-&gt;th7};
+	for (int i = 0; i &lt; 7; i++){
+		Ti-&gt;data[0][0] = cos(th[i]);
+		Ti-&gt;data[0][1] = -sin(th[i]) * cos(alp[i]);
+		Ti-&gt;data[0][2] = sin(th[i]) * sin(alp[i]);
+		Ti-&gt;data[0][3] = a[i] * cos(th[i]);
+		Ti-&gt;data[1][0] = sin(th[i]);
+		Ti-&gt;data[1][1] = cos(th[i]) * cos(alp[i]);
+		Ti-&gt;data[1][2] = -cos(th[i]) * sin(alp[i]);
+		Ti-&gt;data[1][3] = a[i] * sin(th[i]);
+		Ti-&gt;data[2][0] = 0;
+		Ti-&gt;data[2][1] = sin(alp[i]);
+		Ti-&gt;data[2][2] = cos(alp[i]);
+		Ti-&gt;data[2][3] = d[i];
+		Ti-&gt;data[3][0] = 0;
+		Ti-&gt;data[3][1] = 0;
+		Ti-&gt;data[3][2] = 0;
+		Ti-&gt;data[3][3] = 1;
+		//Show_Matrix(Ti);
+		//printf(&#34;\n&#34;);
+		// Matrix Mult_Matrix(Matrix mat_1, Matrix mat_2);
+		rst = Mult_Matrix(rst, Ti);
+		//Show_Matrix(rst);
+	}
+	return rst;
+}
+
+Matrix five_dof_ikine(Input_data DH_para, Matrix fk_T)
+{
+	Matrix ik_T;
+	ik_T = Create_Matrix(2, 5);
+	float a2 = DH_para-&gt;a2;
+	float a3 = DH_para-&gt;a3;
+	float ae = DH_para-&gt;a7;
+	float de = DH_para-&gt;d7;
+	float nx, ny, nz;
+	float ox, oy, oz;
+	float ax, ay, az;
+	float px, py, pz;
+	nx = PickInMat(fk_T, 1, 1);
+	ny = PickInMat(fk_T, 2, 1);
+	nz = PickInMat(fk_T, 3, 1);
+	ox = PickInMat(fk_T, 1, 2);
+	oy = PickInMat(fk_T, 2, 2);
+	oz = PickInMat(fk_T, 3, 2);
+	ax = PickInMat(fk_T, 1, 3);
+	ay = PickInMat(fk_T, 2, 3);
+	az = PickInMat(fk_T, 3, 3);
+	px = PickInMat(fk_T, 1, 4);
+	py = PickInMat(fk_T, 2, 4);
+	pz = PickInMat(fk_T, 3, 4);
+	// theta1
+	float theta1;
+	theta1 = atan2(py - ny*ae - ay*de, px - nx*ae - ax*de);
+	// theta5;
+	float theta5;
+	theta5 = atan2(sin(theta1)*nx - cos(theta1)*ny, sin(theta1)*ox - cos(theta1)*oy);
+	// theta3
+	float m = px - nx*ae - ax*de;
+	float n = py - ny*ae - ay*de;
+	float t = pz - nz*ae - az*de;
+	float c3;
+	c3 = (pow(cos(theta1), 2)*pow(m, 2) + pow(sin(theta1), 2)*pow(n, 2)
+			+ 2*sin(theta1)*cos(theta1)*m*n + pow(t, 2) - pow(a2, 2) - pow(a3, 2)) / (2*a2*a3);
+	float theta3_1 = atan2(sqrt(1-pow(c3, 2)), c3);
+	float theta3_2 = atan2(-sqrt(1-pow(c3, 2)), c3);
+	// theta2
+	float c2_1, s2_1, c2_2, s2_2;
+	c2_1 = ((a3*cos(theta3_1) + a2)*(cos(theta1)*m + sin(theta1)*n) + a3*sin(theta3_1)*t)
+			/ (pow(a3*cos(theta3_1) + a2, 2) + pow(a3, 2)*pow(sin(theta3_1), 2));
+	s2_1 = ((a3*cos(theta3_1) + a2)*t - a3*sin(theta3_1)*(cos(theta1)*m + sin(theta1)*n))
+			/ (pow(a3*cos(theta3_1) + a2, 2) + pow(a3, 2)*pow(sin(theta3_1), 2));
+	c2_2 = ((a3*cos(theta3_2) + a2)*(cos(theta1)*m + sin(theta1)*n) + a3*sin(theta3_2)*t)
+			/ (pow(a3*cos(theta3_2) + a2, 2) + pow(a3, 2)*pow(sin(theta3_2), 2));
+	s2_2 = ((a3*cos(theta3_2) + a2)*t - a3*sin(theta3_2)*(cos(theta1)*m + sin(theta1)*n))
+			/ (pow(a3*cos(theta3_2) + a2, 2) + pow(a3, 2)*pow(sin(theta3_2), 2));
+	float theta2_1 = atan2(s2_1, c2_1);
+	float theta2_2 = atan2(s2_2, c2_2);
+	// theta4
+	float theta4_1 = atan2(az, cos(theta1)*ax + sin(theta1)*ay) - theta3_1 - theta2_1;
+	float theta4_2 = atan2(az, cos(theta1)*ax + sin(theta1)*ay) - theta3_2 - theta2_2;
+
+	float th[10] = {theta1, theta2_1, theta3_1, theta4_1, theta5,
+					theta1, theta2_2, theta3_2, theta4_2, theta5};
+	SetData_Matrix(ik_T, th);
+
+	return ik_T;
+}
+/*
+ * main.c
+
+ *
+ *  Created on: Jul 13, 2019
+ *      Author: xuuyann
+ */
+#include &lt;math.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &#34;../header/FiveDofKinematic.h&#34;
+#include &#34;../header/MyMatrix.h&#34;
+
+
+int main()
+{
+	Matrix fk_T, ik_T;
+	fk_T = Create_Matrix(4, 4);
+	ik_T = Create_Matrix(2, 5);
+	float theta[5] = {0, 45*PI/180, 120*PI/180, 60*PI/180, 45*PI/180};
+	Input_data DH_para;
+	DH_para = (Input_data)malloc(sizeof(struct DH_Node));
+	Init_DH(DH_para);
+	// Matrix five_dof_fkine(Input_data DH_para, float theta[])
+	fk_T = five_dof_fkine(DH_para, theta);
+	printf(&#34;fk_T:\n&#34;);
+	Show_Matrix(fk_T);
+	printf(&#34;\n&#34;);
+	// Matrix five_dof_ikine(Input_data DH_para, Matrix fk_T);
+	printf(&#34;ik_T:\n&#34;);
+	ik_T = five_dof_ikine(DH_para, fk_T);
+	Show_Matrix(ik_T);
+	
+	return 0;
+}</code></pre></div><p data-pid="rVJCwCRR">theta = [0, 45, 120, 60, 45]<br/>Ｃ语言运算结果：<br/></p><br><img src="v2-1b3f4787f322dc46ff8df85b6d9d75e7_720w.jpg" ><p data-pid="wGjnLBJe"><br/>matlab运算结果：<br/></p><br><img src="v2-5edd2be5b05282ab1479c36ece319a19_720w.jpg" ><p data-pid="lxHek1m7"><br/>两者结果一致，证明c程序的正确性。</p>
+<br><div id="moveit"><strong>MoveIt!五自由度手臂pick_and_place抓取规划演示</strong></div>
+<a href="https://zhuanlan.zhihu.com/p/267133750"> https://zhuanlan.zhihu.com/p/267133750</a>
+<h2 data-first-child>MoveIt!五自由度手臂pick_and_place抓取规划演示</h2><h2>写在前面</h2><p data-pid="YkdsCM5n">更正一下，前面一系列博客提到的“六自由度”机械臂实际上是arm部分五自由度+gripper部分一个自由度。我购买的机械臂手抓部分是一个舵机控制两个手爪开合，但是仿真时就得将gripper分成两个单独joint来看。</p><p data-pid="Rq-vjcAC">我查到过可以使用Mimic标签来模拟这种一个舵机控制两个对称手爪，貌似在gazebo中可以仿真，但是可能会在moveit中出现关节丢失的现象（我还没试过，估计比较麻烦）。所以，仿真就简单将gripper分成两个单独joint看。</p><h2>演示</h2><p data-pid="4aPBZMqh">图中演示花费比较长时间，因为计算量比较大，加上五自由度arm部分在运动规划上存在很多限制，很容易出现pick and place failed。</p><br><img src="v2-e2d80b040a776b4db7a5c9ebedd65951_b.gif" ><br><img src="v2-5fe43909fc0a0a3b28b66445fa474d17_720w.jpg" ><p data-pid="NDmytUCi">更换运动学插件ikfast</p><p data-pid="68AX1JCC">我用了几个pick_and_place的例子，换了一些object pose，但一直都是抓取失败。看了这位大神的博客<a href="https://blog.csdn.net/qq_38288618/article/details/78848813" class=" wrap external" target="_blank" rel="nofollow noreferrer">ros下diy手臂rviz演示抓取放置</a>，他和我一样都是五自由度的arm，用了个新包moveit_simple_grasps抓取成功了，嘻嘻天助我也，那我也来试试呗。试来试去，包啥的都配置成功了，结果rosrun pick_and_place.py仍然抓取失败，算好久好久还是失败，换pose也不对。接着baidu、google，查到这个帖子<a href="https://groups.google.com/forum/%23%21topic/moveit-users/P2V9eW5BjW8" >Using moveit with 5-DOF arm</a>(需要fq)，同样也是always fails to grasp object，下面有个评论，如图。</p><br><img src="v2-6bdab50bb3eecdf79710331f6237fec9_720w.jpg" ><p data-pid="Oph1opBL">意思就是moveit中的KDL运动学插件可能对少于六自由度的机械臂不太友好，可以换成ikfast。虽然这是2013年的帖子，但是查了下IKfast插件，看起来很好用的样子，干脆把插件也给换了算了。</p><p data-pid="BabPcSJv"><a href="https://blog.csdn.net/Kalenee/article/details/80740258" >ROS进阶——MoveIt!运动学插件IKFAST配置</a>，参考这个来安装ikfast。参数名字都换成自己相应配置的名称，另外需要注意的是，在进行==生成ikfast文件==这个步骤时，要让iktype=translationdirection5d。我生成这个文件时出错了，改变了一下end effector link的坐标方向就好了。</p><p data-pid="LXIjbU4E">插件如其名，用起来so fast～换了几个pose之后，抓取终于成功了。</p><h2>使用moveit_simple_grasps包</h2><p data-pid="znEV_UbL"><a href="https://github.com/davetcoleman/moveit_simple_grasps" >包地址</a></p><h3>包简介</h3><blockquote data-pid="_wgmtRjG"> A basic grasp generator for simple objects such as blocks or cylinders for use with the MoveIt! pick and place pipeline. Does not consider friction cones or other dynamics.<br/> Its current implementation simple takes as input a pose vector (postition and orientation) and generates a large number of potential grasp approaches and directions. Also includes a grasp filter for removing kinematically infeasible grasps via threaded IK solvers.<br/> </blockquote><p data-pid="JvB38cqv">作者说这个包还有很多东西要维护，所以实际使用起来会出现一些问题。</p><p data-pid="zb8tas3E">先要注释掉几行代码，参见<a href="https://github.com/qboticslabs/mastering_ros/issues/3" ><span class="invisible">https://</span><span class="visible">github.com/qboticslabs/</span><span class="invisible">mastering_ros/issues/3</span><span class="ellipsis"></span></a>，原因是包以及系统版本的问题，下载下面的moveit_simple_grasps_1.zip，然后根据相应修改注释掉几行代码，这个亲测有效。</p><h3>建立自己的(arg robot)_grasp_data.yaml</h3><div class="highlight"><pre><code class="language-yaml"><span class="nt">base_link</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;base_link&#39;</span><span class="w">
+</span><span class="w"></span><span class="c"># ====================================================</span><span class="w">
+</span><span class="w"></span><span class="nt">gripper</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">end_effector_name</span><span class="p">:</span><span class="w"> </span><span class="l">gripper  #ee group name</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c">#actuated joints in end effector</span><span class="w">
+</span><span class="w">    </span><span class="nt">joints </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="l">finger_joint1, finger_joint2]</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c">#open position</span><span class="w">
+</span><span class="w">    </span><span class="nt">pregrasp_posture </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="m">0.0</span><span class="p">,</span><span class="w"> </span><span class="m">0.0</span><span class="p">]</span><span class="w">
+</span><span class="w">    </span><span class="nt">pregrasp_time_from_start </span><span class="p">:</span><span class="w"> </span><span class="m">4.0</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c">#close position</span><span class="w">
+</span><span class="w">    </span><span class="nt">grasp_posture </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="m">0.0225</span><span class="p">,</span><span class="w"> </span><span class="m">0.0225</span><span class="p">]</span><span class="w">
+</span><span class="w">    </span><span class="nt">grasp_time_from_start </span><span class="p">:</span><span class="w"> </span><span class="m">4.0</span><span class="w">
+</span><span class="w">    </span><span class="c">#???</span><span class="w">
+</span><span class="w">    </span><span class="c">#desired pose from end effector to grasp - [x,y,z]</span><span class="w">
+</span><span class="w">    </span><span class="nt">grasp_pose_to_eef </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="m">0.0</span><span class="p">,</span><span class="w"> </span><span class="m">0.0</span><span class="p">,</span><span class="w"> </span><span class="m">0.0</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c">#desired pose from end effector to grasp - [r, p, y]</span><span class="w">
+</span><span class="w">    </span><span class="nt">grasp_pose_to_eef_rotation </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="m">0.0</span><span class="p">,</span><span class="w"> </span><span class="m">0.0</span><span class="p">,</span><span class="w"> </span><span class="m">0.0</span><span class="p">]</span><span class="w"> </span><span class="c"># 1.5707 = PI/2</span><span class="w">
+</span><span class="w">    </span><span class="c">#根据自己moveit_config文件夹中的srdf进行设置</span><span class="w">
+</span><span class="w">    </span><span class="nt">end_effector_parent_link</span><span class="p">:</span><span class="w"> </span><span class="l">gripper_frame</span></code></pre></div><p data-pid="QfQqLM7p">这个文件定义了用于抓取对象的夹持器以及抓取前、后的位姿，注意这里第三行代码名称为<code>gripper</code>，对应simple_grasps_server.cpp中第193行开始的代码，如下。同时，将该文件中的<code>planning_group_name_(side_+&#34;_arm&#34;)</code>修改为<code>planning_group_name_(&#34;arm&#34;)</code>。</p><div class="highlight"><pre><code class="language-cpp"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+  <span class="n">ros</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&#34;grasp_generator_server&#34;</span><span class="p">);</span>
+  <span class="n">moveit_simple_grasps</span><span class="o">::</span><span class="n">GraspGeneratorServer</span> <span class="n">grasp_generator_server</span><span class="p">(</span><span class="s">&#34;generate&#34;</span><span class="p">,</span> <span class="s">&#34;gripper&#34;</span><span class="p">);</span>
+  <span class="n">ros</span><span class="o">::</span><span class="n">spin</span><span class="p">();</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><h3>pick_and_place.py</h3><div class="highlight"><pre><code class="language-python"><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">rospy</span>
+
+<span class="kn">from</span> <span class="nn">moveit_commander</span> <span class="kn">import</span> <span class="n">RobotCommander</span><span class="p">,</span> <span class="n">PlanningSceneInterface</span>
+<span class="kn">from</span> <span class="nn">moveit_commander</span> <span class="kn">import</span> <span class="n">roscpp_initialize</span><span class="p">,</span> <span class="n">roscpp_shutdown</span>
+
+<span class="kn">from</span> <span class="nn">actionlib</span> <span class="kn">import</span> <span class="n">SimpleActionClient</span><span class="p">,</span> <span class="n">GoalStatus</span>
+
+<span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="kn">import</span> <span class="n">Pose</span><span class="p">,</span> <span class="n">PoseStamped</span><span class="p">,</span> <span class="n">PoseArray</span><span class="p">,</span> <span class="n">Quaternion</span>
+<span class="kn">from</span> <span class="nn">moveit_msgs.msg</span> <span class="kn">import</span> <span class="n">PickupAction</span><span class="p">,</span> <span class="n">PickupGoal</span>
+<span class="kn">from</span> <span class="nn">moveit_msgs.msg</span> <span class="kn">import</span> <span class="n">PlaceAction</span><span class="p">,</span> <span class="n">PlaceGoal</span>
+<span class="kn">from</span> <span class="nn">moveit_msgs.msg</span> <span class="kn">import</span> <span class="n">PlaceLocation</span>
+<span class="kn">from</span> <span class="nn">moveit_msgs.msg</span> <span class="kn">import</span> <span class="n">MoveItErrorCodes</span>
+<span class="kn">from</span> <span class="nn">moveit_simple_grasps.msg</span> <span class="kn">import</span> <span class="n">GenerateGraspsAction</span><span class="p">,</span> <span class="n">GenerateGraspsGoal</span><span class="p">,</span> <span class="n">GraspGeneratorOptions</span>
+
+<span class="kn">from</span> <span class="nn">tf.transformations</span> <span class="kn">import</span> <span class="n">quaternion_from_euler</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+
+<span class="c1"># Create dict with human readable MoveIt! error codes:</span>
+<span class="n">moveit_error_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">MoveItErrorCodes</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span><span class="p">:</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">MoveItErrorCodes</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">moveit_error_dict</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+
+
+<span class="k">class</span> <span class="nc">PickAndPlace</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Retrieve params:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_table1_object_name</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;~table_object_name&#39;</span><span class="p">,</span> <span class="s1">&#39;table1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_table2_object_name</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;~table_object_name&#39;</span><span class="p">,</span> <span class="s1">&#39;table2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grasp_object_name</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;~grasp_object_name&#39;</span><span class="p">,</span> <span class="s1">&#39;coke_can&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grasp_object_width</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;~grasp_object_width&#39;</span><span class="p">,</span> <span class="mf">0.015</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_arm_group</span>     <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;~arm&#39;</span><span class="p">,</span> <span class="s1">&#39;arm&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gripper_group</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;~gripper&#39;</span><span class="p">,</span> <span class="s1">&#39;gripper&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_approach_retreat_desired_dist</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;~approach_retreat_desired_dist&#39;</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_approach_retreat_min_dist</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;~approach_retreat_min_dist&#39;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s1">&#39;_approach_retreat_desired_dist=</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_approach_retreat_desired_dist</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s1">&#39;_approach_retreat_min_dist=</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_approach_retreat_min_dist</span><span class="p">)</span>
+        <span class="c1"># Create (debugging) publishers:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grasps_pub</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Publisher</span><span class="p">(</span><span class="s1">&#39;grasps&#39;</span><span class="p">,</span> <span class="n">PoseArray</span><span class="p">,</span> <span class="n">queue_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latch</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_places_pub</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Publisher</span><span class="p">(</span><span class="s1">&#39;places&#39;</span><span class="p">,</span> <span class="n">PoseArray</span><span class="p">,</span> <span class="n">queue_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latch</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="c1"># Create planning scene and robot commander:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">PlanningSceneInterface</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span> <span class="o">=</span> <span class="n">RobotCommander</span><span class="p">()</span>
+
+        <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="c1"># Clean the scene:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">remove_world_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table1_object_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">remove_world_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table2_object_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">remove_world_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grasp_object_name</span><span class="p">)</span>
+
+        <span class="c1"># Add table and Coke can objects to the planning scene:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_table1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_table1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table1_object_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_table2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_table2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table2_object_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_coke_can</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_coke_can</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grasp_object_name</span><span class="p">)</span>
+
+        <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="c1"># Define target place pose:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_place</span> <span class="o">=</span> <span class="n">Pose</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_place</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose_table2</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_place</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose_table2</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_place</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose_coke_can</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span><span class="o">-</span><span class="mf">0.005</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_place</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">(</span><span class="o">*</span><span class="n">quaternion_from_euler</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+
+        <span class="c1"># Retrieve groups (arm and gripper):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_arm</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arm_group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gripper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gripper_group</span><span class="p">)</span>
+
+        <span class="c1"># Create grasp generator &#39;generate&#39; action client:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grasps_ac</span> <span class="o">=</span> <span class="n">SimpleActionClient</span><span class="p">(</span><span class="s1">&#39;/moveit_simple_grasps_server/generate&#39;</span><span class="p">,</span> <span class="n">GenerateGraspsAction</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grasps_ac</span><span class="o">.</span><span class="n">wait_for_server</span><span class="p">(</span><span class="n">rospy</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)):</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="s1">&#39;Grasp generator action client not available!&#39;</span><span class="p">)</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">signal_shutdown</span><span class="p">(</span><span class="s1">&#39;Grasp generator action client not available!&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Create move group &#39;pickup&#39; action client:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pickup_ac</span> <span class="o">=</span> <span class="n">SimpleActionClient</span><span class="p">(</span><span class="s1">&#39;/pickup&#39;</span><span class="p">,</span> <span class="n">PickupAction</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pickup_ac</span><span class="o">.</span><span class="n">wait_for_server</span><span class="p">(</span><span class="n">rospy</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)):</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="s1">&#39;Pick up action client not available!&#39;</span><span class="p">)</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">signal_shutdown</span><span class="p">(</span><span class="s1">&#39;Pick up action client not available!&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Create move group &#39;place&#39; action client:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_place_ac</span> <span class="o">=</span> <span class="n">SimpleActionClient</span><span class="p">(</span><span class="s1">&#39;/place&#39;</span><span class="p">,</span> <span class="n">PlaceAction</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place_ac</span><span class="o">.</span><span class="n">wait_for_server</span><span class="p">(</span><span class="n">rospy</span><span class="o">.</span><span class="n">Duration</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)):</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="s1">&#39;Place action client not available!&#39;</span><span class="p">)</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">signal_shutdown</span><span class="p">(</span><span class="s1">&#39;Place action client not available!&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Pick Coke can object:</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pickup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arm_group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grasp_object_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grasp_object_width</span><span class="p">):</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logwarn</span><span class="p">(</span><span class="s1">&#39;Pick up failed! Retrying ...&#39;</span><span class="p">)</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s1">&#39;Pick up successfully&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Place Coke can object on another place on the support surface (table):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arm_group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grasp_object_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose_place</span><span class="p">):</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logwarn</span><span class="p">(</span><span class="s1">&#39;Place failed! Retrying ...&#39;</span><span class="p">)</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s1">&#39;Place successfully&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Clean the scene:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">remove_world_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grasp_object_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">remove_world_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table1_object_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">remove_world_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table2_object_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_table1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">PoseStamped</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_planning_frame</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.20</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.20</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="n">quaternion_from_euler</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">90.0</span><span class="p">))</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">(</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+
+        <span class="c1"># Table size from ~/.gazebo/models/table/model.sdf, using the values</span>
+        <span class="c1"># for the surface link.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">add_box</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">,</span> <span class="mf">0.003</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">pose</span>
+
+    <span class="k">def</span> <span class="nf">_add_table2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">PoseStamped</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_planning_frame</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mf">0.20</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.20</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="n">quaternion_from_euler</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">90.0</span><span class="p">))</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">(</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+
+        <span class="c1"># Table size from ~/.gazebo/models/table/model.sdf, using the values</span>
+        <span class="c1"># for the surface link.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">add_box</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">,</span> <span class="mf">0.003</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">pose</span>
+
+    <span class="k">def</span> <span class="nf">_add_coke_can</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">PoseStamped</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_planning_frame</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.20</span><span class="o">+</span><span class="mf">0.02</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mf">0.01</span><span class="c1">#0.0117890518355#0.0#-0.015 - 0.01</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.20</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.030</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="n">quaternion_from_euler</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">(</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+
+        <span class="c1"># Coke can size from ~/.gazebo/models/coke_can/meshes/coke_can.dae,</span>
+        <span class="c1"># using the measure tape tool from meshlab.</span>
+        <span class="c1"># The box is the bounding box of the coke cylinder.</span>
+        <span class="c1"># The values are taken from the cylinder base diameter and height.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">add_box</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.015</span><span class="p">,</span> <span class="mf">0.015</span><span class="p">,</span> <span class="mf">0.030</span><span class="p">))</span>
+        <span class="c1">#self._scene.add_sphere (name, p, (0.015))</span>
+        <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">pose</span>
+
+    <span class="k">def</span> <span class="nf">_generate_grasps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Generate grasps by using the grasp generator generate action
+</span><span class="s2">        &#34;&#34;&#34;</span>
+
+        <span class="c1"># Create goal:</span>
+        <span class="n">goal</span> <span class="o">=</span> <span class="n">GenerateGraspsGoal</span><span class="p">()</span>
+
+        <span class="n">goal</span><span class="o">.</span><span class="n">pose</span>  <span class="o">=</span> <span class="n">pose</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+
+        <span class="n">options</span> <span class="o">=</span> <span class="n">GraspGeneratorOptions</span><span class="p">()</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">grasp_axis</span>      <span class="o">=</span> <span class="n">GraspGeneratorOptions</span><span class="o">.</span><span class="n">GRASP_AXIS_Z</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">grasp_direction</span> <span class="o">=</span> <span class="n">GraspGeneratorOptions</span><span class="o">.</span><span class="n">GRASP_DIRECTION_UP</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">grasp_rotation</span>  <span class="o">=</span> <span class="n">GraspGeneratorOptions</span><span class="o">.</span><span class="n">GRASP_ROTATION_FULL</span>
+
+        <span class="c1"># @todo disabled because it works better with the default options</span>
+        <span class="c1">#goal.options.append(options)</span>
+
+        <span class="c1"># Send goal and wait for result:</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grasps_ac</span><span class="o">.</span><span class="n">send_goal_and_wait</span><span class="p">(</span><span class="n">goal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="o">!=</span> <span class="n">GoalStatus</span><span class="o">.</span><span class="n">SUCCEEDED</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="s1">&#39;Grasp goal failed!: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grasps_ac</span><span class="o">.</span><span class="n">get_goal_status_text</span><span class="p">())</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="n">grasps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grasps_ac</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span><span class="o">.</span><span class="n">grasps</span>
+
+        <span class="c1"># Publish grasps (for debugging/visualization purposes):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publish_grasps</span><span class="p">(</span><span class="n">grasps</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">grasps</span>
+
+    <span class="k">def</span> <span class="nf">_generate_places</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+
+        <span class="c1"># Generate places:</span>
+        <span class="n">places</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">360.0</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)):</span>
+            <span class="c1"># Create place location:</span>
+            <span class="n">place</span> <span class="o">=</span> <span class="n">PlaceLocation</span><span class="p">()</span>
+
+            <span class="n">place</span><span class="o">.</span><span class="n">place_pose</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">now</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">place_pose</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_planning_frame</span><span class="p">()</span>
+
+            <span class="c1"># Set target position:</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">place_pose</span><span class="o">.</span><span class="n">pose</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+            <span class="c1"># Generate orientation (wrt Z axis):</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">quaternion_from_euler</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">angle</span><span class="p">)</span>
+            <span class="c1">#q = quaternion_from_euler(0.0,angle, 0.0 )</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">place_pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">(</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+
+            <span class="c1"># Generate pre place approach:</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">pre_place_approach</span><span class="o">.</span><span class="n">desired_distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_approach_retreat_desired_dist</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">pre_place_approach</span><span class="o">.</span><span class="n">min_distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_approach_retreat_min_dist</span>
+
+            <span class="n">place</span><span class="o">.</span><span class="n">pre_place_approach</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">now</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">pre_place_approach</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_planning_frame</span><span class="p">()</span>
+
+            <span class="n">place</span><span class="o">.</span><span class="n">pre_place_approach</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">vector</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span>  <span class="mi">0</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">pre_place_approach</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">vector</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span>  <span class="mi">0</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">pre_place_approach</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">vector</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+            <span class="c1"># Generate post place approach:</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">post_place_retreat</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">now</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">post_place_retreat</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_planning_frame</span><span class="p">()</span>
+
+            <span class="n">place</span><span class="o">.</span><span class="n">post_place_retreat</span><span class="o">.</span><span class="n">desired_distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_approach_retreat_desired_dist</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">post_place_retreat</span><span class="o">.</span><span class="n">min_distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_approach_retreat_min_dist</span>
+
+            <span class="n">place</span><span class="o">.</span><span class="n">post_place_retreat</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">vector</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">post_place_retreat</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">vector</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">post_place_retreat</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">vector</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># Add place:</span>
+            <span class="n">places</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">place</span><span class="p">)</span>
+
+        <span class="c1"># Publish places (for debugging/visualization purposes):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_publish_places</span><span class="p">(</span><span class="n">places</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">places</span>
+
+    <span class="k">def</span> <span class="nf">_create_pickup_goal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">grasps</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Create a MoveIt! PickupGoal
+</span><span class="s2">        &#34;&#34;&#34;</span>
+
+        <span class="c1"># Create goal:</span>
+        <span class="n">goal</span> <span class="o">=</span> <span class="n">PickupGoal</span><span class="p">()</span>
+
+        <span class="n">goal</span><span class="o">.</span><span class="n">group_name</span>  <span class="o">=</span> <span class="n">group</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">target</span>
+
+        <span class="n">goal</span><span class="o">.</span><span class="n">possible_grasps</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">grasps</span><span class="p">)</span>
+
+        <span class="n">goal</span><span class="o">.</span><span class="n">allowed_touch_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+        <span class="n">goal</span><span class="o">.</span><span class="n">support_surface_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table1_object_name</span>
+
+        <span class="c1"># Configure goal planning options:</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">allowed_planning_time</span> <span class="o">=</span> <span class="mf">15.0</span>
+
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">planning_scene_diff</span><span class="o">.</span><span class="n">is_diff</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">planning_scene_diff</span><span class="o">.</span><span class="n">robot_state</span><span class="o">.</span><span class="n">is_diff</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">plan_only</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">replan</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">replan_attempts</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="k">return</span> <span class="n">goal</span>
+
+    <span class="k">def</span> <span class="nf">_create_place_goal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">places</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Create a MoveIt! PlaceGoal
+</span><span class="s2">        &#34;&#34;&#34;</span>
+
+        <span class="c1"># Create goal:</span>
+        <span class="n">goal</span> <span class="o">=</span> <span class="n">PlaceGoal</span><span class="p">()</span>
+
+        <span class="n">goal</span><span class="o">.</span><span class="n">group_name</span>           <span class="o">=</span> <span class="n">group</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">attached_object_name</span> <span class="o">=</span> <span class="n">target</span>
+
+        <span class="n">goal</span><span class="o">.</span><span class="n">place_locations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">places</span><span class="p">)</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">support_surface_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table2_object_name</span>
+
+        <span class="c1"># Configure goal planning options:</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">allowed_planning_time</span> <span class="o">=</span> <span class="mf">15.0</span>
+
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">planning_scene_diff</span><span class="o">.</span><span class="n">is_diff</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">planning_scene_diff</span><span class="o">.</span><span class="n">robot_state</span><span class="o">.</span><span class="n">is_diff</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">plan_only</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">replan</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">goal</span><span class="o">.</span><span class="n">planning_options</span><span class="o">.</span><span class="n">replan_attempts</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="k">return</span> <span class="n">goal</span>
+
+    <span class="k">def</span> <span class="nf">_pickup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Pick up a target using the planning group
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="c1"># Obtain possible grasps from the grasp generator server:</span>
+        <span class="n">grasps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_grasps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pose_coke_can</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grasps</span><span class="o">=</span><span class="n">grasps</span>
+        <span class="c1"># Create and send Pickup goal:</span>
+        <span class="n">goal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_pickup_goal</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">grasps</span><span class="p">)</span>
+
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pickup_ac</span><span class="o">.</span><span class="n">send_goal_and_wait</span><span class="p">(</span><span class="n">goal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="o">!=</span> <span class="n">GoalStatus</span><span class="o">.</span><span class="n">SUCCEEDED</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="s1">&#39;Pick up goal failed!: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pickup_ac</span><span class="o">.</span><span class="n">get_goal_status_text</span><span class="p">())</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pickup_ac</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>
+
+        <span class="c1"># Check for error:</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">error_code</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="n">MoveItErrorCodes</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logwarn</span><span class="p">(</span><span class="s1">&#39;Group </span><span class="si">%s</span><span class="s1"> cannot pick up target </span><span class="si">%s</span><span class="s1">!: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">moveit_error_dict</span><span class="p">[</span><span class="n">err</span><span class="p">])))</span>
+
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">_place</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">place</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Place a target using the planning group
+</span><span class="s2">        &#34;&#34;&#34;</span>
+
+        <span class="c1"># Obtain possible places:</span>
+        <span class="n">places</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_places</span><span class="p">(</span><span class="n">place</span><span class="p">)</span>
+
+        <span class="c1"># Create and send Place goal:</span>
+        <span class="n">goal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_place_goal</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">places</span><span class="p">)</span>
+
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place_ac</span><span class="o">.</span><span class="n">send_goal_and_wait</span><span class="p">(</span><span class="n">goal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="o">!=</span> <span class="n">GoalStatus</span><span class="o">.</span><span class="n">SUCCEEDED</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logerr</span><span class="p">(</span><span class="s1">&#39;Place goal failed!: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place_ac</span><span class="o">.</span><span class="n">get_goal_status_text</span><span class="p">())</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place_ac</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>
+
+        <span class="c1"># Check for error:</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">error_code</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="n">MoveItErrorCodes</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">logwarn</span><span class="p">(</span><span class="s1">&#39;Group </span><span class="si">%s</span><span class="s1"> cannot place target </span><span class="si">%s</span><span class="s1">!: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">moveit_error_dict</span><span class="p">[</span><span class="n">err</span><span class="p">])))</span>
+
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">_publish_grasps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grasps</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Publish grasps as poses, using a PoseArray message
+</span><span class="s2">        &#34;&#34;&#34;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grasps_pub</span><span class="o">.</span><span class="n">get_num_connections</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">PoseArray</span><span class="p">()</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_planning_frame</span><span class="p">()</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">grasp</span> <span class="ow">in</span> <span class="n">grasps</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">grasp</span><span class="o">.</span><span class="n">grasp_pose</span><span class="o">.</span><span class="n">pose</span>
+
+                <span class="n">msg</span><span class="o">.</span><span class="n">poses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Pose</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">orientation</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_grasps_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_publish_places</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">places</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Publish places as poses, using a PoseArray message
+</span><span class="s2">        &#34;&#34;&#34;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_places_pub</span><span class="o">.</span><span class="n">get_num_connections</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">PoseArray</span><span class="p">()</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robot</span><span class="o">.</span><span class="n">get_planning_frame</span><span class="p">()</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="n">places</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">poses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">place</span><span class="o">.</span><span class="n">place_pose</span><span class="o">.</span><span class="n">pose</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_places_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">PickAndPlace</span><span class="p">()</span>
+
+    <span class="n">rospy</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">roscpp_initialize</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span><span class="s1">&#39;pick_and_place&#39;</span><span class="p">)</span>
+    <span class="n">main</span><span class="p">()</span>
+    <span class="n">roscpp_shutdown</span><span class="p">()</span></code></pre></div><p data-pid="cDnErWaO">moveit_simple_grasps包中写了simple_grasp_server.cpp，即创建了一个grasp生成服务器，消息类型为GenerateGraspsAction。pick_and_place.py的主要职责就是创建一个名为/moveit_simple_grasps_server/generate的action客户端来查询grasp位姿，消息类型为GenerateGraspsAction，同时创建move group的/pickup客户端和/place客户端，待成功生成grasps后发送给move group相应服务器进行处理。具体可以看生成的rosgraph。</p><br><img src="v2-9c991e277b25c77c5ef5943ce1d86764_720w.jpg" ><p data-pid="iBnu8sO9">另外，还需要在grasp_data.cpp中把相关数据修改成自己的配置</p><div class="highlight"><pre><code class="language-cpp"><span class="n">approach_retreat_desired_dist_</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">;</span> <span class="c1">// 0.3;
+</span><span class="c1"></span>  <span class="n">approach_retreat_min_dist_</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">;</span>
+  <span class="c1">// distance from center point of object to end effector
+</span><span class="c1"></span>  <span class="n">grasp_depth_</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">;</span><span class="c1">// in negative or 0 this makes the grasps on the other side of the object! (like from below)
+</span><span class="c1"></span>
+  <span class="c1">// generate grasps at PI/angle_resolution increments
+</span><span class="c1"></span>  <span class="n">angle_resolution_</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span> <span class="c1">//TODO parametrize this, or move to action interface
+</span></code></pre></div><h3>运行</h3><p data-pid="Hm_qCpGy">修改grasp_generator_server.launch为自己的配置，如下</p><div class="highlight"><pre><code class="language-text">&lt;launch&gt;
+
+  &lt;arg name=&#34;robot&#34; default=&#34;myrobot&#34; /&gt;
+
+  &lt;arg name=&#34;group&#34; default=&#34;arm&#34; /&gt;
+  &lt;arg name=&#34;end_effector&#34; default=&#34;gripper&#34; /&gt;
+
+  &lt;!-- Start the test --&gt;
+  &lt;node name=&#34;moveit_simple_grasps_server&#34; pkg=&#34;moveit_simple_grasps&#34; type=&#34;moveit_simple_grasps_server&#34; output=&#34;screen&#34;&gt;
+    &lt;param name=&#34;group&#34; value=&#34;$(arg group) &#34; /&gt;
+    &lt;param name=&#34;end_effector&#34; value=&#34;$(arg end_effector)&#34; /&gt;
+    &lt;rosparam command=&#34;load&#34; file=&#34;$(find moveit_simple_grasps)/config/$(arg robot)_grasp_data.yaml&#34;/&gt;
+  &lt;/node&gt;
+
+&lt;/launch&gt;</code></pre></div><p data-pid="lEegVGTu">然后运行命令：</p><div class="highlight"><pre><code class="language-text">roslaunch myrobot_moveit_config demo.launch
+roslaunch moveit_simple_graspsp grasp_generator_server.launch
+rosrun moveit_simple_grasps pick_and_place.py</code></pre></div><h2>参考</h2><p data-pid="4Kiv3Lgp"><a href="https://blog.csdn.net/qq_38288618/article/details/78848813" class=" wrap external" target="_blank" rel="nofollow noreferrer">ros下diy手臂rviz演示抓取放置</a></p><p data-pid="xzFNJE1I"><a href="https://github.com/davetcoleman/moveit_simple_grasps" class=" wrap external" target="_blank" rel="nofollow noreferrer">davetcoleman/moveit_simple_grasps</a></p><p data-pid="ByM7HXvB"><a href="https://github.com/qboticslabs/mastering_ros/issues/3" class=" wrap external" target="_blank" rel="nofollow noreferrer">Moveit_simple_grasping #3</a></p><p data-pid="eDfn-zRW"><a href="https://link.zhihu.com/?target=http%3A//docs.ros.org/kinetic/api/moveit_tutorials/html/doc/pick_place/pick_place_tutorial.html" class=" wrap external" target="_blank" rel="nofollow noreferrer">Pick and Place Tutorial</a></p><p data-pid="qXB00E48">?   </p>
+
+
+
+<br><div id="ros-moveit"><strong>使用ROS MoveIt！控制diy五自由度机械臂</strong></div>
+<a href="https://zhuanlan.zhihu.com/p/267132852"> https://zhuanlan.zhihu.com/p/267132852</a>
+<h2 data-first-child>使用ROS MoveIt！控制diy五自由度机械臂</h2><h2>写在前面</h2><p data-pid="niMQc-fN">环境：Ubuntu16.04+ROS Kinetic</p><p data-pid="Vhwj9pcX">准备工作一定要有，参见前面几篇博客，尤其是<a href="https://blog.csdn.net/qq_26565435/article/details/89856591"> 使用MoveIt！+Arbotix控制六自由度机械臂</a>，里面涉及到控制器配置文件的编写、launch文件修改等。</p><p data-pid="9v-mG3-5">了解驱动的原理：</p><br><img src="v2-0f3ae9620177cd6cfe54d304ba0eef4d_720w.jpg" ><p data-pid="x91nf-C5">重点理解前两个模块的内容，moveit实际上是通过action这种交互机制来控制机械臂的，并且moveit只提供action client，因此driver中的action server需要自己编写，两者的接口类型为FollowJointTrajectoryAction。</p><p data-pid="XIOGWIUY">我没有使用ros_arduino_brige，直接在arduino IDE中编写ros节点订阅driver发送过来的关节信息，然后驱动机械臂。</p><p data-pid="2dr3sdVL">有机会我也要试试ros_arduino_brige～</p><h2>修改功能包中相关文件</h2><h3>编写myrobot_controllers.yaml文件</h3><p data-pid="NY6ViOtV">经过moveit setup assistant设置之后，可以在myrobot_moveit_config包的config文件夹下找到一个fake_controllers.yaml文件，这个是虚拟控制器配置文件，仅供仿真使用，如果要驱动真实机械臂，就要编写自己的controller.yaml（可参见<a href="https://blog.csdn.net/qq_26565435/article/details/89856591" class=" wrap external" target="_blank" rel="nofollow noreferrer">使用MoveIt！+Arbotix控制六自由度机械臂</a>）以取代fake的那个。</p><p data-pid="N0w6-awd">myrobot_controllers.yaml格式如下，注意yaml文件对格式要求比较严格，要用空格代替tab！！</p><div class="highlight"><pre><code class="language-yaml"><span class="nt">controller_list</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">arm_controller</span><span class="w">
+</span><span class="w">    </span><span class="nt">action_ns</span><span class="p">:</span><span class="w"> </span><span class="l">follow_joint_trajectory</span><span class="w">
+</span><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">FollowJointTrajectory</span><span class="w">
+</span><span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="w">    </span><span class="nt">joints</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="l">joint1</span><span class="w">
+</span><span class="w">      </span>- <span class="l">joint2</span><span class="w">
+</span><span class="w">      </span>- <span class="l">joint3</span><span class="w">
+</span><span class="w">      </span>- <span class="l">joint4</span><span class="w">
+</span><span class="w">      </span>- <span class="l">joint5</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">gripper_controller</span><span class="w">
+</span><span class="w">    </span><span class="nt">action_ns</span><span class="p">:</span><span class="w"> </span><span class="l">gripper_action</span><span class="w">
+</span><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">GripperCommand</span><span class="w">
+</span><span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="w">    </span><span class="nt">joints</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="l">finger_joint1</span><span class="w">
+</span><span class="w">      </span>- <span class="l">finger_joint2</span></code></pre></div><h3>修改launch文件</h3><p data-pid="vi37YuO7">在demo.launch文件中，重点关注如下嵌套关系:</p><ul><li data-pid="Jg-1Ts2n">demo.launch</li><li data-pid="HnE1f498">move_group.launch</li><ul><li data-pid="y3oj09f9">trajectory_execution.launch.xml</li><li data-pid="GlDpUzR4">$(arg moveit_controller_manager)_moveit_controller_manager.launch.xml</li></ul></ul><p data-pid="IifWPqAE">一般新建的包，会以你自己的robot名自建一个空的xxx_moveit_controller_manager.launch.xml，我的就是myrobot_moviet_controller_manager.launch.xml。该文件的主要作用就是加载你自己编写的控制器yaml文件，通用格式如下：</p><div class="highlight"><pre><code class="language-xml"><span class="nt">&lt;launch&gt;</span>
+    <span class="nt">&lt;arg</span> <span class="na">name=</span><span class="s">&#34;moveit_controller_manager&#34;</span> <span class="na">default=</span><span class="s">&#34;moveit_simple_controller_manager/MoveItSimpleControllerManager&#34;</span> <span class="nt">/&gt;</span>
+
+    <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&#34;moveit_controller_manager&#34;</span> <span class="na">value=</span><span class="s">&#34;$(arg moveit_controller_manager)&#34;</span> <span class="nt">/&gt;</span>
+
+
+    <span class="nt">&lt;rosparam</span> <span class="na">file=</span><span class="s">&#34;$(find myrobot_moveit_config)/config/myrobot_controllers.yaml&#34;</span> <span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/launch&gt;</span></code></pre></div><p data-pid="0PWg05FY">需要注意，在demo演示时，机械臂的joint_states是通过/move_group/fake_controller_joint_states这个话题发出到/joint_states话题，而驱动真实机械臂时，从上面的Driver模块中可以看出，需要自己编写一个joint_states_pulisher发布/move_group/myrobot_controller_joint_states话题。在demo.launch文件中进行修改：</p><div class="highlight"><pre><code class="language-xml"><span class="nt">&lt;node</span> <span class="na">name=</span><span class="s">&#34;joint_state_publisher&#34;</span> <span class="na">pkg=</span><span class="s">&#34;joint_state_publisher&#34;</span> <span class="na">type=</span><span class="s">&#34;joint_state_publisher&#34;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&#34;use_gui&#34;</span> <span class="na">value=</span><span class="s">&#34;$(arg use_gui)&#34;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;rosparam</span> <span class="na">param=</span><span class="s">&#34;source_list&#34;</span><span class="nt">&gt;</span>[/move_group/myrobot_controller_joint_states]<span class="nt">&lt;/rosparam&gt;</span>
+  <span class="nt">&lt;/node&gt;</span></code></pre></div><h2>myrobot_driver.cpp</h2><p data-pid="ESpXxTyR">综上，自建的/move_group/myrobot_controller_joint_states话题+上文提到的action server = myrobot_driver节点，即自定义的Driver节点。另外，我手头上的机械臂只是简单的舵机驱动，没有角度反馈，所以可以通过获取movie规划得到的最后一组数据作为机械臂运动输出后的实际状态（没有闭环反馈就是很low……），代码如下</p><div class="highlight"><pre><code class="language-cpp"><span class="cm">/*    myrobot_driver.cpp    */</span>
+<span class="cp">#include</span> <span class="cpf">&lt;ros/ros.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;actionlib/server/simple_action_server.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;control_msgs/FollowJointTrajectoryAction.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;control_msgs/FollowJointTrajectoryActionGoal.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;control_msgs/FollowJointTrajectoryActionResult.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sensor_msgs/JointState.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;std_msgs/Float64.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cm">/*------只是arm group部分，因此只有五个舵机-----*/</span>
+<span class="c1">//换算舵机PWM值与弧度之间的关系
+</span><span class="c1">//舵机运动范围PWM500-2500，对应角度0°-270°，中间状态为1500（设定为偏置）
+</span><span class="c1">//关节弧度范围-2.36-2.36，0rad对应舵机中间状态1500
+</span><span class="c1">//换算得到每变化1rad，PWM变化423
+</span><span class="c1"></span><span class="cp">#define scaler 423
+</span><span class="cp">#define offset 1500
+</span><span class="cp"></span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">FollowJointTrajectoryAction</span>
+<span class="p">{</span>
+<span class="k">protected</span><span class="o">:</span>
+    <span class="n">sensor_msgs</span><span class="o">::</span><span class="n">JointState</span> <span class="n">js</span><span class="p">;</span>
+    <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span> <span class="n">joint1_pos</span><span class="p">,</span> <span class="n">joint2_pos</span><span class="p">,</span> <span class="n">joint3_pos</span><span class="p">,</span> <span class="n">joint4_pos</span><span class="p">,</span> <span class="n">joint5_pos</span><span class="p">;</span>
+    <span class="n">ros</span><span class="o">::</span><span class="n">NodeHandle</span> <span class="n">nh</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">action_name_</span><span class="p">;</span>
+    <span class="n">ros</span><span class="o">::</span><span class="n">Publisher</span> <span class="n">pub_joint</span><span class="p">;</span><span class="c1">//给move_group识别的publisher，代替joint_state_publisher，发布joint_states
+</span><span class="c1"></span>    <span class="n">ros</span><span class="o">::</span><span class="n">Publisher</span> <span class="n">pub_joint1</span><span class="p">;</span><span class="c1">//给下位机arduino识别的publiser
+</span><span class="c1"></span>    <span class="n">ros</span><span class="o">::</span><span class="n">Publisher</span> <span class="n">pub_joint2</span><span class="p">;</span><span class="c1">//同上
+</span><span class="c1"></span>    <span class="n">ros</span><span class="o">::</span><span class="n">Publisher</span> <span class="n">pub_joint3</span><span class="p">;</span><span class="c1">//同上
+</span><span class="c1"></span>    <span class="n">ros</span><span class="o">::</span><span class="n">Publisher</span> <span class="n">pub_joint4</span><span class="p">;</span><span class="c1">//同上
+</span><span class="c1"></span>    <span class="n">ros</span><span class="o">::</span><span class="n">Publisher</span> <span class="n">pub_joint5</span><span class="p">;</span><span class="c1">//同上
+</span><span class="c1"></span>    <span class="c1">//与moveit中action client通讯的action server
+</span><span class="c1"></span>    <span class="n">actionlib</span><span class="o">::</span><span class="n">SimpleActionServer</span><span class="o">&lt;</span><span class="n">control_msgs</span><span class="o">::</span><span class="n">FollowJointTrajectoryAction</span><span class="o">&gt;</span> <span class="n">as_</span><span class="p">;</span>
+
+    <span class="n">control_msgs</span><span class="o">::</span><span class="n">FollowJointTrajectoryActionResult</span> <span class="n">result_</span><span class="p">;</span>
+    <span class="n">control_msgs</span><span class="o">::</span><span class="n">FollowJointTrajectoryActionGoal</span> <span class="n">goal_</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">FollowJointTrajectoryAction</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">name</span><span class="p">)</span> <span class="o">:</span>
+        <span class="n">as_</span><span class="p">(</span><span class="n">nh</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">false</span><span class="p">),</span>
+        <span class="n">action_name_</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">as_</span><span class="p">.</span><span class="n">registerGoalCallback</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">FollowJointTrajectoryAction</span><span class="o">::</span><span class="n">goalCB</span><span class="p">,</span> <span class="k">this</span><span class="p">));</span>
+        <span class="n">as_</span><span class="p">.</span><span class="n">registerPreemptCallback</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">FollowJointTrajectoryAction</span><span class="o">::</span><span class="n">preemptCB</span><span class="p">,</span> <span class="k">this</span><span class="p">));</span>
+        <span class="n">as_</span><span class="p">.</span><span class="n">start</span><span class="p">();</span>
+        <span class="n">pub_joint</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">advertise</span><span class="o">&lt;</span><span class="n">sensor_msgs</span><span class="o">::</span><span class="n">JointState</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&#34;/move_group/myrobot_controller_joint_states&#34;</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+        <span class="n">pub_joint1</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">advertise</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&#34;joint1_value&#34;</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+        <span class="n">pub_joint2</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">advertise</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&#34;joint2_value&#34;</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+        <span class="n">pub_joint3</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">advertise</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&#34;joint3_value&#34;</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+        <span class="n">pub_joint4</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">advertise</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&#34;joint4_value&#34;</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+        <span class="n">pub_joint5</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">advertise</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&#34;joint5_value&#34;</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+        <span class="c1">// ros::Rate loop_rate(10);
+</span><span class="c1"></span>        <span class="n">js</span><span class="p">.</span><span class="n">name</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+        <span class="n">js</span><span class="p">.</span><span class="n">position</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+        <span class="c1">//名字要与关节定义的名字一致
+</span><span class="c1"></span>        <span class="n">js</span><span class="p">.</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#34;joint1&#34;</span><span class="p">;</span>
+        <span class="n">js</span><span class="p">.</span><span class="n">name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#34;joint2&#34;</span><span class="p">;</span>
+        <span class="n">js</span><span class="p">.</span><span class="n">name</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#34;joint3&#34;</span><span class="p">;</span>
+        <span class="n">js</span><span class="p">.</span><span class="n">name</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#34;joint4&#34;</span><span class="p">;</span>
+        <span class="n">js</span><span class="p">.</span><span class="n">name</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#34;joint5&#34;</span><span class="p">;</span>
+        <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;-------action start!-------&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">~</span><span class="n">FollowJointTrajectoryAction</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+
+    <span class="kt">void</span> <span class="nf">goalCB</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;-------goal is receive!-------&#34;</span><span class="p">);</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">trajectory_msgs</span><span class="o">::</span><span class="n">JointTrajectoryPoint</span><span class="o">&gt;</span> <span class="n">points_</span><span class="p">;</span>
+        <span class="kt">double</span> <span class="n">points_end</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
+        <span class="kt">double</span> <span class="n">Pos_length</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">as_</span><span class="p">.</span><span class="n">isNewGoalAvailable</span><span class="p">()){</span>
+            <span class="n">js</span><span class="p">.</span><span class="n">position</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+            <span class="n">points_</span> <span class="o">=</span> <span class="n">as_</span><span class="p">.</span><span class="n">acceptNewGoal</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">trajectory</span><span class="p">.</span><span class="n">points</span><span class="p">;</span>
+            <span class="n">Pos_length</span> <span class="o">=</span> <span class="n">points_</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+                <span class="c1">//假设v是一个vector对象,v.at(n)和v[n]是一样的
+</span><span class="c1"></span>                <span class="c1">//但是前者会检查是否越界，后者不会
+</span><span class="c1"></span>                <span class="n">points_end</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">points_</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">Pos_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">).</span><span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+                <span class="n">js</span><span class="p">.</span><span class="n">position</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">points_end</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+            <span class="p">}</span>
+            <span class="n">js</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="n">ros</span><span class="o">::</span><span class="n">Time</span><span class="o">::</span><span class="n">now</span><span class="p">();</span>
+            <span class="c1">//向move_group节点发布规划得到的关节值
+</span><span class="c1"></span>            <span class="n">pub_joint</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="n">js</span><span class="p">);</span>
+            <span class="c1">//向下位机arduino节点发布规划得到的关节值，直接得到舵机PWM值
+</span><span class="c1"></span>            <span class="c1">//舵机2需要反向
+</span><span class="c1"></span>            <span class="n">joint1_pos</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">js</span><span class="p">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scaler</span> <span class="o">+</span> <span class="n">offset</span><span class="p">;</span>
+            <span class="n">joint2_pos</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="o">-</span><span class="n">js</span><span class="p">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scaler</span> <span class="o">+</span> <span class="n">offset</span><span class="p">;</span>
+            <span class="n">joint3_pos</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">js</span><span class="p">.</span><span class="n">position</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">scaler</span> <span class="o">+</span> <span class="n">offset</span><span class="p">;</span>
+            <span class="n">joint4_pos</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">js</span><span class="p">.</span><span class="n">position</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">scaler</span> <span class="o">+</span> <span class="n">offset</span><span class="p">;</span>
+            <span class="n">joint5_pos</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">js</span><span class="p">.</span><span class="n">position</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">scaler</span> <span class="o">+</span> <span class="n">offset</span><span class="p">;</span>
+            <span class="n">pub_joint1</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="n">joint1_pos</span><span class="p">);</span>
+            <span class="n">pub_joint2</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="n">joint2_pos</span><span class="p">);</span>
+            <span class="n">pub_joint3</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="n">joint3_pos</span><span class="p">);</span>
+            <span class="n">pub_joint4</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="n">joint4_pos</span><span class="p">);</span>
+            <span class="n">pub_joint5</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="n">joint5_pos</span><span class="p">);</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+            <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;-------goal is not availabel!-------&#34;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">control_msgs</span><span class="o">::</span><span class="n">FollowJointTrajectoryResult</span> <span class="n">result</span><span class="p">;</span>
+        <span class="n">result</span><span class="p">.</span><span class="n">error_code</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">as_</span><span class="p">.</span><span class="n">setSucceeded</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kt">void</span> <span class="nf">preemptCB</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;%s: Preempted&#34;</span><span class="p">,</span> <span class="n">action_name_</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+        <span class="n">as_</span><span class="p">.</span><span class="n">setPreempted</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">ros</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&#34;myrobot_driver&#34;</span><span class="p">);</span>
+    <span class="n">FollowJointTrajectoryAction</span> <span class="n">followjointtrajectory</span><span class="p">(</span><span class="s">&#34;arm_controller/follow_joint_trajectory&#34;</span><span class="p">);</span><span class="c1">//名称要与yaml配置一致
+</span><span class="c1"></span>    <span class="n">ros</span><span class="o">::</span><span class="n">spin</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><h2>加个验证</h2><h3>运行demo，订阅/move_group/myrobot_controller_joint_states</h3><p data-pid="E0S4w4FB">命令如下：</p><div class="highlight"><pre><code class="language-text">$ rosrun myrobot_real myrobot_driver
+$ roslaunch myrobot_moveit_config demo.launch</code></pre></div><p data-pid="Fl8VTI3i">rqt_graph一下，看看话题/move_group/myrobot_controller_joint_states加载成功没有，同时如下显示可以知道arm_controller加载成功，Driver中的action server与move_group中的action client也配对成功。</p><br><img src="v2-fdfc3d4b451589f8dbb73c5b8c7b5778_b.png" ><br><img src="v2-ca0e215acbe3d2f953dda85878303d4a_b.png" ><p data-pid="5WNjCG0H">监听话题/move_group/myrobot_controller_joint_states，即<code>rostopic echo /move_group/myrobot_controller_joint_states</code>，拖动机械臂并规划执行，可监听到如下数据。目前需要的就是position。</p><br><img src="v2-a6bafed78e168bd3f6d2045d930b3922_720w.jpg" ><p data-pid="e9pj_KEv">编写一个简单的myrobot_sub.cpp</p><p data-pid="XHCufOk_">为了省事，直接撸一个订阅节点，把myrobot_driver.cpp中写的jointX_value全部订阅监听一道，看算的舵机PWM值与弧度值之间是不是正确对应关系，也方便后面测试舵机。</p><div class="highlight"><pre><code class="language-cpp"><span class="cp">#include</span> <span class="cpf">&lt;ros/ros.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;std_msgs/MultiArrayLayout.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;std_msgs/String.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;std_msgs/MultiArrayDimension.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;std_msgs/Int16MultiArray.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sensor_msgs/JointState.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;std_msgs/Float64.h&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="cm">/*------只是arm group部分，因此只有五个舵机-----*/</span>
+<span class="cp">#define scaler 423
+</span><span class="cp">#define offset 1500
+</span><span class="cp"></span>
+<span class="kt">float</span> <span class="n">jointval</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">};</span>
+
+<span class="kt">void</span> <span class="nf">callback1</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span> <span class="n">pos_msg</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">jointval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span>  <span class="n">pos_msg</span><span class="p">.</span><span class="n">data</span>  <span class="p">;</span><span class="c1">//舵机1
+</span><span class="c1"></span>    <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;[%f] &#34;</span><span class="p">,</span> <span class="n">jointval</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">callback2</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span> <span class="n">pos_msg</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">jointval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span>  <span class="n">pos_msg</span><span class="p">.</span><span class="n">data</span> <span class="p">;</span><span class="c1">//舵机2
+</span><span class="c1"></span>    <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;[%f] &#34;</span><span class="p">,</span> <span class="n">jointval</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">callback3</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span> <span class="n">pos_msg</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">jointval</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span>  <span class="n">pos_msg</span><span class="p">.</span><span class="n">data</span> <span class="p">;</span><span class="c1">//舵机3
+</span><span class="c1"></span>    <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;[%f] &#34;</span><span class="p">,</span> <span class="n">jointval</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">callback4</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span> <span class="n">pos_msg</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">jointval</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span>  <span class="n">pos_msg</span><span class="p">.</span><span class="n">data</span><span class="p">;</span><span class="c1">//舵机4
+</span><span class="c1"></span>    <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;[%f] &#34;</span><span class="p">,</span> <span class="n">jointval</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">callback5</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span><span class="n">pos_msg</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">jointval</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span>  <span class="n">pos_msg</span><span class="p">.</span><span class="n">data</span> <span class="p">;</span><span class="c1">//舵机5
+</span><span class="c1"></span>    <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;[%f] &#34;</span><span class="p">,</span> <span class="n">jointval</span><span class="p">[</span><span class="mi">4</span><span class="p">]);</span>
+    <span class="n">ROS_INFO</span><span class="p">(</span><span class="s">&#34;-----------done successfully-----------&#34;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="cm">/* code for main function */</span>
+    <span class="n">ros</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&#34;ListenJointValue&#34;</span><span class="p">);</span>
+
+    <span class="n">ros</span><span class="o">::</span><span class="n">NodeHandle</span> <span class="n">nh</span><span class="p">;</span>
+    <span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span> <span class="n">sub1</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s">&#34;joint1_value&#34;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">callback1</span><span class="p">);</span>
+    <span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span> <span class="n">sub2</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s">&#34;joint2_value&#34;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">callback2</span><span class="p">);</span>
+    <span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span> <span class="n">sub3</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s">&#34;joint3_value&#34;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">callback3</span><span class="p">);</span>
+    <span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span> <span class="n">sub4</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s">&#34;joint4_value&#34;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">callback4</span><span class="p">);</span>
+    <span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span> <span class="n">sub5</span> <span class="o">=</span> <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s">&#34;joint5_value&#34;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">callback5</span><span class="p">);</span>
+
+    <span class="n">ros</span><span class="o">::</span><span class="n">spin</span><span class="p">();</span>
+
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p data-pid="6QM3Ty-i"><code>$ rosrun myrobot_real myrobot_sub</code></p><p data-pid="XIAxWMTD">成功～</p><br><img src="v2-fcab06f69b1bb487de23cb8552beee2f_720w.jpg" ><h2>arduino端节点</h2><p data-pid="9NzKbTI1">模仿上面的myrobot_sub.cpp可以很快的写出arduino程序，只需要加个舵机初始化和驱动程序即可，简单来说就是订阅监听+驱动。</p><p data-pid="8Du54LVt">我试了下，舵机速度超快，震得桌子咚咚响，不行不行太吵了。我之前写了个控制舵机速度的程序，以1rad/s的速度改改正好可以拿来用<a href="https://blog.csdn.net/qq_26565435/article/details/89196694" class=" wrap external" target="_blank" rel="nofollow noreferrer">Arduino学习（4）——串口发送指令控制舵机速度</a>。</p><p data-pid="mTzb8ISG">代码如下：</p><div class="highlight"><pre><code class="language-cpp"><span class="cp">#include</span> <span class="cpf">&lt;ros.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;std_msgs/Int16.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;std_msgs/Float64.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;ArduinoHardware.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;Servo.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cp">#define USE_USBCON
+</span><span class="cp">#define SERVO_NUM 5
+</span><span class="cp">#define init 1500
+</span><span class="cp">#define  SERVO_TIME_PERIOD  20    </span><span class="c1">//每隔20ms处理一次（累加）舵机的PWM增量
+</span><span class="c1"></span>
+<span class="n">Servo</span> <span class="n">myservo</span><span class="p">[</span><span class="n">SERVO_NUM</span><span class="p">];</span>
+<span class="k">const</span> <span class="n">byte</span> <span class="n">servo_pin</span><span class="p">[</span><span class="n">SERVO_NUM</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">10</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A0</span><span class="p">,</span> <span class="n">A1</span><span class="p">};</span>
+<span class="kt">float</span> <span class="n">jointval</span><span class="p">[</span><span class="n">SERVO_NUM</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">};</span>
+<span class="c1">//float buf[SERVO_NUM] = {0.0, 0.0, 0.0, 0.0, 0.0};
+</span><span class="c1"></span><span class="kt">bool</span> <span class="n">check</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span><span class="c1">//check为true才表示订阅到消息
+</span><span class="c1"></span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>                  <span class="c1">//舵机结构体变量声明
+</span><span class="c1"></span>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">aim</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">;</span>      <span class="c1">//舵机目标值 
+</span><span class="c1"></span>    <span class="kt">float</span> <span class="n">cur</span> <span class="o">=</span> <span class="mf">1500.0</span><span class="p">;</span>           <span class="c1">//舵机当前值
+</span><span class="c1"></span>    <span class="kt">float</span> <span class="n">inc</span><span class="o">=</span> <span class="mf">8.48</span><span class="p">;</span>           <span class="c1">//舵机值增量，以20ms为周期
+</span><span class="c1"></span><span class="p">}</span><span class="n">duoji_struct</span><span class="p">;</span>
+<span class="n">duoji_struct</span> <span class="n">servo_do</span><span class="p">[</span><span class="n">SERVO_NUM</span><span class="p">];</span>           <span class="c1">//用结构体变量声明一个舵机变量组
+</span><span class="c1"></span>
+<span class="n">ros</span><span class="o">::</span><span class="n">NodeHandle</span> <span class="n">nh</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">joint1_callback</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">){</span>
+  <span class="n">jointval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+  <span class="c1">//buf[0] = jointval[0];
+</span><span class="c1"></span>  <span class="c1">//myservo[0].writeMicroseconds((int)jointval[0]);
+</span><span class="c1"></span>  <span class="n">check</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">joint2_callback</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">){</span>
+  <span class="n">jointval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+  <span class="c1">//buf[1] = jointval[1];
+</span><span class="c1"></span>  <span class="c1">//myservo[1].writeMicroseconds((int)jointval[1]);
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">joint3_callback</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">){</span>
+  <span class="n">jointval</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+  <span class="c1">//buf[2] = jointval[2];
+</span><span class="c1"></span>  <span class="c1">//myservo[2].writeMicroseconds((int)jointval[2]);
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">joint4_callback</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">){</span>
+  <span class="n">jointval</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+  <span class="c1">//buf[3] = jointval[3];
+</span><span class="c1"></span>  <span class="c1">//myservo[3].writeMicroseconds((int)jointval[3]);
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">joint5_callback</span><span class="p">(</span><span class="k">const</span> <span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&amp;</span> <span class="n">msg</span><span class="p">){</span>
+  <span class="n">jointval</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+  <span class="c1">//buf[4] = jointval[4];
+</span><span class="c1"></span>  <span class="c1">//myservo[4].writeMicroseconds((int)jointval[4]);
+</span><span class="c1"></span><span class="p">}</span>
+
+
+<span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span> <span class="n">sub1</span><span class="p">(</span><span class="s">&#34;joint1_value&#34;</span><span class="p">,</span> <span class="n">joint1_callback</span><span class="p">);</span>
+<span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span> <span class="n">sub2</span><span class="p">(</span><span class="s">&#34;joint2_value&#34;</span><span class="p">,</span> <span class="n">joint2_callback</span><span class="p">);</span>
+<span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span> <span class="n">sub3</span><span class="p">(</span><span class="s">&#34;joint3_value&#34;</span><span class="p">,</span> <span class="n">joint3_callback</span><span class="p">);</span>
+<span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span> <span class="n">sub4</span><span class="p">(</span><span class="s">&#34;joint4_value&#34;</span><span class="p">,</span> <span class="n">joint4_callback</span><span class="p">);</span>
+<span class="n">ros</span><span class="o">::</span><span class="n">Subscriber</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">Float64</span><span class="o">&gt;</span> <span class="n">sub5</span><span class="p">(</span><span class="s">&#34;joint5_value&#34;</span><span class="p">,</span> <span class="n">joint5_callback</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">AttachServosAndInit</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">byte</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">SERVO_NUM</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+    <span class="n">myservo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">attach</span><span class="p">(</span><span class="n">servo_pin</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+    <span class="n">myservo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">writeMicroseconds</span><span class="p">(</span><span class="n">init</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">subscribeToAll</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">sub1</span><span class="p">);</span>
+  <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">sub2</span><span class="p">);</span>
+  <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">sub3</span><span class="p">);</span>
+  <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">sub4</span><span class="p">);</span>
+  <span class="n">nh</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">sub5</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">/*
+</span><span class="cm">时间处理函数，第一个参数是上一次处理时间点， 第二个参数是处理时间间隔，
+</span><span class="cm">到达时间间隔返回0，否则返回1
+</span><span class="cm">*/</span>
+<span class="kt">bool</span> <span class="nf">handleTimePeriod</span><span class="p">(</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="o">*</span><span class="n">ptr_time</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">time_period</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">((</span><span class="n">millis</span><span class="p">()</span> <span class="o">-</span> <span class="o">*</span><span class="n">ptr_time</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">time_period</span><span class="p">)</span> <span class="p">{</span><span class="c1">//millis()返回Arduino开始运行当前程序以来经历的毫秒数
+</span><span class="c1"></span>      <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>  
+  <span class="p">}</span> <span class="k">else</span><span class="p">{</span>
+       <span class="o">*</span><span class="n">ptr_time</span> <span class="o">=</span> <span class="n">millis</span><span class="p">();</span>
+       <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">//解析订阅得到的PWM
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">analyJoint</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">byte</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">SERVO_NUM</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">aim</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">jointval</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> 
+<span class="p">}</span>
+
+<span class="c1">//舵机PWM增量处理函数，每隔SERVO_TIME_PERIOD毫秒处理一次，这样就实现了舵机的连续控制
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">handleServo</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="k">static</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">systick_ms_bak</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">handleTimePeriod</span><span class="p">(</span><span class="o">&amp;</span><span class="n">systick_ms_bak</span><span class="p">,</span> <span class="n">SERVO_TIME_PERIOD</span><span class="p">))</span><span class="k">return</span><span class="p">;</span>  <span class="c1">//20ms处理一次，不到20ms则返回不处理
+</span><span class="c1"></span>  <span class="k">for</span><span class="p">(</span><span class="n">byte</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">SERVO_NUM</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">abs</span><span class="p">(</span> <span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">aim</span> <span class="o">-</span> <span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cur</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">abs</span> <span class="p">(</span><span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">inc</span><span class="p">)</span> <span class="p">)</span> <span class="p">{</span><span class="c1">//这里就体现了这个程序的精度，SERVO_TIME_PERIOD越小精度越高
+</span><span class="c1"></span>       <span class="n">myservo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">writeMicroseconds</span><span class="p">(</span><span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">aim</span><span class="p">);</span>              
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">aim</span> <span class="o">&lt;</span> <span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cur</span> <span class="p">)</span>
+        <span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cur</span> <span class="o">-=</span> <span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">inc</span><span class="p">;</span>
+      <span class="k">else</span>
+        <span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cur</span> <span class="o">+=</span> <span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">inc</span><span class="p">;</span>
+      <span class="n">myservo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">writeMicroseconds</span><span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">servo_do</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cur</span><span class="p">);</span> 
+    <span class="p">}</span>    
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">setup</span><span class="p">(){</span>
+  <span class="n">nh</span><span class="p">.</span><span class="n">initNode</span><span class="p">();</span>
+  <span class="n">subscribeToAll</span><span class="p">();</span>
+  <span class="n">AttachServosAndInit</span><span class="p">();</span>
+
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">(){</span>
+  <span class="n">nh</span><span class="p">.</span><span class="n">spinOnce</span><span class="p">();</span> 
+  <span class="n">analyJoint</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">check</span><span class="p">){</span><span class="c1">//保证起始状态为中间位置
+</span><span class="c1"></span>    <span class="n">handleServo</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2>效果图</h2><p data-pid="CQNn52ol">运行命令<code>rosrun rosserial_python serial_node.py /dev/ttyUSB0</code> </p><br><img src="v2-b25e443dc8689726fdee921283575af6_b.gif" ><br><img src="v2-232a7919de0114030e5e878e57a9d247_720w.jpg" >
+
+
+
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
