@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>双臂机器人建模仿真</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">双臂机器人建模仿真</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/264911739 "> https://zhuanlan.zhihu.com/p/264911739  </a> 
+<h2 data-first-child>源码随后附上，稍安勿躁</h2><br><img src="v2-84c44a79142a075478a89ab21166f4b1_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="CQj-ngpK">实际上，如果就把双臂中的每个臂当做单个的机械臂进行规划，那么用matlab进行双臂建模就没有太大必要，只需要对每个单臂进行单独规划即可。但是，如果涉及到双臂之间的协同轨迹规划，如上图所示，这时用matlab进行双臂建模仿真就会显得事半功倍。本文先只介绍双臂在matlab中的正运动学建模，后续会补充在matlab中如何进行双臂轨迹规划。</p><h2>PUMA560构型双臂</h2><p data-pid="v0_g3Asg">熟悉Peter大神工具箱的都知道，该工具箱使用dh连杆建模，建立双臂模型，需要建立腰关节连杆，并将两个单机械臂组合到腰关节上。如下图所示，本文针对puma560构型双臂采用==改进DH建模==（具体建模步骤见博客<a href="https://blog.csdn.net/qq_26565435/article/details/91460988" >机器人学回炉重造（1）：正运动学、标准D-H法与改进D-H法的区别与应用（附ABB机械臂运动学建模matlab代码）</a>），此时腰关节连杆坐标系就是基坐标系X0Y0Z0，此时的肩关节坐标系X2Y2Z2就是单臂机器人的基坐标系，然后就从肩关节坐标系开始建立单臂的DH坐标系，也可以认为是单独的腰关节连杆坐标系+单臂的DH坐标系，需要注意的是建立整体DH坐标系时腰关节与肩关节之间需要加-pi/2角度偏置，目的是将puma560构型的机械臂垂下去，下图中的虚线X2即为不加偏置的肩关节坐标系，实线X2即为加了偏置角度后的肩关节坐标系,d=肩宽/2。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-1fb4b90dfcd2ebc4603595c2b1c1edd3_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="eU5Eairr">对应的matlab正运动学仿真如下所示：</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-9e2b1afd89c472ef5440d60080ac0e32_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="99AjpSFZ">腰关节与肩关节之间也可以不加偏置角度，这样的话，两个坐标系之间的转换就可以画成如下所示。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-76428214e86d7fe58950e05cc266b274_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="Bvwp_moW">对应的matlab正运动学仿真如下所示：</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-0d6b3bfa10d11e678fe0fffff06c4f81_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h2>UR构型双臂</h2><p data-pid="TDbhxBI3">本文UR采用标准DH建模，建模过程全网可搜，标准DH坐标系建立如下。</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-f28f18c9b30e6fc1c1dc4048c5ca803d_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-ab9f28bacea6becc78e27edc09987cf1_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="GS1CRWbu">分析上图，黑色坐标系X0Y0Z0是世界坐标系，也可认为这是腰关节坐标系，红色虚线坐标系X1Y1Z1是肩关节坐标系（也就是UR的基坐标系{0}），此时腰关节与肩关节不存在角度偏置，matlab仿真建模就是如下所示</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-98394f07c70df4544ba519d9ac408f7e_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="dwZsCCrL">亮蓝色实线坐标系X1Y1Z1是加了pi/2偏置角度后的肩关节坐标系，matlab建模仿真如下所示</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-d6a0621a47b91bdd5fb652196f8d7235_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><h2>如何进行轨迹仿真</h2><p data-pid="3ALvUykZ">进行轨迹仿真的最重要一点就是，<b>如何将世界（全局坐标系）坐标系下（也为腰关节坐标系）的轨迹映射到肩关节坐标系（机械臂的基坐标系）下</b>，弄明白这一点，使用matlab进行双臂轨迹算法验证就简单很多了~</p><p data-pid="-QUCD4LM">以PUMA560腰关节与肩关节有-pi/2角度偏置的双臂构型为例，如下图所示，</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-1fb4b90dfcd2ebc4603595c2b1c1edd3_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="Hg4V8dfO">世界（全局，也为腰关节）坐标系下的位姿表示为$^0_{n}T$，这就是我们算法验证时所给定的轨迹位姿，都是相对于世界坐标系的；现在的问题就是，将轨迹位姿映射到肩关节（机械臂基坐标系）下，也就是求$^2_{n}T$。这个就很简单了，即$^2_{n}T=inv(^0_{2}T)<i>^0_{n}T$。$^0_{2}T$即为单臂基坐标系相对于腰关节坐标系的姿态变换矩阵，根据腰关节和肩关节之间的坐标变换，可以分析得出，腰关节坐标系先绕X1轴（自己的）旋转pi/2，再绕动轴Z1旋转-pi/2，最后再沿着动轴Z1移动d长度，故$^0_{2}T=trotx(90)</i>trotz(-90)*transz(d)$。按照上述步骤即可将全局坐标系下的位姿映射到单臂局部坐标系下了。</p><p data-pid="7FNdbmjJ">同理，UR也可如此。</p><p data-pid="vEqXg5nv">最后就可以愉快的画轨迹了~（当然 过程挺艰辛）</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-04791242d95e884f8c465d21f26bb0b0.gif" ><p class="ztext-empty-paragraph"><br/></p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-61a26f54914aebe2dbf8491a0c7fbec4.gif" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="pKzYxdSg">也可以做双臂协同</p><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-e5d840c6374ec1657eb1a19644943a79.gif" >
+<p data-first-child data-pid="6LiaBEXn">做了几个demo，测试一下</p><br><img src="v2-e5d840c6374ec1657eb1a19644943a79.gif"><br>双臂协同，摆花手，开汽车<br><img src="v2-2f818851a57d9f7fecee5c12839013c4.gif">恒定工作空间<br><img src="v2-95059055a132a3bf95ad05bf00fef69e.gif"><br>爱的魔力转圈圈<br><img src="v2-b9c1f4ce3c49c4a7b6cb75d6038126d6.gif"><br>双臂任务规划
+<p data-first-child data-pid="xoOatCe7">工业6轴构型，用的是改进DH建模方法</p><p data-pid="TqaAU6P-">源代码</p><a href="https://github.com/OpenRobotSL/Dual_Arm_Robot">OpenRobotSL/Dual_Arm_Robot</a><br><img src="v2-0d6b3bfa10d11e678fe0fffff06c4f81_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="5uLVRia5">UR 6轴构型，用的是标准DH建模方法</p><br><img src="v2-98394f07c70df4544ba519d9ac408f7e_720w.jpg" >
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
