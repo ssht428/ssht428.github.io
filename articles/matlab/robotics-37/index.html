@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>理解URDF建模与Simscape建模笔记</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">理解URDF建模与Simscape建模笔记</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/264930343 ">  https://zhuanlan.zhihu.com/p/264930343 </a> 
+<h2 data-first-child>Simscape建模笔记</h2><h2>urdf开始讲起吧</h2><br><img src="v2-ca956170af59827163c68ec03db7c48c_720w.jpg" ><p data-pid="FX7NJANn">urdf建模过程其实与dh建模本质一样，<b>DH建模是连杆坐标系，建立的是关节与关节之间的变换关系</b>，也就是上图中==黄色主线==所指示的，从joint1(B1)到joint2(F2)之间的变换关系，而这就需要知道base的坐标、关节1的坐标一直到关节n的坐标位置，以此才能逐渐建立关节之间的数学关系T01、T12、……、Tnn+1，最终可以得到末端相对于前面任意关节的齐次变换关系。</p><p data-pid="YRp9q7LO">而urdf呢，多加了visual、inertial等标签，先简单以下图为例，link1建立在关节0上，也就是base，link2建立在joint1上，那么link1的坐标系是基于关节0的，link2的坐标系是基于joint1的，而joint1是基于base（也就是关节0）。加上inertial以及visual标签后，这两个标签的坐标也是基于该连杆前一个joint的，比如上图中的连杆各个标签就是基于前一个joint1的，也就是上图中的==黄色子线==。</p><br><img src="v2-f81fa0ed2be79033a8919da0fdb9c3d7_720w.jpg" ><h2>开始讲urdf转simscape</h2><p class="ztext-empty-paragraph"><br/></p><br><img src="v2-3c40829a650f96ab57be6975d78f8601_720w.jpg" ><p class="ztext-empty-paragraph"><br/></p><p data-pid="mfizdMWy">以<code>smimport(robot2.urdf)</code>为例，下图为base_link模块点开后，ReferenceFrame是参考坐标系，目前不知道这个坐标系是如何建立的，没有数据，因为我urdf文件是sw模型直接导的，~~猜测是建模时起始参考面的中心点上坐标系。~~直接看matlab官方介绍，如下，反正经验证这RF虽然不影响建模，但是能直接标定谁是参考，RF不影响整套模型，但是对于坐标系标注还是有影响得，所以保险起见建模时就加上。</p><blockquote data-pid="a1sdUX_l"> 定义一个框架，网络中的其他框架可以引用到该框架，或者可以附加到这些框架。 参照系不是必需的，但可以为建模和设计提供方便。<br/> 端口R是用参考框架标识的框架端口。 直接连接到R的任何框架端口也用参考框架标识。<br/> </blockquote><br><img src="v2-90e6a88bc78ae12c4bb92ed378083008_720w.jpg" ><br><img src="v2-d3be36523f03ceca5864368434f47a6f_720w.jpg" ><p data-pid="UzCloTuT">线路1、线路2和线路3分别代表的是从ReferenceFrame出发(也就是基于ReferenceFrame坐标系)，分别经过变换1、2、3-1以及3-2后得到inertial、visual以及输出的F1坐标系（F1坐标系就是base_link连接的joint2的输入B）。</p><p data-pid="871k82nz">经过变换1得到Inertial标签的R坐标，也就是第二幅图中椭圆圈圈中的偏移数据，对应的是urdf中的这段语句，可以看到中的标签的xyz和rpy对应上面第二幅图中<code>Rotation</code>和<code>Translation</code>相关数据。</p><div class="highlight"><pre><code class="language-xml"><span class="nt">&lt;link</span>
+    <span class="na">name=</span><span class="s">&#34;base_link&#34;</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;inertial&gt;</span>
+      <span class="nt">&lt;origin</span>
+        <span class="na">xyz=</span><span class="s">&#34;0.022007 0 0.019645&#34;</span>
+        <span class="na">rpy=</span><span class="s">&#34;0 0 0&#34;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;mass</span>
+        <span class="na">value=</span><span class="s">&#34;0.75904&#34;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;inertia</span>
+        <span class="na">ixx=</span><span class="s">&#34;0.0010231&#34;</span>
+        <span class="na">ixy=</span><span class="s">&#34;1.2626E-19&#34;</span>
+        <span class="na">ixz=</span><span class="s">&#34;0.00026134&#34;</span>
+        <span class="na">iyy=</span><span class="s">&#34;0.0029377&#34;</span>
+        <span class="na">iyz=</span><span class="s">&#34;-1.3324E-20&#34;</span>
+        <span class="na">izz=</span><span class="s">&#34;0.003596&#34;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/inertial&gt;</span></code></pre></div><br><img src="v2-c330d07c89f213901028bcae88722319_720w.jpg" ><p data-pid="jVMWgXwb">上面这个图呢，就是从referenceFrame出来的第二条变换线路，通过变换2得到visual标签下的R坐标系，方框中数据对应urdf文件中的这段语句，现在只看标签下的标签，即xyz和rpy，另外标签中的属性数据可以通过双击框图中的visual模块进行修改。</p><div class="highlight"><pre><code class="language-xml"><span class="nt">&lt;visual&gt;</span>
+      <span class="nt">&lt;origin</span>
+        <span class="na">xyz=</span><span class="s">&#34;0 0 0&#34;</span>
+        <span class="na">rpy=</span><span class="s">&#34;0 0 0&#34;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;geometry&gt;</span>
+        <span class="nt">&lt;mesh</span>
+          <span class="na">filename=</span><span class="s">&#34;package://myrobot_description_ultimate/meshes/base_link.STL&#34;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;/geometry&gt;</span>
+      <span class="nt">&lt;material</span>
+        <span class="na">name=</span><span class="s">&#34;&#34;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;color</span>
+          <span class="na">rgba=</span><span class="s">&#34;1 1 1 1&#34;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;/material&gt;</span>
+    <span class="nt">&lt;/visual&gt;</span></code></pre></div><br><img src="v2-8ed40d339bf51a472f9f77669f71beac_720w.jpg" ><p data-pid="HN3sj533">上面两幅图呢，就是从referenceFrame出发的第三条变换线路，通过坐标变换3-1和变换3-2可以得到该子框图(base_link)的输出F1，也就是该link所连接的joint1的输入B。可以理解为$T_{ref}T_{3-1}T_{3-2}=F1$，对应于urdf中的joint1的语句，此时只看标签中的xyz和rpy语句，joint1中另外的标签属性呢可以通过双击大框图中对应的joint1模块进行查看和修改。</p><div class="highlight"><pre><code class="language-xml"><span class="nt">&lt;joint</span>
+    <span class="na">name=</span><span class="s">&#34;joint1&#34;</span>
+    <span class="na">type=</span><span class="s">&#34;revolute&#34;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;origin</span>
+      <span class="na">xyz=</span><span class="s">&#34;0 0 0.05&#34;</span>
+      <span class="na">rpy=</span><span class="s">&#34;0 0 0&#34;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;parent</span>
+      <span class="na">link=</span><span class="s">&#34;base_link&#34;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;child</span>
+      <span class="na">link=</span><span class="s">&#34;link1&#34;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;axis</span>
+      <span class="na">xyz=</span><span class="s">&#34;0 0 1&#34;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;limit</span>
+      <span class="na">lower=</span><span class="s">&#34;-2.36&#34;</span>
+      <span class="na">upper=</span><span class="s">&#34;2.36&#34;</span>
+      <span class="na">effort=</span><span class="s">&#34;30&#34;</span>
+      <span class="na">velocity=</span><span class="s">&#34;1&#34;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/joint&gt;</span></code></pre></div><p data-pid="PEUK360V">上面讲的所有都是base_link子框图中的东西，其他的linkn与之类似，我就不多说了。不过还需要注意下面几幅图，按框图的数据流进行分析，就可以看出base_link框图输出的坐标系F1是joint1输入坐标系B，joint1输出坐标系F是link1输入坐标系F，<b>也就是base_link基于ReferenceFrame，可以将这个ReferenceFrame理解为joint0，joint1的变换涵盖在base_link中，基于ReferenceFrame，link1就是基于joint1的，至于link1子框图中的ReferenceFrame，从下图中可以看出，就是joint1的输出，也就是说能够理解为link1是基于joint1的，一个模块串联一个模块，最终就构成了urdf模型树。</b></p><p data-pid="Wngry2vl">就是这么个顺序建模，完事儿撒花??ヽ(°▽°)ノ?</p><br><img src="v2-5420a63addf991b300ff149742d774d0_720w.jpg" ><br><img src="v2-e97c0b4301fefe642524b2e76cad33ca_720w.jpg" ><p data-pid="edh-DzmM">下面是link2子框图中的内容，看起来特别清晰，同样也是三条变换线路。。。</p><br><img src="v2-13c97564113ad5ca8881090438f8ea2f_720w.jpg" ><h2>至于MBD给的UR臂xml文件呢</h2><p data-pid="yn7qnNQX">这个总的来说，是一个很有意思的建模方式，不同于之前的DH建模顺序流。DH建模顺序流实际上就是数学建模，首先得知道各个连杆关节相对于基坐标系或者前一个关节的坐标位置，然后通过变换矩阵连续相乘得到末端或者某个关节相对于基系或者其他关节的齐次变换。urdf呢，建模顺序可以从上面simscape框图可以看出，与DH建模顺序类似，可在其中加上inertial、visual、collision等标签。</p><p data-pid="NygwBuIZ">MBD课程给的这个xml文件呢，是通过sw中的simscape插件导出来的，通过这种方式建模实际上是一种物理建模，运行UR臂的xml文件后，可以看到，每个连杆link的子框图都是一样的，如下图，数据流是通过如下两个箭头方向进行的。urdf中的inertial、visual等标签都在R(solid)中，双击即可修改，所以说simscape直接导的模型更模块化一些。。。</p><br><img src="v2-dd181f4c8460f041ccd563ab1ae6b542_720w.jpg" ><p data-pid="JEoCbm33">下面这个图呢，最上面一层红色的单向长剪头是整个模型树的流向，中间绿色的箭头是urdf的建模顺序，最下面的红色箭头是DH的建模顺序，中间的红色短箭头是simscape建模的思路。。。</p><br><img src="v2-e0d4f5de6aff6da7ef1d2a837fe489ce_720w.jpg" ><p data-pid="N3p_v5dW">从simulink模型上来说，urdf的建模思路更为直观，直接通过搭积木的方式将最终的模型树建好，而simscape更具模块化的思想，直接通过拼图的方式将模型一块一块拼好。</p><h2>补充一下ReferenceFrame</h2><p data-pid="KO1GvuKj">点开urdf导出的simulink中link1模块，进行如下修改，运行后可以发现</p><br><img src="v2-2278a00819d67e5a02f6bbf36770b7d4_720w.jpg" ><br><img src="v2-6abd9e8590375525e542f2c2d4540b53_720w.jpg" ><p data-pid="6AncwfaC">由上面可以看出，ReferenceFrame是由输入F逆乘joint1_AxisinvTranseform旋转矩阵得到，旋转矩阵是单位阵，所以是沿着F坐标系的x反方向移动了0.1。。。总之这个RF用处很迷，建模时只要joint1_AxisinvTranseform是单位旋转阵+零平移，则RF就是输入F坐标系= =。所以我上面画的变换路线图均是从RF出发的。</p><p data-pid="TI1sKMHb">个人还是觉得，用urdf先建模然后再转simscape更容易理解一下。</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
