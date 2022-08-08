@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>matlab调用C++dll，需要安装编译器TDM-GCC</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">matlab调用C++dll，需要安装编译器TDM-GCC</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="../../../index.html"> Home </a> 
+<br>
+<br>
+<p>
+<br>本文转载自：<a href="https://zhuanlan.zhihu.com/p/264971858 "> https://zhuanlan.zhihu.com/p/264971858  </a> 
+<br><a href="#download">Matlab代码GIT地址和相关文件下载</a>
+<p data-first-child data-pid="BYz3iZ_U">本人彩笔嘴笨，直接上过程。。。</p><p data-pid="YIlmkJ95">如果有封装好的C++ dll文件，matlab想调用他的话，就需要配置编译器，这里直接推荐TDM-GCC。无脑简单傻瓜操作。</p><p data-pid="wgpYbyeq">下图DLL是封装好的DLL文件，提供给matlab使用</p><br><img src="v2-95bf5a6589d37c06a4895eb1f4e4f9dc_720w.jpg" ><p data-pid="1QNb85B0">配置好TDM-GCC编译器后启动下面代码，就可以了</p><br><img src="v2-a94ca6b5d1bb70b075808923e41dedf9_720w.jpg" ><p data-pid="xux1B7bQ"> 启动结果</p><br><img src="v2-6dd2629548f6253a4dd0a7d5ce32649b_720w.jpg" ><p data-pid="mv5LJx8n"> 然后通过指针就可以动态调用DLL函数了！</p><br><img src="v2-c1cb7202747df9669f76fd97a8b3ae66_720w.jpg" ><p data-pid="gDi17O3f">TMD文件我会上传的GIT上，因为这个程序不好下，直接无脑create,默认C盘路径不要改，就OK了。</p><br><img src="v2-938131897e9f966506aae8a384b6e6c2_720w.jpg" ><br><img src="v2-5a572d74aa0db84af7d4fe0cffebfc94_720w.jpg" >
+<br><div id="download"><strong>下载地址</strong></div>
+<p data-first-child data-pid="I8qykgVf">1.首先是机器人工具箱下载地址9.10版本和10.3版本</p><a href="https://zhuanlan.zhihu.com/p/264974131">OpenRobotSL：MatlabPeter机器人工具箱Robotics Toolbox  9.10</a><a href="https://pan.baidu.com/s/1VxWPLo3PCinsZzwDNt1kRw">https://pan.baidu.com/s/1VxWPLo3PCinsZzwDNt1kRw</a><p data-pid="xLDo9mE3">提取码：6mdu </p><p class="ztext-empty-paragraph"><br/></p><p data-pid="dr3bPeKu">2.下面是TDM_GCC C++编译器地址，我的双臂会用到这个文件</p><a target="_blank" href="https://zhuanlan.zhihu.com/p/264971858">OpenRobotSL：matlab调用C++dll，需要安装编译器TDM-GCC</a><a href="https://pan.baidu.com/s/1KPvc4dBLFcuayfcKSXPdmw">https://pan.baidu.com/s/1KPvc4dBLFcuayfcKSXPdmw</a><p data-pid="LLuSMVC9">提取码：uf6l </p><p class="ztext-empty-paragraph"><br/></p><p data-pid="7Qb54BxW">3.GITHUB地址</p><a href="https://github.com/OpenRobotSL">https://github.com/OpenRobotSL</a><a href="https://github.com/OpenRobotSL">OpenRobotSL - Overview</a><p data-pid="CWE3rJ5p">里面暂时包含三个内容得代码</p><p data-pid="Gc1Pfxvf">首先是机器人工具箱教程代码</p><a href="https://zhuanlan.zhihu.com/p/265259022">OpenRobotSL：Matlab官方机器人工具箱Robotics System Toolbox，官网翻译教程10-15</a><a href="https://zhuanlan.zhihu.com/p/264991465">OpenRobotSL：Robotics System Toolbox学习笔记（一）：简单建立一个机器人</a><p data-pid="IJbqFzyA">下一个是ROS配置文件</p><a href="https://zhuanlan.zhihu.com/p/264922978">OpenRobotSL：大白菜的ROS笔记1</a><p data-pid="difS0rCj">最后是双臂仿真文件，其中DLL库是工业6轴库，可以工业使用哦</p><a href="https://zhuanlan.zhihu.com/p/264911739">OpenRobotSL：Matlab双臂机器人建模仿真</a><p class="ztext-empty-paragraph"><br/></p><p data-pid="cOcZPXAy">以后代码都会文章内添加，这次比较匆忙单独开了一个</p>
+</p>
+<p>
+<br> ======================================================================
+<br><strong> 我的测试结果及程序  </strong>
+<br>下面是我测试的代码：
+<pre>
+
+ 
+</pre>
+<br> <img src="myTestResult.png"   width=" " height=" ">
+
+
+</p>
+
+
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com</div>
+	<script src="../../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
