@@ -1,56 +1,148 @@
+<!DOCTYPE html>
 <html>
-	<head>
-                    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<title>工业机器人视觉</title>
-	</head>
-	<body>
-		<ul style="display:none">
-                              <li>2022年12月31日 ARM嵌入式软硬件开发</li>
-                              <li>2022年12月31日 工业视觉图像处理及软件开发</li>
-                              <li>2022年12月31日 机器人应用编程及视觉结合</li> 			
-                              
-                              
-		</ul>
-                    <h1><a href="articles/welcome/index.html">欢迎来到我的博客-总目录</a> </h1>
-                    <br> 电话打不通的话请加微信或者邮件联系&emsp;&emsp;&emsp;&emsp;&emsp;  <img src="connection.png" width="425px" height="15px">  
-                    <br>  
-                    <br>
-		<!-- <h1>联系：一八七-2194-八零六九，Email:ssht428@163.com</h1> -->
-		<table id="articles">
-			<tr id="row_example" style="display: none">
-				<td id="index"></td>
-				<td><a id="title"></a></td>
-				<td id="date"></td>
-			</tr>
-		</table>
-	</body>
-	<script>
-		window.onload = function()
-		{
-			var tr_articles = document.getElementById("articles");
-			var tr_row = document.getElementById("row_example");
-			var td_index = document.getElementById("index");
-			var td_title = document.getElementById("title");
-			var td_date = document.getElementById("date");
-			var list = document.getElementsByTagName("li");
-			for(var i = 0; i < list.length; i++)
-			{
-				var info = list[i].innerText;
-				var index = info.indexOf(" ");
-				var date = info.substring(0, index);
-				var title = info.substring(index + 1);
-				td_index.innerText = list.length - i;
-				td_title.innerText = title;
-				td_date.innerText = date;
-				var year = date.substring(0, 4);
-				var directory = title.replace(/\//g, "-").replace(/\./g, "_");
-				var href = "./articles/" + year + "/" + directory + "/index.html";
-				td_title.href = href;
-				var row = tr_row.cloneNode(true);
-				row.style = "";
-				tr_articles.appendChild(row);
-			}
-		};
-	</script>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>欢迎来到我的博客</title>
+        <link rel="stylesheet" type="text/css" media="all" href="style.css">
+        
+    </head>
+    <body class="post-template-default single single-post postid-0 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-0" class="post-0 post type-post status-publish format-standard hentry category-0">
+                            <header class="entry-header">
+                                <h1 class="entry-title">欢迎来到我的博客</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="http://www.sangkeji.com"> 主页 </a>  &emsp;&emsp;&emsp;&emsp;   <a href="#welcome0">  工业  </a>&emsp;&emsp;&emsp;&emsp;<a href="#welcome1">  机器人  </a>&emsp;&emsp;&emsp;&emsp; <a href="#welcome2">  视觉  </a>&emsp;&emsp;&emsp;&emsp; <a href="#welcome3">  嵌入式 </a>&emsp;&emsp;&emsp;&emsp; <a href="#welcome4">  杂七杂八  </a>&emsp;&emsp;&emsp;&emsp;
+<br>
+<br>
+<p>
+  <br> 本博客主要是记录过去做过的一些项目，好多都已经忘记。
+  <br> 其次如有“钱多活少环境好”的工作也可以联系我^_^，可加wechat:&emsp;&emsp;
+  <img class="img_zoom" src="wechat_qrcode.png" width="60px" height="60px"/> 
+  <br> 2011年就在万网注册域名，当时因为国内服务器要各种审查，并且随时会关掉，所以就没买。后来2016年在midphase买了服务器(赠送域名)，当时就简单下载了个主题玩了几天然后又是放在一边不更新了。
+<br> 最近想着还是记录一下过去做过的各个项目，还有顺便整理下学习收集的各种资料，所以找个最简单的方式先记录一下。虽然目前我也有专门网站，或者使用其他网站提供的blog功能，但是鉴于各种不确定性，还是找个自己能把控的并且还简单的。
+对比了一圈，就先用github pages功能，因为还要存储对应的代码，所以正好就放一起算了。
+
+<br> 下面是所有文章的目录(原创+转载)：
+<br>
+<br>===========================  闲言碎语    ==================================
+
+<br>2.1. <a href=" articles/misc/book-recommend/index.html"> 书藉推荐 Book  </a> 
+<br>2.2 <a href=" articles/misc/song-recommend/index.html">歌曲推荐 Song  </a> 
+<br>2.3 <a href=" articles/misc/movie-recommend/index.html"> 电影推荐 Movie </a> 
+<br>2.4 <a href=" articles/misc/tv-recommend/index.html"> 电视剧推荐 TV Play/Drama </a> 
+<br>2.5 <a href=" articles/misc/docfilm-recommend/index.html"> 记录片推荐 Documentary Film </a> 
+<br>1. <a href=" articles/misc/work-996/index.html "> 工作与996 </a> 
+<br>0. <a href=" articles/misc/index.html "> 闲言碎语 </a> 
+
+<br>
+<br>===========================  杂七杂八-技术类    ==================================
+
+
+<br>80. <a href=" articles/DeepLearning-500-questions/index.html "> 深度学习500问  </a>  
+
+<br>72. <a href=" articles/pid/tuning.html "> PID整定  </a>  
+<br>71. <a href=" articles/pid/principle.html "> PID原理算法  </a>  
+
+<br>61. <a href=" articles/algebra/index.html "> 线性代数学习记录  </a>  
+
+<br>51. <a href=" articles/lua/index.html "> Lua学习记录  </a>  
+
+<br>11. <a href=" articles/opencv/index.html "> OpenCV学习记录  </a>  
+
+
+
+<br>6. <a href=" articles/ompl/robotics.html "> 开源运动规划库（OMPL）中文教程  </a>  
+<br>5. <a href=" articles/matlab/robotics.html "> Matlab Robotics学习记录(含11篇转载)  </a>  
+<br>4. <a href=" articles/matlab/image-plot.html "> Matlab作图实例学习记录(含67篇转载)  </a>  
+<br>3. <a href=" articles/matlab/image-financial.html "> Matlab金融工具箱学习记录(含11篇转载)  </a>  
+<br>2. <a href=" articles/matlab/image-process.html "> Matlab图像处理学习记录(含108篇转载)  </a>  
+<br>1. <a href=" articles/2022/miscellaneous/matlab-file-path/index.html "> Matlab File Path test </a> 
+
+<br>===========================  ARM嵌入式软硬件开发    ==================================
+<br>2. <a href=" articles/2022/ARM嵌入式软硬件开发/four-leg-dog/index.html "> 大型机械狗 </a> 
+<br>1. <a href=" articles/2022/ARM嵌入式软硬件开发/four-wheels/index.html "> 四轮农业车 </a>  
+<br>0. <a href=" articles/2022/ARM嵌入式软硬件开发/index.html "> ARM嵌入式软硬件开发 </a>  
+
+<br>===========================  工业视觉图像处理及软件开发    =========================
+
+
+<br>16. <a href=" articles/2022/工业视觉图像处理及软件开发/camera-calib-opencv/index.html "> OpenCV中相机标定  </a>  
+<br>15. <a href=" articles/2022/工业视觉图像处理及软件开发/camera-calib-matlab/index.html "> Matlab中相机标定  </a>  
+<br>14. <a href=" articles/2022/工业视觉图像处理及软件开发/nine-points-calib/index.html "> 九点手眼标定  </a>  
+<br>13. <a href=" articles/2022/工业视觉图像处理及软件开发/qrcode-calib/index.html "> UR机器人使用二维码QrCode校准  </a>  
+<br>12. <a href=" articles/2022/工业视觉图像处理及软件开发/opencv-note/index.html "> OpenCV笔记- </a>  
+<br>11. <a href=" articles/2022/工业视觉图像处理及软件开发/opencv-learning/index.html "> OpenCV相关学习书籍 </a>  
+<br>10. <a href=" articles/2022/工业视觉图像处理及软件开发/opencv-install/index.html "> OpenCV在Windows下的安装及VS2015中的配置 </a>  
+<br>9. <a href=" articles/2022/工业视觉图像处理及软件开发/opencv-functions/index.html "> OpenCV部分函数简单说明 </a>  
+<br>8. <a href=" articles/2022/工业视觉图像处理及软件开发/opencv-morphology/index.html "> OpenCV中形态学操作 </a>  
+<br>7. <a href=" articles/2022/工业视觉图像处理及软件开发/hand-eye-calib2d/index.html "> 手眼标定2D </a>  
+<br>6. <a href=" articles/2022/工业视觉图像处理及软件开发/qt-install/index.html "> Qt的安装及配置OpenCV  </a>  
+<br>5. <a href=" articles/2022/工业视觉图像处理及软件开发/merlic-try/index.html "> Merlic视觉软件介绍  </a>  
+<br>4. <a href=" articles/2022/工业视觉图像处理及软件开发/keyence-debug/index.html "> 基恩士Keyence视觉软硬件介绍及调试  </a>  
+<br>3. <a href=" articles/2022/工业视觉图像处理及软件开发/basler-sw-hw/index.html "> Basler软硬件介绍及驱动安装配置  </a>  
+<br>2. <a href=" articles/2022/工业视觉图像处理及软件开发/hand-eye-calib2d/calibrateCamera.html "> 相机标定(棋盘格方式)-calibrateCamera()  </a>  
+<br>1. <a href=" articles/2022/工业视觉图像处理及软件开发/hand-eye-calib2d/handeyeSelfCalculation.html "> 手动计算手眼标定  </a>  
+<br>0. <a href=" articles/2022/工业视觉图像处理及软件开发/hand-eye-calib2d/handeyeEstimateRigidTransform.html "> 手眼标定-estimateRigidTransform()  </a>  
+<br>00. <a href=" articles/2022/工业视觉图像处理及软件开发/index.html "> 工业视觉图像处理及软件开发 </a>  
+<br>========================  机器人应用编程及视觉结合   =============================
+<br>16.   <a href=" articles/2022/机器人应用编程及视觉结合/misc/vrep/index.html "> v-rep机器人仿真 </a>  
+<br>15.   <a href=" articles/2022/机器人应用编程及视觉结合/misc/grbl-3axis/index.html ">grbl控制3轴机械臂</a>  
+<br>14.   <a href=" articles/2022/机器人应用编程及视觉结合/misc/route-plan/index.html ">(转载)轨迹规划</a>  
+<br>14.   <a href=" articles/2022/机器人应用编程及视觉结合/force-polish/index.html ">力控打磨机器人</a>  
+<br>13.   <a href=" articles/2022/机器人应用编程及视觉结合/force-torque-sensor/index.html "> 机器人力矩传感器防碰撞 </a>  
+<br>12.   <a href=" articles/2022/机器人应用编程及视觉结合/kuka-sw-hw/index.html "> 库卡KUKA机器人软硬件介绍 </a>  
+<br>11.   <a href=" articles/2022/机器人应用编程及视觉结合/ur-sw-hw/index.html "> 优傲UR机器人UR10软硬件介绍 </a>  
+<br>10.    <a href=" articles/2022/机器人应用编程及视觉结合/qkm-tcp/index.html "> 李群机器人AH-5020-054S TCP通信(带断开重连功能) </a>  
+<br>9.    <a href=" articles/2022/机器人应用编程及视觉结合/qkm-sw-hw/index.html "> 李群机器人QKM SCARA 软硬件介绍 </a>  
+<br>8.    <a href=" articles/2022/机器人应用编程及视觉结合/mitRobot-electronic/index.html "> 三菱机器人RH-3FH 装配空调显示模块 </a>  
+<br>7.    <a href=" articles/2022/机器人应用编程及视觉结合/mitRobot-sw-hw/index.html "> 三菱机器人MITSUBISHI SCARA 软硬件介绍 </a>  
+<br>6.    <a href=" articles/2022/机器人应用编程及视觉结合/dobot-exg64/index.html "> 越疆DOBOT机器人与上银HIWIN EXG64电动夹爪搬运书/档案盒高速运动测试 </a>  
+<br>5.    <a href=" articles/2022/机器人应用编程及视觉结合/hiwin-xeg64/index.html "> 上银HIWIN XEG64电动夹爪介绍 </a> 
+<br>4.    <a href=" articles/2022/机器人应用编程及视觉结合/dobot-software/index.html ">  越疆DOBOT机器人软件介绍 </a> 
+<br>3.    <a href=" articles/2022/机器人应用编程及视觉结合/dobot-hardware/index.html ">  越疆DOBOT机器人硬件介绍 </a> 
+<br>2.    <a href=" articles/2022/机器人应用编程及视觉结合/dobot-pro-defect/index.html ">  越疆DOBOT机器人优缺点 </a> 
+<br>1.    <a href=" articles/2022/机器人应用编程及视觉结合/misc/robotics/index.html ">  (转载)机器人基础介绍 </a> 
+<br>0. <a href=" articles/2022/机器人应用编程及视觉结合/index.html "> 机器人应用编程及视觉结合 </a>  
+
+
+<br>===========================  工作项目- null    ==================================
+<br>.   <a href=" ../../index.html "> 汽车接插件电阻焊 </a>                               
+<br>.   <a href=" ../../index.html "> 各类非标设备 </a>  
+<br>.   <a href=" ../../index.html "> 印包设备 </a>  
+<br>.   <a href=" ../../index.html "> 化纤经编机 </a>  
+<br>.   <a href=" ../../index.html "> 真空镀膜机 </a>  
+<br>.   <a href=" ../../index.html "> 多轴向经编机 </a>  
+<br>.   <a href=" ../../index.html "> 两翼平开安全旋转门 </a>  
+<br>.   <a href=" ../../index.html "> 现代电机控制实验室 </a>  
+<br>.   <a href=" ../../index.html "> 产品管理系统 </a>  
+<br>.   <a href=" ../../index.html "> 组建产品管理部 </a>  
+
+<br>=============================================================================
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            <footer id="colophon" role="contentinfo">
+                <div id="site-generator">孙悟空  sunwukong@sangkeji.com  Copyright 2021-2022</div>
+                <script src="footer.js"></script>
+            </footer>
+        </div>
+        <!-- <div class="to_top_button"> <a href="#">^</a> </div>  -->
+         <div class="to_top_button"> <a href="#">
+        <svg width="50" height="50" viewBox="0 0 25 25" fill="currentColor">
+        <path d="M13.204 3.107a1.75 1.75 0 00-2.408 0L3.806 9.73c-1.148 1.088-.378 3.02 1.204 3.02h2.24V20c0 .966.784 1.75 1.75 1.75h6A1.75 1.75 0 0016.75 20v-7.25h2.24c1.582 0 2.353-1.932 1.204-3.02l-6.99-6.623z" fill-rule="evenodd" clip-rule="evenodd">
+        </path>
+        </svg>
+        
+        </a> </div>
+    </body>
 </html>
