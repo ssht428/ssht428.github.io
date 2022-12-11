@@ -1,1 +1,1891 @@
-aaaaa
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>线性代数学习记录</title>
+        <link rel="stylesheet" type="text/css" media="all" href="../../style.css">
+    </head>
+    <body class="post-template-default single single-post postid-14 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-14" class="post-14 post type-post status-publish format-standard hentry category-18">
+                            <header class="entry-header">
+                                <h1 class="entry-title">线性代数学习记录</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="http://www.sangkeji.com"> 主页 </a>  &emsp;&emsp;&emsp;&emsp; <a href="../../welcome.html">  博客  </a>&emsp;&emsp;&emsp;&emsp;  <a href="#algebra0">  矩阵的运算及其运算规则  </a>&emsp;&emsp;&emsp;&emsp; <a href="#algebra1">  矩阵运算与常用矩阵  </a>&emsp;&emsp;&emsp;&emsp;<a href="#algebra2">  矩阵运算 </a>&emsp;&emsp;&emsp;&emsp; 
+<br>
+<br>
+<p>
+<br>学习线性代数主要是各种机器人坐标变换及图像处理数据矩阵运算要用；
+<br>
+<br>本文主要是转载；
+<br>
+<br>目录如下：
+<br>
+
+<br>=======================================================================
+<div id="algebra0"><strong>6.5 矩阵的运算及其运算规则</strong></div>
+<br>转载自： <a href="http://www2.edu-edu.com.cn/lesson_crs78/self/j_4184/soft/ch0605.html ">  http://www2.edu-edu.com.cn/lesson_crs78/self/j_4184/soft/ch0605.html</a>
+<br>
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<h2>一、矩阵的加法与减法</h2>
+<br clear="none">
+　　<strong>1、运算规则</strong>
+<br clear="none">
+　　设矩阵<img src="ch0605_image001.gif" width="168" height="99" align="absmiddle">，<img src="ch0605_image002.gif" width="164" height="99" align="absmiddle">，<br clear="none">
+　　则<br clear="none">
+　　　　　 <img src="ch0605_image003.gif" width="296" height="99" align="absmiddle">
+<br clear="none">
+　　简言之，两个矩阵相加减，即它们相同位置的元素相加减！<br clear="none">
+　　<strong>注意：</strong>只有对于两个行数、列数分别相等的矩阵（即同型矩阵），加减法运算才有意义，即加减运算是可行的．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part1_3" id="part1_3">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+<b>　　2、</b>
+<b>运算性质</b>
+<b>（假设运算都是可行的）</b>
+<br clear="none">
+　　满足交换律和结合律<br clear="none">
+<b>　　交换律　</b>
+<b>
+<img src="ch0605_image004.gif" width="96" height="17" align="absmiddle">；</b>
+<br clear="none">
+<b>　　结合律　</b>
+<b>
+<img src="ch0605_image005.gif" width="167" height="23" align="absmiddle">．<br clear="none">
+<br clear="none">
+</b>
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part2_1" id="part2_1">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<h2>二、矩阵与数的乘法</h2>
+<br clear="none">
+<b>　　1、</b>
+<b>运算规则</b>
+<br clear="none">
+<b>　　</b>数<img src="ch0605_image006.gif" width="13" height="19" align="absmiddle">乘矩阵A，就是将数<img src="ch0605_image006.gif" width="13" height="19" align="absmiddle">乘矩阵A中的每一个元素，记为<img src="ch0605_image007.gif" width="23" height="19" align="absmiddle">或<img src="ch0605_image008.gif" width="24" height="19" align="absmiddle">．<br clear="none">
+　　特别地，称<img src="ch0605_image009.gif" width="28" height="17" align="absmiddle">称为<img src="ch0605_image010.gif" width="69" height="21" align="absmiddle">的负矩阵．<br clear="none">
+<b>　　2、</b>
+<b>运算性质</b>
+<br clear="none">
+　　满足结合律和分配律<br clear="none">
+<b>　　结合律：</b>
+<b>(λμ)A=λ(μA)</b>
+<b>；</b>
+<b>(λ+μ)A =λA+μA</b>．<br clear="none">
+<b>　　分配律：</b>
+<b>λ</b>
+<b>(A+B)=λA+λB</b>．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part2_2" id="part2_2">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　<span class="Title2">典型例题</span>
+<br clear="none">
+　　<strong>例6.5.1</strong>　已知两个矩阵
+<center>
+<img src="ch0605_image011.gif" width="236" height="75" align="absmiddle">
+</center>
+　　满足矩阵方程<img src="ch0605_image012.gif" width="80" height="17" align="absmiddle">，求未知矩阵<img src="ch0605_image013.gif" width="19" height="17" align="absmiddle">．<br clear="none">
+　　<strong>解</strong>　由已知条件知<br clear="none">
+　&nbsp; 　<img src="ch0605_image014.gif" width="293" height="93" align="absmiddle">
+<br clear="none">
+　　　　<img src="ch0605_image015.gif" width="221" height="91" align="absmiddle">
+<br clear="none">
+<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part3_1" id="part3_1">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<h2>三、矩阵与矩阵的乘法</h2>
+<br clear="none">
+<b>　　1、</b>
+<b>运算规则</b>
+<br clear="none">
+　　设<img src="ch0605_image010.gif" align="absmiddle">，<img src="ch0605_image016.gif" align="absmiddle">，则A与B的乘积<img src="ch0605_image017.gif" align="absmiddle">是这样一个矩阵：<br clear="none">
+　　(1) 行数与（左矩阵）A相同，列数与（右矩阵）B相同，即<img src="ch0605_image018.gif" align="absmiddle">．<br clear="none">
+　　(2) C的第<img src="ch0605_image019.gif" width="9" height="17" align="absmiddle">行第<img src="ch0605_image020.gif" width="13" height="20" align="absmiddle">列的元素<img src="ch0605_image113.gif" align="absmiddle">由A的第<img src="ch0605_image019.gif" width="9" height="17" align="absmiddle">行元素与B的第<img src="ch0605_image020.gif" width="13" height="20" align="absmiddle">列元素对应相乘，再取乘积之和．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part3_2" id="part3_2">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　<span class="Title2">典型例题</span>
+<br clear="none">
+　　<strong>例6.5.2</strong>　设矩阵
+<center>
+<img src="ch0605_image021.gif" width="200" height="56" align="absmiddle">
+</center>
+　　计算<img src="ch0605_image022.gif" width="29" height="19" align="absmiddle">
+<br clear="none">
+　　<strong>解</strong>　<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">是<img src="ch0605_image024.gif" width="32" height="19" align="absmiddle">的矩阵．设它为<br clear="none">
+　　　　<img src="ch0605_image025.gif" width="39" height="17" align="absmiddle">
+<img src="ch0605_image026.gif" width="52" height="56" align="absmiddle">
+<img src="ch0605_image027.gif" width="85" height="56" align="absmiddle">
+<img src="ch0605_image028.gif" width="113" height="59" align="absmiddle">
+<br clear="none">
+<br clear="none">
+　　　　<img src="ch0605_image025.gif" width="39" height="17" align="absmiddle">
+<img src="ch0605_image026.gif" width="52" height="56" align="absmiddle">
+<img src="ch0605_image027.gif" width="85" height="56" align="absmiddle">
+<img src="ch0605_image030.gif" width="100" height="56" align="absmiddle">
+<br clear="none">
+　　<strong>想一想</strong>：设列矩阵<img src="ch0605_image031.gif" width="61" height="91" align="absmiddle">，行矩阵<img src="ch0605_image032.gif" width="104" height="24" align="absmiddle">，<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">和<img src="ch0605_image033.gif" width="25" height="17" align="absmiddle">的行数和列数分别是多少呢<img src="wenh.jpg" width="25" height="25" align="absmiddle">
+<br clear="none">
+　　<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">是3×3的矩阵，<img src="ch0605_image033.gif" width="25" height="17" align="absmiddle">是1×1的矩阵，即<img src="ch0605_image033.gif" width="25" height="17" align="absmiddle">只有一个元素．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part3_3" id="part3_3">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　<b>课堂练习</b>
+<br clear="none">
+　　1、设<img src="ch0605_image034.gif" width="121" height="56" align="absmiddle">，<img src="ch0605_image035.gif" width="103" height="120" align="absmiddle">，求<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">．<br clear="none">
+　　2、在第1道练习题中，两个矩阵相乘的顺序是A在左边，B在右边，称为A左乘B或B右乘A．如果交换顺序，让B在左边，A在右边，即A右乘B，运算还能进行吗？请算算试试看．并由此思考：两个矩阵应当满足什么条件，才能够做乘法运算．<br clear="none">
+
+　　3、设列矩阵<img src="ch0605_image031.gif" width="61" height="91" align="absmiddle">，行矩阵<img src="ch0605_image032.gif" width="104" height="24" align="absmiddle">，求<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">和<img src="ch0605_image033.gif" width="25" height="17" align="absmiddle">，比较两个计算结果，能得出什么结论吗？<br clear="none">
+　　4、设三阶方阵<img src="ch0605_image036.gif" width="135" height="91" align="absmiddle">，三阶单位阵为<img src="ch0605_image037.gif" width="93" height="91" align="absmiddle">，试求<img src="ch0605_image038.gif" width="27" height="17" align="absmiddle">和<img src="ch0605_image039.gif" width="25" height="17" align="absmiddle">，并将计算结果与A比较，看有什么样的结论．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part3_4" id="part3_4">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　<strong>解：</strong>
+<br clear="none">
+　　第1题
+<center>
+<img src="ch0605_image040.gif" width="124" height="56" align="absmiddle">．</center>
+　　第2题<br clear="none">
+　　对于
+<center>
+<img src="ch0605_image034.gif" width="121" height="56" align="absmiddle">，<img src="ch0605_image035.gif" width="103" height="120" align="absmiddle">．</center>
+　　求<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">是有意义的，而<img src="ch0605_image033.gif" width="25" height="17" align="absmiddle">是无意义的．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part3_5" id="part3_5">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　<b>结论1</b>　只有在下列情况下，两个矩阵的乘法才有意义，或说乘法运算是可行的：左矩阵的列数＝右矩阵的行数．<br clear="none">
+　　第3题<br clear="none">
+　　<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">是<img src="ch0605_image041.gif" width="32" height="19" align="absmiddle">矩阵，<img src="ch0605_image033.gif" width="25" height="17" align="absmiddle">是<img src="ch0605_image042.gif" width="28" height="17" align="absmiddle">的矩阵．<br clear="none">
+　　　&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="ch0605_image043.gif" width="144" height="91" align="absmiddle">
+<img src="ch0605_image044.gif" width="140" height="91" align="absmiddle">．<br clear="none">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="ch0605_image045.gif" width="143" height="91" align="absmiddle">
+<img src="ch0605_image046.gif" width="127" height="24" align="absmiddle">
+<br clear="none">
+&nbsp;&nbsp;&nbsp; <b>结论2</b>　在矩阵的乘法中，必须注意相乘的顺序．即使在<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">与<img src="ch0605_image047.gif" width="25" height="17" align="absmiddle">均有意义时，也未必有<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">=<img src="ch0605_image047.gif" width="25" height="17" align="absmiddle">成立．可见矩阵乘法不满足交换律．<br clear="none">
+　　第4题<br clear="none">
+　　计算得：<img src="ch0605_image048.gif" width="92" height="17" align="absmiddle">．<br clear="none">
+<b>　　结论3</b>　方阵A和它同阶的单位阵作乘积，结果仍为A，即<img src="ch0605_image048.gif" width="92" height="17" align="absmiddle">．<br clear="none">
+　　单位阵在矩阵乘法中的作用相当于数1在我们普通乘法中的作用．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part3_6" id="part3_6">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　<span class="Title2">典型例题</span>
+<br clear="none">
+　　<strong>例6.5.3</strong>　设<img src="ch0605_image049.gif" width="191" height="48" align="absmiddle">，试计算<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">和<img src="ch0605_image033.gif" width="25" height="17" align="absmiddle">．<br clear="none">
+　　<strong>解</strong>　<img src="ch0605_image050.gif" width="163" height="56" align="absmiddle">
+<br clear="none">
+　　　　　　<img src="ch0605_image051.gif" width="297" height="48" align="absmiddle">
+<br clear="none">
+　　　　　　<img src="ch0605_image052.gif" width="59" height="56" align="absmiddle">．<br clear="none">
+　　　　<img src="ch0605_image053.gif" width="159" height="56" align="absmiddle">
+<br clear="none">
+　　　　　　<img src="ch0605_image054.gif" width="248" height="56" align="absmiddle">
+<br clear="none">
+　　　　　　<img src="ch0605_image055.gif" width="84" height="56" align="absmiddle">
+<br clear="none">
+&nbsp;&nbsp;&nbsp; <b>结论4</b>　两个非零矩阵的乘积可以是零矩阵．由此若<img src="ch0605_image056.gif" width="49" height="19" align="absmiddle">，不能得出<img src="ch0605_image057.gif" width="40" height="19" align="absmiddle">或<img src="ch0605_image058.gif" width="40" height="19" align="absmiddle">的结论．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part3_7" id="part3_7">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　<strong>例6.5.4</strong>　利用矩阵的乘法，三元线性方程组
+<center>
+<img src="ch0605_image059.gif" width="176" height="75" align="absmiddle">
+</center>
+　　可以写成矩阵的形式
+<center>
+<img src="ch0605_image060.gif" width="107" height="75" align="absmiddle">
+<img src="ch0605_image061.gif" width="35" height="75" align="absmiddle">＝<img src="ch0605_image062.gif" width="33" height="75" align="absmiddle">
+</center>
+　　若记系数、未知量和常数项构成的三个矩阵分别为
+<center>
+<img src="ch0605_image063.gif" width="28" height="17" align="absmiddle">
+<img src="ch0605_image060.gif" width="107" height="75" align="absmiddle">，<img src="ch0605_image064.gif" width="64" height="75" align="absmiddle">，<img src="ch0605_image065.gif" width="60" height="75" align="absmiddle">，</center>
+　　则线性方程组又可以简写为矩阵方程的形式：<img src="ch0605_image066.gif" width="55" height="17" align="absmiddle">．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part3_8" id="part3_8">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　<b>2、</b>
+<b>运算性质（假设运算都是可行的）</b>
+<br clear="none">
+　　(1)　结合律　<img src="ch0605_image067.gif" width="108" height="23" align="absmiddle">．<br clear="none">
+　　(2)　分配律　<img src="ch0605_image068.gif" width="136" height="23" align="absmiddle">（左分配律）；<br clear="none">
+　　　　　　　　　<img src="ch0605_image069.gif" width="132" height="23" align="absmiddle">（右分配律）．<br clear="none">
+　　(3)　<img src="ch0605_image070.gif" width="156" height="23" align="absmiddle">．<br clear="none">
+<b>　　</b>
+<b>3、</b>
+<b>方阵的幂</b>
+<br clear="none">
+<table width="80%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tbody><tr>
+<td colspan="1" rowspan="1" width="39" height="18">
+<img src="tab1.jpg" width="39" height="18">
+</td>
+<td colspan="1" rowspan="1" height="18" background="tab2.jpg">
+</td><td colspan="1" rowspan="1" width="23" height="18">
+<img src="tab4.jpg" width="23" height="18">
+</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" width="39" valign="top" background="tab6.jpg">
+<img src="tab4-2.jpg" width="39" height="119">
+</td>
+<td colspan="1" rowspan="1" background="tabbg.jpg">
+　　<strong>定义：</strong>设A是方阵，<img src="ch0605_image071.gif" width="13" height="19" align="absmiddle">是一个正整数，规定
+<center>
+<img src="ch0605_image072.gif" width="51" height="20" align="absmiddle">，<img src="ch0605_image073.gif" width="104" height="37" align="absmiddle">
+</center>
+显然，记号<img src="ch0605_image074.gif" width="23" height="21" align="absmiddle">表示<img src="ch0605_image071.gif" width="13" height="19" align="absmiddle">个A的连乘积．</td>
+<td colspan="1" rowspan="1" width="23" valign="top" background="tab7.jpg">
+<img src="tab5.jpg" width="23" height="119">
+</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" width="39" height="22">
+<img src="tab8.jpg" width="39" height="22">
+</td>
+<td colspan="1" rowspan="1" height="22" background="tab10.jpg" align="left">
+<img src="tab9.jpg" width="292" height="22">
+</td>
+<td colspan="1" rowspan="1" width="23" height="22">
+<img src="tab11.jpg" width="23" height="22">
+</td>
+</tr>
+</tbody></table>
+<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part4_1" id="part4_1">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<h2>四、矩阵的转置</h2>
+<br clear="none">
+　　<b>1、</b>
+<b>定义</b>
+<table width="80%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tbody><tr>
+<td colspan="1" rowspan="1" width="39" height="18">
+<img src="tab1.jpg" width="39" height="18">
+</td>
+<td colspan="1" rowspan="1" height="18" background="tab2.jpg">
+</td><td colspan="1" rowspan="1" width="23" height="18">
+<img src="tab4.jpg" width="23" height="18">
+</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" width="39" valign="top" background="tab6.jpg">
+<img src="tab4-2.jpg" width="39" height="119">
+</td>
+<td colspan="1" rowspan="1" background="tabbg.jpg">
+　　<strong>定义：</strong>将矩阵A的行换成同序号的列所得到的新矩阵称为矩阵A的转置矩阵，记作<img src="ch0605_image075.gif" width="19" height="17" align="absmiddle">或<img src="ch0605_image076.gif" width="24" height="21" align="absmiddle">．</td>
+<td colspan="1" rowspan="1" width="23" valign="top" background="tab7.jpg">
+<img src="tab5.jpg" width="23" height="119">
+</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" width="39" height="22">
+<img src="tab8.jpg" width="39" height="22">
+</td>
+<td colspan="1" rowspan="1" height="22" background="tab10.jpg" align="left">
+<img src="tab9.jpg" width="292" height="22">
+</td>
+<td colspan="1" rowspan="1" width="23" height="22">
+<img src="tab11.jpg" width="23" height="22">
+</td>
+</tr>
+</tbody></table>
+<b>　　例如，矩阵<img src="ch0605_image034.gif" width="121" height="56" align="absmiddle">的转置矩阵为<img src="ch0605_image077.gif" width="121" height="96" align="absmiddle">．<br clear="none">
+　　2、运算性质（假设运算都是可行的）<br clear="none">
+　　(1)　<img src="ch0605_image078.gif" width="55" height="23" align="absmiddle">
+<br clear="none">
+　　(2)　<img src="ch0605_image079.gif" width="103" height="23" align="absmiddle">
+<br clear="none">
+　　(3)　<img src="ch0605_image080.gif" width="80" height="23" align="absmiddle">
+<br clear="none">
+　　(4)　<img src="ch0605_image081.gif" width="69" height="23" align="absmiddle">，<img src="ch0605_image082.gif" width="15" height="19" align="absmiddle">是常数．<br clear="none">
+</b>
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part4_2" id="part4_2">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　<span class="Title2">典型例题</span>
+<br clear="none">
+　　<strong>例6.5.5</strong>&nbsp; 利用矩阵
+<center>
+<img src="ch0605_image083.gif" width="228" height="75" align="absmiddle">
+</center>
+　　验证运算性质：<img src="ch0605_image084.gif" width="85" height="21" align="absmiddle">
+<br clear="none">
+　　<strong>解</strong>　<img src="ch0605_image085.gif" width="39" height="17" align="absmiddle">
+<img src="ch0605_image086.gif" width="72" height="23" align="absmiddle">
+<img src="ch0605_image087.gif" width="81" height="75" align="absmiddle">
+<img src="ch0605_image088.gif" width="87" height="23" align="absmiddle">；<br clear="none">
+　　而<br clear="none">
+　　　　<img src="ch0605_image089.gif" width="232" height="80" align="absmiddle">
+<br clear="none">
+　　所以<br clear="none">
+　　　<img src="ch0605_image090.gif" width="247" height="91" align="absmiddle">．<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part4_3" id="part4_3">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+<table width="80%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tbody><tr>
+<td colspan="1" rowspan="1" width="39" height="18">
+<img src="tab1.jpg" width="39" height="18">
+</td>
+<td colspan="1" rowspan="1" height="18" background="tab2.jpg">
+</td><td colspan="1" rowspan="1" width="23" height="18">
+<img src="tab4.jpg" width="23" height="18">
+</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" width="39" valign="top" background="tab6.jpg">
+<img src="tab4-2.jpg" width="39" height="119">
+</td>
+<td colspan="1" rowspan="1" background="tabbg.jpg">
+　　<strong>定义：</strong>如果方阵满足<img src="ch0605_image091.gif" width="43" height="17" align="absmiddle">，即<img src="ch0605_image092.gif" width="55" height="25" align="absmiddle">，则称A为<strong>对称矩阵</strong>．</td>
+<td colspan="1" rowspan="1" width="23" valign="top" background="tab7.jpg">
+<img src="tab5.jpg" width="23" height="119">
+</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" width="39" height="22">
+<img src="tab8.jpg" width="39" height="22">
+</td>
+<td colspan="1" rowspan="1" height="22" background="tab10.jpg" align="left">
+<img src="tab9.jpg" width="292" height="22">
+</td>
+<td colspan="1" rowspan="1" width="23" height="22">
+<img src="tab11.jpg" width="23" height="22">
+</td>
+</tr>
+</tbody></table>
+　　对称矩阵的<strong>特点</strong>是：它的元素以主对角线为对称轴对应相等．<br clear="none">
+<br clear="none">
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part5_1" id="part5_1">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<h2>五、方阵的行列式</h2>
+<br clear="none">
+　　<strong>1、定义</strong>
+<table width="80%" cellspacing="0" cellpadding="0" border="0" align="center">
+<tbody><tr>
+<td colspan="1" rowspan="1" width="39" height="18">
+<img src="tab1.jpg" width="39" height="18">
+</td>
+<td colspan="1" rowspan="1" height="18" background="tab2.jpg">
+</td><td colspan="1" rowspan="1" width="23" height="18">
+<img src="tab4.jpg" width="23" height="18">
+</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" width="39" valign="top" background="tab6.jpg">
+<img src="tab4-2.jpg" width="39" height="119">
+</td>
+<td colspan="1" rowspan="1" background="tabbg.jpg">
+　　<strong>定义：</strong>由方阵A的元素所构成的行列式（各元素的位置不变），称为方阵A的行列式，记作<img src="ch0605_image093.gif" width="20" height="27" align="absmiddle">或<img src="ch0605_image094.gif" width="37" height="19" align="absmiddle">．</td>
+<td colspan="1" rowspan="1" width="23" valign="top" background="tab7.jpg">
+<img src="tab5.jpg" width="23" height="119">
+</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" width="39" height="22">
+<img src="tab8.jpg" width="39" height="22">
+</td>
+<td colspan="1" rowspan="1" height="22" background="tab10.jpg" align="left">
+<img src="tab9.jpg" width="292" height="22">
+</td>
+<td colspan="1" rowspan="1" width="23" height="22">
+<img src="tab11.jpg" width="23" height="22">
+</td>
+</tr>
+</tbody></table>
+<br clear="none">
+　　<b>2</b>
+<b>、运算性质</b>
+<br clear="none">
+　　(1) <b>
+<img src="ch0605_image095.gif" width="53" height="27" align="absmiddle">
+</b>（行列式的性质）<br clear="none">
+　　(2) <img src="ch0605_image096.gif" width="83" height="27" align="absmiddle">，特别地：<img src="ch0605_image097.gif" width="151" height="45" align="absmiddle">
+<br clear="none">
+　　(3) <img src="ch0605_image098.gif" width="76" height="28" align="absmiddle">（<img src="ch0605_image082.gif" width="15" height="19" align="absmiddle">是常数，A的阶数为n）<br clear="none">
+　　<strong>思考：</strong>设A为<img src="ch0605_image099.gif" width="13" height="15" align="absmiddle">阶方阵，那么<img src="ch0605_image100.gif" width="23" height="19" align="absmiddle">的行列式<img src="ch0605_image101.gif" width="28" height="27" align="absmiddle">与A的行列式<img src="ch0605_image093.gif" width="20" height="27" align="absmiddle">之间的关系为什么不是<img src="ch0605_image102.gif" width="68" height="27" align="absmiddle">，而是<img src="ch0605_image098.gif" width="76" height="28" align="absmiddle">？</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="page-part" code="part5_2" id="part5_2">
+<table width="95%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td colspan="1" rowspan="1">
+<br clear="none">
+　　不妨自行设计一个二阶方阵，计算一下<img src="ch0605_image103.gif" width="21" height="27" align="absmiddle">和<img src="ch0605_image104.gif" width="28" height="27" align="absmiddle">．<br clear="none">
+　　例如<img src="ch0605_image105.gif" width="77" height="56" align="absmiddle">，则<img src="ch0605_image106.gif" width="103" height="56" align="absmiddle">．<br clear="none">
+　　于是<img src="ch0605_image107.gif" width="72" height="56" align="absmiddle">，而<img src="ch0605_image108.gif" width="216" height="56" align="absmiddle">
+<img src="ch0605_image109.gif" width="41" height="27" align="absmiddle">．<br clear="none">
+　　<strong>思考：</strong>设<img src="ch0605_image110.gif" width="171" height="48" align="absmiddle">，有几种方法可以求<img src="ch0605_image111.gif" width="31" height="27" align="absmiddle">？<br clear="none">
+　　<strong>解</strong>&nbsp; 方法一：先求矩阵乘法<img src="ch0605_image023.gif" width="27" height="17" align="absmiddle">，得到一个二阶方阵，再求其行列式．<br clear="none">
+　　　　方法二：先分别求行列式<img src="ch0605_image112.gif" width="41" height="27" align="absmiddle">，再取它们的乘积．</td>
+</tr>
+</tbody></table>
+<br>=======================================================================
+<div id="algebra1"><strong>矩阵运算与常用矩阵</strong></div>
+<br>转载自： <a href="https://zhuanlan.zhihu.com/p/362082020 "> https://zhuanlan.zhihu.com/p/362082020 </a>
+<br>
+<h2 data-first-child>概念</h2><p data-pid="QIcybRjC">由 m*n 个数排成的m行n列的数表称为m行n列的矩阵，简称 m*n 矩阵。记作：</p><p data-pid="wuw354q0"><img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%3D%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+%26+a_%7B12%7D+%26+...+%26a_%7B1n%7D+%5C%5C+a_%7B21%7D+%26+a_%7B22%7D+%26+...+%26a_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7Bm1%7D+%26+a_%7Bm2%7D+%26+...+%26a_%7Bmn%7D+%5Cend%7Bbmatrix%7D" alt="\mathbf{A}=\begin{bmatrix} a_{11} &amp; a_{12} &amp; ... &amp;a_{1n} \\ a_{21} &amp; a_{22} &amp; ... &amp;a_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ a_{m1} &amp; a_{m2} &amp; ... &amp;a_{mn} \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="In6heZdo">这  m*n 个数称为矩阵的元素，简称为元，数 <img src="https://www.zhihu.com/equation?tex=a_%7Bij%7D" alt="a_{ij}" loading="lazy" eeimg="1"/> 位于矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 的第i行第j列，称为矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 的 (i, j) 元。</p><p data-pid="ZZ0GVaj3">元素是实数的矩阵称为<b>实矩阵</b>，元素是复数的矩阵称为<b>复矩阵</b>。</p><p data-pid="kBUQ7cTS">若多个矩阵的行数和列数相同，我们称它们为<b>同型矩阵</b>。</p><p data-pid="l1UkgiZ9">行数与列数都等于n的矩阵称为<b>n阶矩阵或n阶方阵</b>。若多个方阵的行数（行数=列数）相同，我们称它们为<b>同阶矩阵</b>。</p><h2>基本运算</h2><p data-pid="leZQbks_">矩阵的加减法和矩阵的数乘合称矩阵的线性运算</p><h3>加法</h3><p data-pid="qrc3bNuT">只有同型矩阵之间才可以进行加法运算，将两个矩阵相同位置的元相加即可，m行n列的两个矩阵相加后得到一个新的m行n列矩阵，例如：</p><p data-pid="i3_QqQVH"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+%26+a_%7B12%7D+%26+...+%26a_%7B1n%7D+%5C%5C+a_%7B21%7D+%26+a_%7B22%7D+%26+...+%26a_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7Bm1%7D+%26+a_%7Bm2%7D+%26+...+%26a_%7Bmn%7D+%5Cend%7Bbmatrix%7D+%2B+%5Cbegin%7Bbmatrix%7D+b_%7B11%7D+%26+b_%7B12%7D+%26+...+%26b_%7B1n%7D+%5C%5C+b_%7B21%7D+%26+b_%7B22%7D+%26+...+%26b_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+b_%7Bm1%7D+%26+b_%7Bm2%7D+%26+...+%26b_%7Bmn%7D+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+%2B+b_%7B11%7D+%26+a_%7B12%7D+%2B+b_%7B12%7D+%26+...+%26a_%7B1n%7D+%2B+b_%7B1n%7D+%5C%5C+a_%7B21%7D+%2B+b_%7B21%7D+%26+a_%7B22%7D+%2B+b_%7B22%7D+%26+...+%26a_%7B2n%7D+%2B+b_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7Bm1%7D+%2B+b_%7Bm1%7D+%26+a_%7Bm2%7D+%2B+b_%7Bm2%7D+%26+...+%26a_%7Bmn%7D+%2B+b_%7Bmn%7D+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} a_{11} &amp; a_{12} &amp; ... &amp;a_{1n} \\ a_{21} &amp; a_{22} &amp; ... &amp;a_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ a_{m1} &amp; a_{m2} &amp; ... &amp;a_{mn} \end{bmatrix} + \begin{bmatrix} b_{11} &amp; b_{12} &amp; ... &amp;b_{1n} \\ b_{21} &amp; b_{22} &amp; ... &amp;b_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ b_{m1} &amp; b_{m2} &amp; ... &amp;b_{mn} \end{bmatrix} = \begin{bmatrix} a_{11} + b_{11} &amp; a_{12} + b_{12} &amp; ... &amp;a_{1n} + b_{1n} \\ a_{21} + b_{21} &amp; a_{22} + b_{22} &amp; ... &amp;a_{2n} + b_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ a_{m1} + b_{m1} &amp; a_{m2} + b_{m2} &amp; ... &amp;a_{mn} + b_{mn} \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="21EVg95r"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+1+%26+3+%26+5+%26+7+%5C%5C+2+%26+4+%26+6+%26+8+%5Cend%7Bbmatrix%7D+%2B+%5Cbegin%7Bbmatrix%7D+4+%26+3+%26+1+%26+4+%5C%5C+5+%26+3+%26+1+%26+6+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+5+%26+6+%26+6+%26+11+%5C%5C+7+%26+7+%26+7+%26+14+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} 1 &amp; 3 &amp; 5 &amp; 7 \\ 2 &amp; 4 &amp; 6 &amp; 8 \end{bmatrix} + \begin{bmatrix} 4 &amp; 3 &amp; 1 &amp; 4 \\ 5 &amp; 3 &amp; 1 &amp; 6 \end{bmatrix} = \begin{bmatrix} 5 &amp; 6 &amp; 6 &amp; 11 \\ 7 &amp; 7 &amp; 7 &amp; 14 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="2Tj-AZHU"><b>运算律</b>：</p><p data-pid="Yl8OKOqr">交换律： <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D+%2B+%5Cmathbf%7BB%7D+%3D+%5Cmathbf%7BB%7D+%2B+%5Cmathbf%7BA%7D" alt="\mathbf{A} + \mathbf{B} = \mathbf{B} + \mathbf{A}" loading="lazy" eeimg="1"/> </p><p data-pid="OSeAnZ9h">结合律： <img src="https://www.zhihu.com/equation?tex=%5Cleft+%28+%5Cmathbf%7BA%7D+%2B+%5Cmathbf%7BB%7D%5Cright+%29+%2B+%5Cmathbf%7BC%7D+%3D+%5Cmathbf%7BA%7D+%2B+%5Cleft+%28+%5Cmathbf%7BB%7D+%2B+%5Cmathbf%7BC%7D+%5Cright+%29" alt="\left ( \mathbf{A} + \mathbf{B}\right ) + \mathbf{C} = \mathbf{A} + \left ( \mathbf{B} + \mathbf{C} \right )" loading="lazy" eeimg="1"/> </p><h3>减法</h3><p data-pid="9SVuOE6c">与加法类似，如下：</p><p data-pid="JAVNtGkL"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+%26+a_%7B12%7D+%26+...+%26a_%7B1n%7D+%5C%5C+a_%7B21%7D+%26+a_%7B22%7D+%26+...+%26a_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7Bm1%7D+%26+a_%7Bm2%7D+%26+...+%26a_%7Bmn%7D+%5Cend%7Bbmatrix%7D+-+%5Cbegin%7Bbmatrix%7D+b_%7B11%7D+%26+b_%7B12%7D+%26+...+%26b_%7B1n%7D+%5C%5C+b_%7B21%7D+%26+b_%7B22%7D+%26+...+%26b_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+b_%7Bm1%7D+%26+b_%7Bm2%7D+%26+...+%26b_%7Bmn%7D+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+-+b_%7B11%7D+%26+a_%7B12%7D+-+b_%7B12%7D+%26+...+%26a_%7B1n%7D+-+b_%7B1n%7D+%5C%5C+a_%7B21%7D+-+b_%7B21%7D+%26+a_%7B22%7D+-+b_%7B22%7D+%26+...+%26a_%7B2n%7D+-+b_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7Bm1%7D+-+b_%7Bm1%7D+%26+a_%7Bm2%7D+-+b_%7Bm2%7D+%26+...+%26a_%7Bmn%7D+-+b_%7Bmn%7D+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} a_{11} &amp; a_{12} &amp; ... &amp;a_{1n} \\ a_{21} &amp; a_{22} &amp; ... &amp;a_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ a_{m1} &amp; a_{m2} &amp; ... &amp;a_{mn} \end{bmatrix} - \begin{bmatrix} b_{11} &amp; b_{12} &amp; ... &amp;b_{1n} \\ b_{21} &amp; b_{22} &amp; ... &amp;b_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ b_{m1} &amp; b_{m2} &amp; ... &amp;b_{mn} \end{bmatrix} = \begin{bmatrix} a_{11} - b_{11} &amp; a_{12} - b_{12} &amp; ... &amp;a_{1n} - b_{1n} \\ a_{21} - b_{21} &amp; a_{22} - b_{22} &amp; ... &amp;a_{2n} - b_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ a_{m1} - b_{m1} &amp; a_{m2} - b_{m2} &amp; ... &amp;a_{mn} - b_{mn} \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="OEP2c4QA"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+1+%26+3+%26+5+%26+7+%5C%5C+2+%26+4+%26+6+%26+8+%5Cend%7Bbmatrix%7D+-+%5Cbegin%7Bbmatrix%7D+4+%26+3+%26+1+%26+4+%5C%5C+5+%26+3+%26+1+%26+6+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+-3+%26+0+%26+4+%26+3+%5C%5C+-3+%26+1+%26+5+%26+2+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} 1 &amp; 3 &amp; 5 &amp; 7 \\ 2 &amp; 4 &amp; 6 &amp; 8 \end{bmatrix} - \begin{bmatrix} 4 &amp; 3 &amp; 1 &amp; 4 \\ 5 &amp; 3 &amp; 1 &amp; 6 \end{bmatrix} = \begin{bmatrix} -3 &amp; 0 &amp; 4 &amp; 3 \\ -3 &amp; 1 &amp; 5 &amp; 2 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><h3>数乘</h3><p data-pid="4RvFWeZx">数乘即将矩阵乘以一个常量，矩阵中的每个元都与这个常量相乘，例如：</p><p data-pid="BYfxZ2KG"><img src="https://www.zhihu.com/equation?tex=k+%2A+%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+%26+a_%7B12%7D+%26+...+%26a_%7B1n%7D+%5C%5C+a_%7B21%7D+%26+a_%7B22%7D+%26+...+%26a_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7Bm1%7D+%26+a_%7Bm2%7D+%26+...+%26a_%7Bmn%7D+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+k+%2A+a_%7B11%7D+%26+k+%2A+a_%7B12%7D+%26+...+%26k+%2A+a_%7B1n%7D+%5C%5Ck+%2A+a_%7B21%7D+%26+k+%2A+a_%7B22%7D+%26+...+%26k+%2A+a_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+k+%2A+a_%7Bm1%7D+%26+k+%2A+a_%7Bm2%7D+%26+...+%26k+%2A+a_%7Bmn%7D+%5Cend%7Bbmatrix%7D" alt="k * \begin{bmatrix} a_{11} &amp; a_{12} &amp; ... &amp;a_{1n} \\ a_{21} &amp; a_{22} &amp; ... &amp;a_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ a_{m1} &amp; a_{m2} &amp; ... &amp;a_{mn} \end{bmatrix} = \begin{bmatrix} k * a_{11} &amp; k * a_{12} &amp; ... &amp;k * a_{1n} \\k * a_{21} &amp; k * a_{22} &amp; ... &amp;k * a_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ k * a_{m1} &amp; k * a_{m2} &amp; ... &amp;k * a_{mn} \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="Y58Rdvvr"><img src="https://www.zhihu.com/equation?tex=5%2A%5Cbegin%7Bbmatrix%7D+4+%26+3+%26+-1+%26+4+%5C%5C+5+%26+-3+%26+1+%26+6+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+20+%26+15+%26+-5+%26+20+%5C%5C+25+%26+-15+%26+5+%26+30+%5Cend%7Bbmatrix%7D" alt="5*\begin{bmatrix} 4 &amp; 3 &amp; -1 &amp; 4 \\ 5 &amp; -3 &amp; 1 &amp; 6 \end{bmatrix} = \begin{bmatrix} 20 &amp; 15 &amp; -5 &amp; 20 \\ 25 &amp; -15 &amp; 5 &amp; 30 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="LXqY2IeX"><b>运算律</b>：</p><p data-pid="OB2DSQuM"><img src="https://www.zhihu.com/equation?tex=k%28v%5Cmathbf%7BA%7D%29+%3D+v%28k%5Cmathbf%7BA%7D%29" alt="k(v\mathbf{A}) = v(k\mathbf{A})" loading="lazy" eeimg="1"/> </p><p data-pid="BQf26Jms"><img src="https://www.zhihu.com/equation?tex=k%28v%5Cmathbf%7BA%7D%29+%3D+%28vk%29%5Cmathbf%7BA%7D" alt="k(v\mathbf{A}) = (vk)\mathbf{A}" loading="lazy" eeimg="1"/> </p><p data-pid="7qoLxhfp"><img src="https://www.zhihu.com/equation?tex=%28k%2Bv%29%5Cmathbf%7BA%7D+%3D+v%5Cmathbf%7BA%7D+%2B+k%5Cmathbf%7BA%7D" alt="(k+v)\mathbf{A} = v\mathbf{A} + k\mathbf{A}" loading="lazy" eeimg="1"/> </p><p data-pid="iw9b0_nR"><img src="https://www.zhihu.com/equation?tex=k%28%5Cmathbf%7BA%7D+%2B+%5Cmathbf%7BB%7D%29+%3D+k%5Cmathbf%7BA%7D+%2B+k%5Cmathbf%7BB%7D" alt="k(\mathbf{A} + \mathbf{B}) = k\mathbf{A} + k\mathbf{B}" loading="lazy" eeimg="1"/> </p><h3>转置</h3><p data-pid="bkpAfsn1">把矩阵 <img src="https://www.zhihu.com/equation?tex=A" alt="A" loading="lazy" eeimg="1"/> 的行和列互相交换所产生的矩阵称为A的转置矩阵（标记为 <img src="https://www.zhihu.com/equation?tex=A%5ET" alt="A^T" loading="lazy" eeimg="1"/> ），这一过程称为矩阵的转置。</p><p data-pid="B8Tj4s4m"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+%26+a_%7B12%7D+%26+...+%26a_%7B1n%7D+%5C%5C+a_%7B21%7D+%26+a_%7B22%7D+%26+...+%26a_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7Bm1%7D+%26+a_%7Bm2%7D+%26+...+%26a_%7Bmn%7D+%5Cend%7Bbmatrix%7D%5E%7BT%7D+%3D+%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+%26+a_%7B21%7D+%26+...+%26a_%7Bm1%7D+%5C%5C+a_%7B12%7D+%26+a_%7B22%7D+%26+...+%26a_%7Bm2%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7B1n%7D+%26+a_%7B2n%7D+%26+...+%26a_%7Bmn%7D+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} a_{11} &amp; a_{12} &amp; ... &amp;a_{1n} \\ a_{21} &amp; a_{22} &amp; ... &amp;a_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ a_{m1} &amp; a_{m2} &amp; ... &amp;a_{mn} \end{bmatrix}^{T} = \begin{bmatrix} a_{11} &amp; a_{21} &amp; ... &amp;a_{m1} \\ a_{12} &amp; a_{22} &amp; ... &amp;a_{m2} \\ ... &amp; ... &amp; ... &amp;... \\ a_{1n} &amp; a_{2n} &amp; ... &amp;a_{mn} \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="Q3I5R4rr"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+1+%26+3+%26+5+%26+7+%5C%5C+2+%26+4+%26+6+%26+8+%5Cend%7Bbmatrix%7D%5E%7BT%7D+%3D+%5Cbegin%7Bbmatrix%7D+1+%26+2+%5C%5C+3+%26+4%5C%5C+5+%26+6%5C%5C+7+%26+8+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} 1 &amp; 3 &amp; 5 &amp; 7 \\ 2 &amp; 4 &amp; 6 &amp; 8 \end{bmatrix}^{T} = \begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4\\ 5 &amp; 6\\ 7 &amp; 8 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="R9Qs7_0a"><b>运算律</b>：</p><p data-pid="yZ-8RF6R"><img src="https://www.zhihu.com/equation?tex=%28%5Cmathbf%7BA%7D%5E%7BT%7D%29%5E%7BT%7D%3D%5Cmathbf%7BA%7D" alt="(\mathbf{A}^{T})^{T}=\mathbf{A}" loading="lazy" eeimg="1"/> </p><p data-pid="cXQKpzO6"><img src="https://www.zhihu.com/equation?tex=%28k%5Cmathbf%7BA%7D%29%5E%7BT%7D%3Dk%5Cmathbf%7BA%7D%5E%7BT%7D" alt="(k\mathbf{A})^{T}=k\mathbf{A}^{T}" loading="lazy" eeimg="1"/> </p><p data-pid="xbwRTRxv"><img src="https://www.zhihu.com/equation?tex=%28%5Cmathbf%7BA%7D%5Cmathbf%7BB%7D%29%5E%7BT%7D%3D%5Cmathbf%7BB%7D%5E%7BT%7D%5Cmathbf%7BA%7D%5E%7BT%7D" alt="(\mathbf{A}\mathbf{B})^{T}=\mathbf{B}^{T}\mathbf{A}^{T}" loading="lazy" eeimg="1"/> </p><h3>共轭</h3><p data-pid="TmK0Rrkn">对于一个复数矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> ，我们对其做实部不变，虚部取负的操作即为共轭操作，记作 <img src="https://www.zhihu.com/equation?tex=%5Cbar%7B%5Cmathbf%7BA%7D%7D" alt="\bar{\mathbf{A}}" loading="lazy" eeimg="1"/> 。例如</p><p data-pid="-b-Kk3ms"><img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%3D%5Cbegin%7Bbmatrix%7D+3%2Bi+%26+5%5C%5C+2-2i+%26+i+%5Cend%7Bbmatrix%7D" alt="\mathbf{A}=\begin{bmatrix} 3+i &amp; 5\\ 2-2i &amp; i \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="O2QJUTJG"> 则</p><p data-pid="Zqsf7Nyt"><img src="https://www.zhihu.com/equation?tex=%5Cbar%7B%5Cmathbf%7BA%7D%7D%3D%5Cbegin%7Bbmatrix%7D+3-i+%26+5%5C%5C+2%2B2i+%26+-i+%5Cend%7Bbmatrix%7D" alt="\bar{\mathbf{A}}=\begin{bmatrix} 3-i &amp; 5\\ 2+2i &amp; -i \end{bmatrix}" loading="lazy" eeimg="1"/> </p><h3>乘法</h3><p data-pid="-E6RSB0O">两个矩阵的乘法仅当第一个矩阵的<b>列数</b>和另一个矩阵的<b>行数</b>相等时才能定义，<i>m</i>×<i>n </i>矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 和 <i>n</i>×<i>p </i>矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BB%7D" alt="\mathbf{B}" loading="lazy" eeimg="1"/> 相乘，会得到一个 <i>m</i>×<i>p </i>矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BC%7D" alt="\mathbf{C}" loading="lazy" eeimg="1"/> ，记为 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BC%7D+%3D+%5Cmathbf%7BA%7D%5Cmathbf%7BB%7D" alt="\mathbf{C} = \mathbf{A}\mathbf{B}" loading="lazy" eeimg="1"/> 。</p><p data-pid="zA2yd39j"><img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BC%7D" alt="\mathbf{C}" loading="lazy" eeimg="1"/> 中第 i 行 j 列的元即为：</p><p data-pid="Htcceq31"><img src="https://www.zhihu.com/equation?tex=c_%7Bij%7D+%3D+a_%7Bi1%7Db_%7B1j%7D%2Ba_%7Bi2%7Db_%7B2j%7D%2B%5Ccdot+%5Ccdot+%5Ccdot+%2Ba_%7Bin%7Db_%7Bnj%7D%3D%5Csum_%7Br%3D1%7D%5E%7Bn%7Da_%7Bir%7Db_%7Brj%7D" alt="c_{ij} = a_{i1}b_{1j}+a_{i2}b_{2j}+\cdot \cdot \cdot +a_{in}b_{nj}=\sum_{r=1}^{n}a_{ir}b_{rj}" loading="lazy" eeimg="1"/> </p><p data-pid="io3rwWA9"> 式子看着很复杂，其实很简单， <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BC%7D" alt="\mathbf{C}" loading="lazy" eeimg="1"/> <b>中第i行第j列的元素的值为：</b> <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> <b>中第i行所有元素 与 </b><img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BB%7D" alt="\mathbf{B}" loading="lazy" eeimg="1"/> <b>中第j列的所有元素一一对应相乘，然后将相乘后的所有值相加</b>。</p><p data-pid="SK1O9fcy">例如：</p><p data-pid="Mvw46auH"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+1+%26+3+%26+5+%5C%5C+2+%26+4+%26+6+%5Cend%7Bbmatrix%7D+%2A+%5Cbegin%7Bbmatrix%7D+7+%26+9+%5C%5C+8+%26+0+%5C%5C+-1+%26+1+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+1%2A7%2B3%2A8%2B5%2A-1+%26+1%2A9%2B3%2A0%2B5%2A1+%5C%5C+2%2A7%2B4%2A8%2B6%2A-1+%26+2%2A9%2B4%2A0%2B6%2A1+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+26+%26+14+%5C%5C+40+%26+24+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} 1 &amp; 3 &amp; 5 \\ 2 &amp; 4 &amp; 6 \end{bmatrix} * \begin{bmatrix} 7 &amp; 9 \\ 8 &amp; 0 \\ -1 &amp; 1 \end{bmatrix} = \begin{bmatrix} 1*7+3*8+5*-1 &amp; 1*9+3*0+5*1 \\ 2*7+4*8+6*-1 &amp; 2*9+4*0+6*1 \end{bmatrix} = \begin{bmatrix} 26 &amp; 14 \\ 40 &amp; 24 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="9qaRZH0f">我们看结果中的第一行第二列 1*9+3*0+5*1，不就是前者的第一行1,3,5和后者的第二列9,0,1互相相乘然后相加。</p><p data-pid="s9f8NVnQ"><b>运算律</b>：</p><p data-pid="cb7-iypE"><img src="https://www.zhihu.com/equation?tex=%28%5Cmathbf%7BA%7D%5Cmathbf%7BB%7D%29%5Cmathbf%7BC%7D+%3D+%5Cmathbf%7BA%7D%28%5Cmathbf%7BB%7D%5Cmathbf%7BC%7D%29" alt="(\mathbf{A}\mathbf{B})\mathbf{C} = \mathbf{A}(\mathbf{B}\mathbf{C})" loading="lazy" eeimg="1"/> </p><p data-pid="lrEAKpSW"><img src="https://www.zhihu.com/equation?tex=%28%5Cmathbf%7BA%7D%2B%5Cmathbf%7BB%7D%29%5Cmathbf%7BC%7D+%3D+%5Cmathbf%7BA%7D%5Cmathbf%7BC%7D%2B%5Cmathbf%7BB%7D%5Cmathbf%7BC%7D" alt="(\mathbf{A}+\mathbf{B})\mathbf{C} = \mathbf{A}\mathbf{C}+\mathbf{B}\mathbf{C}" loading="lazy" eeimg="1"/> </p><p data-pid="zYndK7eb"><img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BC%7D%28%5Cmathbf%7BA%7D%2B%5Cmathbf%7BB%7D%29+%3D+%5Cmathbf%7BC%7D%5Cmathbf%7BA%7D+%2B+%5Cmathbf%7BC%7D%5Cmathbf%7BB%7D" alt="\mathbf{C}(\mathbf{A}+\mathbf{B}) = \mathbf{C}\mathbf{A} + \mathbf{C}\mathbf{B}" loading="lazy" eeimg="1"/> </p><p data-pid="FxSsu_T8">不满足交换律，即 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5Cmathbf%7BB%7D+%5Cneq+%5Cmathbf%7BB%7D%5Cmathbf%7BA%7D" alt="\mathbf{A}\mathbf{B} \neq \mathbf{B}\mathbf{A}" loading="lazy" eeimg="1"/> </p><p data-pid="Y9e93kXm">例如1*3的矩阵乘以3*1的矩阵得到的是1*1的矩阵（每n行乘以每n列，左边只有一行，右边只有一列，<b>向量的点乘</b>就属于这种情况）：</p><p data-pid="P8d0RoZZ"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+1+%26+3+%26+5++%5Cend%7Bbmatrix%7D+%2A+%5Cbegin%7Bbmatrix%7D+2%5C%5C4%5C%5C6+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+1%2A2%2B3%2A4%2B5%2A6+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+44+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} 1 &amp; 3 &amp; 5  \end{bmatrix} * \begin{bmatrix} 2\\4\\6 \end{bmatrix} = \begin{bmatrix} 1*2+3*4+5*6 \end{bmatrix} = \begin{bmatrix} 44 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="JqbBrEZc">而把它们反过来，即3*1的矩阵乘以1*3的矩阵，就变成了3*3的矩阵：</p><p data-pid="K5U0ACpY"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+2%5C%5C4%5C%5C6+%5Cend%7Bbmatrix%7D+%2A%5Cbegin%7Bbmatrix%7D+1+%26+3+%26+5++%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+2%2A1%262%2A3%262%2A5%5C%5C4%2A1%264%2A3%264%2A5%5C%5C6%2A1%266%2A3%266%2A5+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+2%266%2610%5C%5C4%2612%2620%5C%5C6%2618%2630+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} 2\\4\\6 \end{bmatrix} *\begin{bmatrix} 1 &amp; 3 &amp; 5  \end{bmatrix} = \begin{bmatrix} 2*1&amp;2*3&amp;2*5\\4*1&amp;4*3&amp;4*5\\6*1&amp;6*3&amp;6*5 \end{bmatrix} = \begin{bmatrix} 2&amp;6&amp;10\\4&amp;12&amp;20\\6&amp;18&amp;30 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p class="ztext-empty-paragraph"><br/></p><h3>矩阵与向量相乘</h3><p data-pid="-DGdm6r-">向量用矩阵表示的话，是属于一个n*1的矩阵，例如二维向量为 <img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+x%5C%5C+y+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} x\\ y \end{bmatrix}" loading="lazy" eeimg="1"/>  ，三维向量为 <img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+x%5C%5C+y%5C%5C+z+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} x\\ y\\ z \end{bmatrix}" loading="lazy" eeimg="1"/></p><p data-pid="1MF6eFee">因此一个 m * 2 的矩阵可以乘以一个二维向量，m * 3 的矩阵可以乘以一个三维向量。</p><p data-pid="zJEs2MpY">这点对于<b>向量的变换运算</b>非常的重要，例如我们想要将向量 (x, y) 做一个y轴的对称操作，即变为 (-x, y) ，只需要用下面的矩阵乘以这个向量即可：</p><p data-pid="dsRd4kYZ"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+-1+%26+0+%5C%5C+0+%26+1+%5Cend%7Bbmatrix%7D+%2A+%5Cbegin%7Bbmatrix%7D+x+%5C%5C+y+%5Cend%7Bbmatrix%7D+%3D%5Cbegin%7Bbmatrix%7D+-x+%5C%5C+y+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} -1 &amp; 0 \\ 0 &amp; 1 \end{bmatrix} * \begin{bmatrix} x \\ y \end{bmatrix} =\begin{bmatrix} -x \\ y \end{bmatrix}" loading="lazy" eeimg="1"/> </p><h3>矩阵表示向量的点积</h3><p data-pid="B6_ooKWf"><img src="https://www.zhihu.com/equation?tex=%5Cvec%7Ba%7D+%5Ccdot+%5Cvec%7Bb%7D+%3D+%5Cvec%7Ba%7D%5E%7BT%7D+%5Cvec%7Bb%7D+%3D+%5Cbegin%7Bbmatrix%7D+x_%7Ba%7D+%26+y_%7Ba%7D+%26+z_%7Ba%7D+%5Cend%7Bbmatrix%7D+%2A+%5Cbegin%7Bbmatrix%7D+x_%7Bb%7D+%5C%5C+y_%7Bb%7D+%5C%5C+z_%7Bb%7D+%5Cend%7Bbmatrix%7D%3D+%5Cbegin%7Bbmatrix%7D+x_%7Ba%7Dx_%7Bb%7D%2By_%7Ba%7Dy_%7Bb%7D%2Bz_%7Ba%7Dz_%7Bb%7D+%5Cend%7Bbmatrix%7D" alt="\vec{a} \cdot \vec{b} = \vec{a}^{T} \vec{b} = \begin{bmatrix} x_{a} &amp; y_{a} &amp; z_{a} \end{bmatrix} * \begin{bmatrix} x_{b} \\ y_{b} \\ z_{b} \end{bmatrix}= \begin{bmatrix} x_{a}x_{b}+y_{a}y_{b}+z_{a}z_{b} \end{bmatrix}" loading="lazy" eeimg="1"/> </p><h3>矩阵表示向量的叉积</h3><p data-pid="xe5CMpiE"><img src="https://www.zhihu.com/equation?tex=%5Cvec%7Ba%7D+%5Ctimes+%5Cvec%7Bb%7D+%3D+%5Cbegin%7Bbmatrix%7D+0+%26+-z_%7Ba%7D+%26+y_%7Ba%7D%5C%5Cz_%7Ba%7D+%26+0+%26+-x_%7Ba%7D%5C%5C-y_%7Ba%7D+%26+x_%7Ba%7D+%260+%5Cend%7Bbmatrix%7D+%2A+%5Cbegin%7Bbmatrix%7D+x_%7Bb%7D+%5C%5C+y_%7Bb%7D+%5C%5C+z_%7Bb%7D+%5Cend%7Bbmatrix%7D%3D+%5Cbegin%7Bbmatrix%7D+0%2Ax_%7Bb%7D-z_%7Ba%7Dy_%7Bb%7D%2By_%7Ba%7Dz_%7Bb%7D%5C%5Cz_%7Ba%7Dx_%7Bb%7D%2B0%2Ay_%7Bb%7D-x_%7Ba%7Dz_%7Bb%7D%5C%5C-y_%7Ba%7Dx_%7Bb%7D%2Bx_%7Ba%7Dy_%7Bb%7D%2B0%2Az_%7Bb%7D+%5Cend%7Bbmatrix%7D" alt="\vec{a} \times \vec{b} = \begin{bmatrix} 0 &amp; -z_{a} &amp; y_{a}\\z_{a} &amp; 0 &amp; -x_{a}\\-y_{a} &amp; x_{a} &amp;0 \end{bmatrix} * \begin{bmatrix} x_{b} \\ y_{b} \\ z_{b} \end{bmatrix}= \begin{bmatrix} 0*x_{b}-z_{a}y_{b}+y_{a}z_{b}\\z_{a}x_{b}+0*y_{b}-x_{a}z_{b}\\-y_{a}x_{b}+x_{a}y_{b}+0*z_{b} \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="JbBlBk5T">至于左边这个矩阵怎么来的？可以看后续的三维旋转推导。</p><h3>哈达玛积(Hadamard product)</h3><p data-pid="F16BX8NF">矩阵还有一种运算叫作哈达玛积或者基本积，该运算类似于矩阵的加减法，将两个m*n的同阶矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 、 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BB%7D" alt="\mathbf{B}" loading="lazy" eeimg="1"/> 的对应位置相乘得到一个m*n的新矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BC%7D" alt="\mathbf{C}" loading="lazy" eeimg="1"/> ，常记作 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BC%7D%3D%5Cmathbf%7BA%7D%5Cast%5Cmathbf%7BB%7D" alt="\mathbf{C}=\mathbf{A}\ast\mathbf{B}" loading="lazy" eeimg="1"/> 或 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BC%7D%3D%5Cmathbf%7BA%7D%5Ccirc%5Cmathbf%7BB%7D" alt="\mathbf{C}=\mathbf{A}\circ\mathbf{B}" loading="lazy" eeimg="1"/> 。</p><p data-pid="M86Lj83A">例如：</p><p data-pid="tcY-NdGI"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+%26+a_%7B12%7D+%26+...+%26a_%7B1n%7D+%5C%5C+a_%7B21%7D+%26+a_%7B22%7D+%26+...+%26a_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7Bm1%7D+%26+a_%7Bm2%7D+%26+...+%26a_%7Bmn%7D+%5Cend%7Bbmatrix%7D+%5Ccirc+%5Cbegin%7Bbmatrix%7D+b_%7B11%7D+%26+b_%7B12%7D+%26+...+%26b_%7B1n%7D+%5C%5C+b_%7B21%7D+%26+b_%7B22%7D+%26+...+%26b_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+b_%7Bm1%7D+%26+b_%7Bm2%7D+%26+...+%26b_%7Bmn%7D+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+a_%7B11%7D+%2A+b_%7B11%7D+%26+a_%7B12%7D+%2A+b_%7B12%7D+%26+...+%26a_%7B1n%7D+%2A+b_%7B1n%7D+%5C%5C+a_%7B21%7D+%2A+b_%7B21%7D+%26+a_%7B22%7D+%2A+b_%7B22%7D+%26+...+%26a_%7B2n%7D+%2A+b_%7B2n%7D+%5C%5C+...+%26+...+%26+...+%26...+%5C%5C+a_%7Bm1%7D+%2A+b_%7Bm1%7D+%26+a_%7Bm2%7D+%2A+b_%7Bm2%7D+%26+...+%26a_%7Bmn%7D+%2A+b_%7Bmn%7D+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} a_{11} &amp; a_{12} &amp; ... &amp;a_{1n} \\ a_{21} &amp; a_{22} &amp; ... &amp;a_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ a_{m1} &amp; a_{m2} &amp; ... &amp;a_{mn} \end{bmatrix} \circ \begin{bmatrix} b_{11} &amp; b_{12} &amp; ... &amp;b_{1n} \\ b_{21} &amp; b_{22} &amp; ... &amp;b_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ b_{m1} &amp; b_{m2} &amp; ... &amp;b_{mn} \end{bmatrix} = \begin{bmatrix} a_{11} * b_{11} &amp; a_{12} * b_{12} &amp; ... &amp;a_{1n} * b_{1n} \\ a_{21} * b_{21} &amp; a_{22} * b_{22} &amp; ... &amp;a_{2n} * b_{2n} \\ ... &amp; ... &amp; ... &amp;... \\ a_{m1} * b_{m1} &amp; a_{m2} * b_{m2} &amp; ... &amp;a_{mn} * b_{mn} \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="XS0yq2Y3"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+1+%26+3+%26+5+%26+7+%5C%5C+2+%26+4+%26+6+%26+8+%5Cend%7Bbmatrix%7D+%5Ccirc+%5Cbegin%7Bbmatrix%7D+4+%26+3+%26+1+%26+4+%5C%5C+5+%26+3+%26+1+%26+6+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+4+%26+9+%26+5+%26+28+%5C%5C+10+%26+12+%26+6+%26+48+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} 1 &amp; 3 &amp; 5 &amp; 7 \\ 2 &amp; 4 &amp; 6 &amp; 8 \end{bmatrix} \circ \begin{bmatrix} 4 &amp; 3 &amp; 1 &amp; 4 \\ 5 &amp; 3 &amp; 1 &amp; 6 \end{bmatrix} = \begin{bmatrix} 4 &amp; 9 &amp; 5 &amp; 28 \\ 10 &amp; 12 &amp; 6 &amp; 48 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="m7jHrJan"><b>运算律</b>：</p><p data-pid="6EhKsR9W"><img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D+%5Ccirc+0+%3D+0" alt="\mathbf{A} \circ 0 = 0" loading="lazy" eeimg="1"/> </p><p data-pid="ERAExpim"><img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D+%5Ccirc+%5Cmathbf%7BB%7D+%3D+%5Cmathbf%7BB%7D+%5Ccirc+%5Cmathbf%7BA%7D" alt="\mathbf{A} \circ \mathbf{B} = \mathbf{B} \circ \mathbf{A}" loading="lazy" eeimg="1"/> </p><p data-pid="xJ6cyVrk"><img src="https://www.zhihu.com/equation?tex=%28+%5Cmathbf%7BA%7D+%2B+%5Cmathbf%7BB%7D%29+%5Ccirc+%5Cmathbf%7BC%7D+%3D+%28%5Cmathbf%7BA%7D+%5Ccirc%5Cmathbf%7BC%7D%29%2B+%28+%5Cmathbf%7BB%7D+%5Ccirc+%5Cmathbf%7BC%7D+%29" alt="( \mathbf{A} + \mathbf{B}) \circ \mathbf{C} = (\mathbf{A} \circ\mathbf{C})+ ( \mathbf{B} \circ \mathbf{C} )" loading="lazy" eeimg="1"/> \</p><p class="ztext-empty-paragraph"><br/></p><h2>常用的特殊的矩阵</h2><h3>单位矩阵</h3><p data-pid="oCzeRNee">单位矩阵是个方阵，从左上角到右下角的对角线（称为主对角线）上的元素均为1，除此以外全都为0，即</p><p data-pid="nsDogbmB"><img src="https://www.zhihu.com/equation?tex=%5Cleft%5C%7B%5Cbegin%7Bmatrix%7D+a_%7Bij%7D%3D1+%26%28i%3Dj%29%5C%5C++a_%7Bij%7D%3D0+%26%28i%5Cne+j%29+%5Cend%7Bmatrix%7D%5Cright." alt="\left\{\begin{matrix} a_{ij}=1 &amp;(i=j)\\  a_{ij}=0 &amp;(i\ne j) \end{matrix}\right." loading="lazy" eeimg="1"/> </p><p data-pid="N7u8Q1rp">单位矩阵记为 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BI%7D_%7Bn%7D" alt="\mathbf{I}_{n}" loading="lazy" eeimg="1"/> 或者 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BE%7D_%7Bn%7D" alt="\mathbf{E}_{n}" loading="lazy" eeimg="1"/> ，通常用 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BI%7D" alt="\mathbf{I}" loading="lazy" eeimg="1"/>  或 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BE%7D" alt="\mathbf{E}" loading="lazy" eeimg="1"/> 表示，例如：</p><p data-pid="E71rSAOq"><img src="https://www.zhihu.com/equation?tex=I_%7B2%7D+%3D+%5Cbegin%7Bbmatrix%7D+1+%26+0+%5C%5C+0+%26+1+%5Cend%7Bbmatrix%7D" alt="I_{2} = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="gdza0lpR"><img src="https://www.zhihu.com/equation?tex=I_%7B3%7D+%3D+%5Cbegin%7Bbmatrix%7D+1+%26+0+%26+0+%5C%5C+0+%26+1+%26+0+%5C%5C+0+%26+0+%26+1+%5Cend%7Bbmatrix%7D" alt="I_{3} = \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 1 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="ftjZ_8uD"><b>重要性质</b>：任何矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 乘以单位矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BI%7D" alt="\mathbf{I}" loading="lazy" eeimg="1"/> ，或者单位矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BI%7D" alt="\mathbf{I}" loading="lazy" eeimg="1"/> 乘以任何矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 的结果都为 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 。记作： <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5Cmathbf%7BI%7D+%3D+%5Cmathbf%7BA%7D" alt="\mathbf{A}\mathbf{I} = \mathbf{A}" loading="lazy" eeimg="1"/> 或 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BI%7D%5Cmathbf%7BA%7D+%3D+%5Cmathbf%7BA%7D" alt="\mathbf{I}\mathbf{A} = \mathbf{A}" loading="lazy" eeimg="1"/> </p><p class="ztext-empty-paragraph"><br/></p><h3>逆矩阵</h3><p data-pid="-PrO0KfS">设 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 是一个n阶矩阵，若存在另一个n阶矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BB%7D" alt="\mathbf{B}" loading="lazy" eeimg="1"/> ，使得： <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5Cmathbf%7BB%7D+%3D+%5Cmathbf%7BB%7D%5Cmathbf%7BA%7D+%3D+%5Cmathbf%7BI%7D" alt="\mathbf{A}\mathbf{B} = \mathbf{B}\mathbf{A} = \mathbf{I}" loading="lazy" eeimg="1"/> （ <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BI%7D" alt="\mathbf{I}" loading="lazy" eeimg="1"/> 为单位矩阵），则称方阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 可逆，并称方阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BB%7D" alt="\mathbf{B}" loading="lazy" eeimg="1"/> 是 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 的逆矩阵。</p><p data-pid="P9Chrpzv">若矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 可逆，则其的逆矩阵是唯一的，记为 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5E%7B-1%7D" alt="\mathbf{A}^{-1}" loading="lazy" eeimg="1"/> ，则 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5Cmathbf%7BA%7D%5E%7B-1%7D+%3D+%5Cmathbf%7BI%7D" alt="\mathbf{A}\mathbf{A}^{-1} = \mathbf{I}" loading="lazy" eeimg="1"/> 或 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5E%7B-1%7D%5Cmathbf%7BA%7D+%3D+%5Cmathbf%7BI%7D" alt="\mathbf{A}^{-1}\mathbf{A} = \mathbf{I}" loading="lazy" eeimg="1"/> 。</p><p data-pid="bfRVo52K">一些性质：</p><p data-pid="ASCHL0kE">若 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 可逆，则 <img src="https://www.zhihu.com/equation?tex=%28%5Cmathbf%7BA%7D%5E%7B-1%7D%29%5E%7B-1%7D+%3D+%5Cmathbf%7BA%7D" alt="(\mathbf{A}^{-1})^{-1} = \mathbf{A}" loading="lazy" eeimg="1"/> </p><p data-pid="jogGyCK5">若 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 可逆，则其转置矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5E%7BT%7D" alt="\mathbf{A}^{T}" loading="lazy" eeimg="1"/> 也可逆，且 <img src="https://www.zhihu.com/equation?tex=%28%5Cmathbf%7BA%7D%5E%7BT%7D%29%5E%7B-1%7D+%3D+%28%5Cmathbf%7BA%7D%5E%7B-1%7D%29%5E%7BT%7D" alt="(\mathbf{A}^{T})^{-1} = (\mathbf{A}^{-1})^{T}" loading="lazy" eeimg="1"/> </p><p data-pid="vzBw-qyO">若 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> ， <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BB%7D" alt="\mathbf{B}" loading="lazy" eeimg="1"/> 都可逆，则 <img src="https://www.zhihu.com/equation?tex=%28%5Cmathbf%7BA%7D%5Cmathbf%7BB%7D%29%5E%7B-1%7D+%3D+%5Cmathbf%7BB%7D%5E%7B-1%7D%5Cmathbf%7BA%7D%5E%7B-1%7D" alt="(\mathbf{A}\mathbf{B})^{-1} = \mathbf{B}^{-1}\mathbf{A}^{-1}" loading="lazy" eeimg="1"/> </p><p class="ztext-empty-paragraph"><br/></p><h3>对角矩阵</h3><p data-pid="HecHXbS1">当一个方阵上所有非对角线上的元素均为0时，即 <img src="https://www.zhihu.com/equation?tex=i+%5Cneq+j" alt="i \neq j" loading="lazy" eeimg="1"/> 时 <img src="https://www.zhihu.com/equation?tex=a_%7Bij%7D+%3D+0" alt="a_{ij} = 0" loading="lazy" eeimg="1"/> ，该矩阵即为对角矩阵。例如：</p><p data-pid="RQyw3Fxn"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+1+%26+0+%26+0+%5C%5C+0+%26+5+%26+0+%5C%5C+0+%26+0+%26+2+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; 5 &amp; 0 \\ 0 &amp; 0 &amp; 2 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="Kxt2b57j">它可用于缩放变换，假如我们要将 (x, y) 分别缩放m倍和n倍，变为 (mx, ny) 那么就可以用下面矩阵来表达：</p><p data-pid="I0GMOP02"><img src="https://www.zhihu.com/equation?tex=%5Cbegin%7Bbmatrix%7D+m+%26+0%5C%5C+0+%26+n+%5Cend%7Bbmatrix%7D+%2A+%5Cbegin%7Bbmatrix%7D+x%5C%5C+y+%5Cend%7Bbmatrix%7D+%3D%5Cbegin%7Bbmatrix%7D+m%2A+x%5C%5C+n+%2A+y+%5Cend%7Bbmatrix%7D" alt="\begin{bmatrix} m &amp; 0\\ 0 &amp; n \end{bmatrix} * \begin{bmatrix} x\\ y \end{bmatrix} =\begin{bmatrix} m* x\\ n * y \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="SdPA-V9S">该对角矩阵也可称为<b>缩放矩阵</b>。</p><p class="ztext-empty-paragraph"><br/></p><h3>正交矩阵</h3><p data-pid="gzDMYJg0">如果有个n阶实矩阵 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> ，它满足 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D+%5Cmathbf%7BA%7D%5E%7BT%7D+%3D+%5Cmathbf%7BI%7D" alt="\mathbf{A} \mathbf{A}^{T} = \mathbf{I}" loading="lazy" eeimg="1"/> 或 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5E%7BT%7D+%5Cmathbf%7BA%7D+%3D+%5Cmathbf%7BI%7D" alt="\mathbf{A}^{T} \mathbf{A} = \mathbf{I}" loading="lazy" eeimg="1"/> ，则称 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 为正交矩阵，正交矩阵常用字母 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BQ%7D" alt="\mathbf{Q}" loading="lazy" eeimg="1"/> 来表示。</p><p data-pid="ihc3kCMU">我们可以发现这和逆矩阵的定义（ <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5Cmathbf%7BA%7D%5E%7B-1%7D+%3D+%5Cmathbf%7BI%7D" alt="\mathbf{A}\mathbf{A}^{-1} = \mathbf{I}" loading="lazy" eeimg="1"/> ）很像，因此正交矩阵的转置等于其逆矩阵，即 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5E%7BT%7D+%3D+%5Cmathbf%7BA%7D%5E%7B-1%7D" alt="\mathbf{A}^{T} = \mathbf{A}^{-1}" loading="lazy" eeimg="1"/>。</p><p data-pid="Y_8Q-pSs">除此之外， <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 或 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5E%7BT%7D" alt="\mathbf{A}^{T}" loading="lazy" eeimg="1"/> 的<b>各行都是单位向量且两两正交，且各列也都是单位向量且两两正交</b>。</p><p data-pid="ishTh6mi"><b>推导：</b></p><p data-pid="X1n324C3">假设 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D+%3D+%5Cbegin%7Bbmatrix%7D+a+%26+b+%5C%5C+c+%26+d+%5Cend%7Bbmatrix%7D" alt="\mathbf{A} = \begin{bmatrix} a &amp; b \\ c &amp; d \end{bmatrix}" loading="lazy" eeimg="1"/> 为正交矩阵，那么 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5E%7BT%7D+%3D+%5Cbegin%7Bbmatrix%7D+a+%26+c+%5C%5C+b+%26+d+%5Cend%7Bbmatrix%7D" alt="\mathbf{A}^{T} = \begin{bmatrix} a &amp; c \\ b &amp; d \end{bmatrix}" loading="lazy" eeimg="1"/> ，可得：</p><p data-pid="3FPx60eS"><img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D+%5Cmathbf%7BA%7D%5E%7BT%7D+%3D+%5Cbegin%7Bbmatrix%7D+aa%2Bbb+%26+ac%2Bbd+%5C%5C+ca%2Bdb+%26+cc%2Bdd+%5Cend%7Bbmatrix%7D+%3D+%5Cbegin%7Bbmatrix%7D+1+%26+0+%5C%5C+0+%26+1+%5Cend%7Bbmatrix%7D" alt="\mathbf{A} \mathbf{A}^{T} = \begin{bmatrix} aa+bb &amp; ac+bd \\ ca+db &amp; cc+dd \end{bmatrix} = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="MW1THbCQ">可得 ac+bd=0，aa+bb=cc+dd=1。</p><p data-pid="saqimxQy">若按照 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 的行来取向量，我们可得到向量 <img src="https://www.zhihu.com/equation?tex=%5Cvec%7Bi%7D%3D%28a%2Cb%29" alt="\vec{i}=(a,b)" loading="lazy" eeimg="1"/> 和 <img src="https://www.zhihu.com/equation?tex=%5Cvec%7Bj%7D%3D%28c%2Cd%29" alt="\vec{j}=(c,d)" loading="lazy" eeimg="1"/> 。</p><p data-pid="G2DAT01X">做点积得 <img src="https://www.zhihu.com/equation?tex=%5Cvec%7Bi%7D%5Ccdot+%5Cvec%7Bj%7D%3Dac%2Bbd" alt="\vec{i}\cdot \vec{j}=ac+bd" loading="lazy" eeimg="1"/> ，前面已得到ac+bd=0，所以 <img src="https://www.zhihu.com/equation?tex=%5Cvec%7Bi%7D%5Ccdot+%5Cvec%7Bj%7D%3D0" alt="\vec{i}\cdot \vec{j}=0" loading="lazy" eeimg="1"/> ，根据正交的定义可得，这两个向量正交。</p><p data-pid="Btfwundh">然后再来取模，可得 <img src="https://www.zhihu.com/equation?tex=+%7C+%5Cvec%7Bi%7D+%7C%3D%5Csqrt%7Baa%2Bbb%7D" alt=" | \vec{i} |=\sqrt{aa+bb}" loading="lazy" eeimg="1"/> ，前面得到aa+bb=1，因此 <img src="https://www.zhihu.com/equation?tex=%5Cvec%7Bi%7D" alt="\vec{i}" loading="lazy" eeimg="1"/> 的模长为1，为单位向量， <img src="https://www.zhihu.com/equation?tex=%5Cvec%7Bj%7D" alt="\vec{j}" loading="lazy" eeimg="1"/> 同理为单位向量。</p><p data-pid="dGLppkTL">上面我们验证了 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D" alt="\mathbf{A}" loading="lazy" eeimg="1"/> 中各行都是单位向量且两两正交，要验证每列也是这样的情况只需要使用 <img src="https://www.zhihu.com/equation?tex=%5Cmathbf%7BA%7D%5E%7BT%7D+%5Cmathbf%7BA%7D+%3D+%5Cmathbf%7BI%7D" alt="\mathbf{A}^{T} \mathbf{A} = \mathbf{I}" loading="lazy" eeimg="1"/> 来推导即可。同样的在三维空间也可以用此方法来推导，用 3*3的矩阵相乘即可。</p><p class="ztext-empty-paragraph"><br/></p><p data-pid="Q4fzlU55">在坐标系中，我们x轴的单位向量为(1, 0, 0)，y轴为(0, 1, 0)，z轴为(0, 0, 1)，那么他们所组成的矩阵即为：</p><p data-pid="Mp0mLy3M"><img src="https://www.zhihu.com/equation?tex=+%5Cbegin%7Bbmatrix%7D+1+%26+0+%26+0%5C%5C+0+%26+1%26+0%5C%5C0%26+0%261+%5Cend%7Bbmatrix%7D" alt=" \begin{bmatrix} 1 &amp; 0 &amp; 0\\ 0 &amp; 1&amp; 0\\0&amp; 0&amp;1 \end{bmatrix}" loading="lazy" eeimg="1"/> </p><p data-pid="lqyAipgJ">它既是单位矩阵，又是正交矩阵。</p>
+
+
+<br>=======================================================================
+<div id="algebra2"><strong>矩阵运算</strong></div>
+<br>转载自： <a href="https://blog.csdn.net/weixin_48524215/article/details/114497918 "> https://blog.csdn.net/weixin_48524215/article/details/114497918 </a>
+<br>
+<h3>目录</h3>
+ <ul><li><a href="#1__1">1. 矩阵运算</a></li><li><ul><li><a href="#11__3">1.1 矩阵分析</a></li><li><ul><li><a href="#110__4">1.1.0 向量和矩阵的范数运算</a></li><li><a href="#111__31">1.1.1 矩阵的秩</a></li><li><a href="#112__38">1.1.2 矩阵的行列式</a></li><li><a href="#113__43">1.1.3 矩阵的迹</a></li><li><a href="#114__49">1.1.4 矩阵的化零矩阵</a></li><li><a href="#115__55">1.1.5 矩阵的正交空间</a></li><li><a href="#116__60">1.1.6 矩阵的约化行阶梯形式</a></li><li><a href="#117__71">1.1.7 矩阵空间之间的夹角</a></li></ul>
+   </li><li><a href="#12__80">1.2 矩阵分解</a></li><li><ul><li><a href="#120_Cholesky_99">1.2.0 对称正定矩阵的Cholesky分解</a></li><li><a href="#121_LU_135">1.2.1 一般方阵的高斯消去法分解&#xff08;LU分解&#xff09;</a></li><li><a href="#122_QR_173">1.2.2 矩形矩阵的正交分解&#xff08;QR分解&#xff09;</a></li><li><a href="#123__194">1.2.3 舒尔分解</a></li></ul>
+   </li><li><a href="#13__208">1.3 特征值和特征向量</a></li><li><ul><li><a href="#130__209">1.3.0 特征值和特征向量的定义</a></li><li><a href="#131__221">1.3.1 特征值和特征向量的相关函数</a></li><li><a href="#132__242">1.3.2 特征值和特征向量的计算</a></li></ul>
+  </li></ul>
+ </li></ul>
+
+<p></p> 
+<h1><a id="1__1"></a>1. 矩阵运算</h1> 
+<p>矩阵运算包括矩阵分析、特征值求解、奇异值等</p> 
+<h2><a id="11__3"></a>1.1 矩阵分析</h2> 
+<h3><a id="110__4"></a>1.1.0 向量和矩阵的范数运算</h3> 
+<p><img src="20210307205813669.png" alt="" /><br /> 求<mark>向量范数</mark>的函数</p> 
+<blockquote> 
+ <p><mark>N&#61;norm(x,p)</mark>&#xff1a;对任意大于1的p值&#xff0c;返回向量x的p阶范数<br /> <mark>N&#61;norm(x)</mark>&#xff1a;返回向量的2阶范数&#xff0c;相当于N&#61;norm(x,2)<br /> <mark>N&#61;norm(x,inf)</mark>&#xff1a;返回向量的<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         ∞
+        
+       
+       
+        \infty
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord">∞</span></span></span></span></span>阶范数&#xff0c;相当于N&#61;max(abs(x))<br /> <mark>N&#61;norm(x,-inf)</mark>&#xff1a;返回向量的–<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         ∞
+        
+       
+       
+        \infty
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord">∞</span></span></span></span></span>阶范数&#xff0c;相当于N&#61;min(abs(x))</p> 
+</blockquote> 
+<p>求<mark>矩阵范数</mark>的函数</p> 
+<blockquote> 
+ <p><mark>N&#61;norm(A)</mark>&#xff1a;计算矩阵的2阶范数&#xff0c;也就是最大奇异值<br /> <mark>N&#61;norm(A,p)</mark>&#xff1a;根据参数p的值不同&#xff0c;求不同阶的范数值<br /> 当p&#61;1时&#xff0c;计算矩阵A的1阶范数&#xff0c;相当于max(sum(abs(A)))<br /> 当p&#61;2时&#xff0c;计算矩阵A的2阶范数&#xff0c;相当于norm(A)<br /> 当p&#61;inf时&#xff0c;计算矩阵A的<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         ∞
+        
+       
+       
+        \infty
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord">∞</span></span></span></span></span>阶范数&#xff0c;相当于max(sum(abs(A’)))<br /> 当p&#61;pro时&#xff0c;计算矩阵A的F范数(Frobenius范数)&#xff0c;相当于sqrt(sum(diag(A’*A)))</p> 
+</blockquote> 
+<p><mark>求向量x的2阶范数范例&#xff1a;</mark><br /> <img src="2021030721554070.png" alt="" /><br /> <img src="20210307215602857.png" alt="" /></p> 
+<p>当矩阵<mark>维数比较大</mark>时&#xff0c;会导致<mark>计算</mark>矩阵范数的<mark>时间比较长</mark>&#xff0c;并且当一个近似的范数值满足要求时&#xff0c;可以考虑用函数 normest( )来估计2阶范数值。<br /> 函数 normest( ) 最初是为了提供给稀疏矩阵(sparse matrix)使用的&#xff0c;同时它也能接受满矩阵的输入&#xff0c;一般在满矩阵维数比较大时使用</p> 
+<blockquote> 
+ <p><mark>normest(S)</mark>&#xff1a;估计矩阵S的2阶范数值<br /> <mark>normest(S,tol)</mark>&#xff1a;使用 tol 作为允许的相对误差</p> 
+</blockquote> 
+<p><mark>求矩阵的范式示例&#xff1a;</mark><br /> <img src="20210307220419927.png" alt="" /><img src="20210307220432942.png" alt="" /></p> 
+<h3><a id="111__31"></a>1.1.1 矩阵的秩</h3> 
+<p>矩阵A中<mark>线性无关的列向量个数</mark>成为<mark>列秩</mark>&#xff0c;<mark>线性无关的行向量个数</mark>称为<mark>行秩</mark></p> 
+<blockquote> 
+ <p><mark>rank(A)</mark>&#xff1a;默认允许误差计算矩阵的秩<br /> <mark>rank(A,tol)</mark>&#xff1a;给定允许误差计算矩阵的秩&#xff0c;tol&#61;max(size(A))*eps(norm(A))</p> 
+</blockquote> 
+<p><mark>求矩阵的秩示例:</mark><br /> <img src="20210307221155887.png" alt="" /></p> 
+<h3><a id="112__38"></a>1.1.2 矩阵的行列式</h3> 
+<blockquote> 
+ <p><mark>det(A)</mark>&#xff1a;计算矩阵A的行列式</p> 
+</blockquote> 
+<p><img src="20210307221647602.png" alt="" /><br /> <img src="202103072217019.png" alt="" /></p> 
+<h3><a id="113__43"></a>1.1.3 矩阵的迹</h3> 
+<p>矩阵的迹定义为矩阵对角元素之和</p> 
+<blockquote> 
+ <p><mark>trace(A)</mark>&#xff1a;矩阵&#xff21;的迹</p> 
+</blockquote> 
+<p><img src="20210307222206139.png" alt="" /><br /> <img src="20210307222225225.png" alt="" /></p> 
+<h3><a id="114__49"></a>1.1.4 矩阵的化零矩阵</h3> 
+<blockquote> 
+ <p><mark>Z&#61;null(A)</mark>&#xff1a;返回矩阵A的一个化零矩阵&#xff0c;如果化零矩阵不存在则返回空矩阵<br /> <mark>z&#61;null(A,‘r’)</mark>&#xff1a;返回有理数形式的化零矩阵</p> 
+</blockquote> 
+<p><mark>求矩阵的化零矩阵范例&#xff1a;</mark><br /> <img src="20210307222715278.png" alt="" /><img src="20210307222728468.png" alt="" /></p> 
+<h3><a id="115__55"></a>1.1.5 矩阵的正交空间</h3> 
+<p>矩阵A的正交空间Q具有Q’<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        ?
+       
+      
+      
+       \cdot
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.44445em; vertical-align: 0em;"></span><span class="mord">?</span></span></span></span></span>Q&#61;I的性质&#xff0c;并且Q的列矢量构成的线性空间与矩阵A的列矢量构成的线性空间相同&#xff0c;且正交空间Q与矩阵A具有相同的秩</p> 
+<blockquote> 
+ <p><mark>orth(A)</mark>&#xff1a;矩阵A的正交空间</p> 
+</blockquote> 
+<p><img src="20210307223541317.png" alt="" /></p> 
+<h3><a id="116__60"></a>1.1.6 矩阵的约化行阶梯形式</h3> 
+<p>矩阵的约化行阶梯形式是高斯&#xff0d;约旦消去法解线性方程组的结果</p> 
+<blockquote> 
+ <p><mark>R&#61;rref(A)</mark>&#xff1a;返回矩阵A的约化行阶梯形式R<br /> <mark>[R,jb]&#61;rref(A)</mark>&#xff1a;返回矩阵A的约化行阶梯形式R&#xff0c;并返回1×r的向量jb<br /> r为矩阵A的秩<br /> A(:,jb)是矩阵A的列矢量构成的线性空间<br /> R(1:r,jb)是r×r的单位矩阵<br /> <mark>[R,jb]&#61;rref(A,tol)</mark>&#xff1a;以tol作为允许的相对误差计算矩阵A的秩</p> 
+</blockquote> 
+<p><mark>求矩阵A的约化行阶梯形式示例&#xff1a;</mark><br /> <img src="20210307224733827.png" alt="" /></p> 
+<h3><a id="117__71"></a>1.1.7 矩阵空间之间的夹角</h3> 
+<p>矩阵空间之间的夹角代表两个矩阵线性相关的程度<br /> 如果夹角很小&#xff0c;它们之间的线性相关度就很高<br /> 反之&#xff0c;它们之间的线性相关度不大</p> 
+<blockquote> 
+ <p><mark>theta&#61;subspace(A,B)</mark>&#xff1a;返回矩阵A和矩阵B之间的夹角</p> 
+</blockquote> 
+<p><mark>求矩阵A和B之间的夹角</mark></p> 
+<p><img src="2021030722523251.png" alt="" /></p> 
+<h2><a id="12__80"></a>1.2 矩阵分解</h2> 
+<table><thead><tr><th>函数</th><th>功能描述</th></tr></thead><tbody><tr><td>chol</td><td>Cholesky分解</td></tr><tr><td>cholinc</td><td>稀疏矩阵的不完全Cholesky分解</td></tr><tr><td>lu</td><td>矩阵LU分解&#xff5c;</td></tr><tr><td>luinc</td><td>稀疏矩阵的不完全LU分解</td></tr><tr><td>qr</td><td>正交三角分解</td></tr><tr><td>svd</td><td>奇异值分解</td></tr><tr><td>gsvd</td><td>一般奇异值分解</td></tr><tr><td>schur</td><td>舒尔分解</td></tr></tbody></table>
+<p>线性方程组的求解主要基于4种基本的矩阵分解</p> 
+<ol><li>Cholesky分解</li><li>一般方阵的高斯消去法分解</li><li>舒尔分解</li><li>矩形矩阵的正交分解</li></ol> 
+<h3><a id="120_Cholesky_99"></a>1.2.0 对称正定矩阵的Cholesky分解</h3> 
+<blockquote> 
+ <p><mark>R&#61;chol(X)</mark>&#xff1a;其中X为对称正定矩阵&#xff0c;R是上三角矩阵&#xff0c;使得X&#61;R’<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         ?
+        
+       
+       
+        \cdot
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.44445em; vertical-align: 0em;"></span><span class="mord">?</span></span></span></span></span>R<br /> <mark>[R,p]&#61;chol(X)</mark>&#xff1a;<br /> 当<mark>X是正定矩阵</mark>时&#xff0c;返回的上三角矩阵R满足X&#61;R’<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         ?
+        
+       
+       
+        \cdot
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.44445em; vertical-align: 0em;"></span><span class="mord">?</span></span></span></span></span>R&#xff0c;且p&#61;0&#xff1b;<br /> 当<mark>X是非正定矩阵</mark>时&#xff0c;返回值p是正整数&#xff0c;R是上三角矩阵&#xff0c;其阶数p-1&#xff0c;且满足X(1:p-1,1:p-1)&#61;R’<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         ?
+        
+       
+       
+        \cdot
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.44445em; vertical-align: 0em;"></span><span class="mord">?</span></span></span></span></span>R</p> 
+</blockquote> 
+<p>考虑线性方程组<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        A
+       
+       
+        x
+       
+       
+        &#61;
+       
+       
+        b
+       
+      
+      
+       Ax&#61;b
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault">b</span></span></span></span></span>&#xff0c;其中A可以做Cholesky分解&#xff0c;使得<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        A
+       
+       
+        &#61;
+       
+       
+        
+         R
+        
+        
+         ′
+        
+       
+       
+        ?
+       
+       
+        R
+       
+      
+      
+       A&#61;R&#39;\cdot R
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.751892em; vertical-align: 0em;"></span><span class="mord"><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.751892em;"><span class="" style="top: -3.063em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span></span></span></span></span>&#xff0c;这样线性方程组就可以改写成<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        
+         R
+        
+        
+         ′
+        
+       
+       
+        ?
+       
+       
+        R
+       
+       
+        ?
+       
+       
+        x
+       
+       
+        &#61;
+       
+       
+        b
+       
+      
+      
+       R&#39;\cdot R\cdot x&#61;b
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.751892em; vertical-align: 0em;"></span><span class="mord"><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.751892em;"><span class="" style="top: -3.063em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault">b</span></span></span></span></span>&#xff0c;由于左除算符( \ )可以快速处理三角矩阵&#xff0c;因此得出&#xff1a;<span class="katex--display"><span class="katex-display"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         x
+        
+        
+         &#61;
+        
+        
+         R
+        
+        
+         \
+        
+        
+         (
+        
+        
+         
+          R
+         
+         
+          ′
+         
+        
+        
+         \
+        
+        
+         b
+        
+        
+         )
+        
+       
+       
+        x&#61;R\backslash (R&#39;\backslash b)
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 1.05189em; vertical-align: -0.25em;"></span><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span><span class="mord">\</span><span class="mopen">(</span><span class="mord"><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.801892em;"><span class="" style="top: -3.113em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mord">\</span><span class="mord mathdefault">b</span><span class="mclose">)</span></span></span></span></span></span>如果A是方阵<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        n
+       
+       
+        ×
+       
+       
+        n
+       
+      
+      
+       n×n
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.66666em; vertical-align: -0.08333em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">n</span></span></span></span></span>的方阵&#xff0c;则chol(&#xff21;)的计算复杂度 <span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        O
+       
+       
+        (
+       
+       
+        
+         n
+        
+        
+         3
+        
+       
+       
+        )
+       
+      
+      
+       O(n^3)
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 1.06411em; vertical-align: -0.25em;"></span><span style="margin-right: 0.02778em;" class="mord mathdefault">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.814108em;"><span class="" style="top: -3.063em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span>&#xff0c;而左除算符的计算复杂度只有 <span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        O
+       
+       
+        (
+       
+       
+        
+         n
+        
+        
+         2
+        
+       
+       
+        )
+       
+      
+      
+       O(n^2)
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 1.06411em; vertical-align: -0.25em;"></span><span style="margin-right: 0.02778em;" class="mord mathdefault">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.814108em;"><span class="" style="top: -3.063em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p> 
+<p><mark>利用chol进行矩阵分解范例&#xff1a;</mark><br /> <img src="20210308121137102.png" alt="" /><br /> <img src="20210308121155314.png" alt="" /></p> 
+<p>在矩阵中&#xff0c;若数值为0的元素数目远远多于非0元素的数目&#xff0c;并且非0元素分布没有规律时&#xff0c;则称该矩阵为<mark>稀疏矩阵</mark>&#xff1b;<br /> 与之相反&#xff0c;若非0元素数目占大多数时&#xff0c;则称该矩阵为<mark>稠密矩阵</mark></p> 
+<p>对于稀疏矩阵&#xff0c;函数cholinc( )来做不完全Cholesky分解<br /> 函数cholinc( )的另一个优点是它可用于计算实半正定矩阵</p> 
+<blockquote> 
+ <p><mark>R&#61;cholinc(X,DROPTOL)</mark>&#xff1a;<br /> 其中X和R的含义与函数chol( )中的变量相同&#xff0c;DROPTOL为不完全Cholesky分解的丢失容限。当DROPTOL设为0时&#xff0c;退化为完全Cholesky分解<br /> <mark>R&#61;cholinc(X,OPTS)</mark>&#xff1a;<br /> 其中OPTS为结构体&#xff0c;它有3个属性&#xff0c;即DROPTOL、MICHOL、RDIAG<br /> 1.DROPTOL为不完全Cholesky分解的丢失容限<br /> 2.MICHOL为1时采用改进算法的不完全Cholesky分解&#xff0c;否则不采用改进算法<br /> 3.RDIAG为1时R的对角元素中的零值替换成为DROPTPL的平方根&#xff0c;R&#61;0时不做此替换<br /> <mark>R&#61;cholinc(X,‘0’)</mark>&#xff1a;完全Cholesky分解<br /> <mark>[R,p]&#61;cholinc(X,‘0’)</mark>&#xff1a;返回两个参数&#xff0c;并且不会返回出错信息。<br /> 当X是正定矩阵时&#xff0c;返回的上三角矩阵R满足<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         X
+        
+        
+         &#61;
+        
+        
+         
+          R
+         
+         
+          ′
+         
+        
+        
+         ?
+        
+        
+         R
+        
+       
+       
+        X&#61;R&#39;\cdot R
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">X</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.751892em; vertical-align: 0em;"></span><span class="mord"><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.751892em;"><span class="" style="top: -3.063em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span></span></span></span></span>&#xff0c;且p&#61;0&#xff1b;<br /> 当X是非正定矩阵时&#xff0c;返回值p是正整数&#xff0c;R是上三角矩阵其阶数p-1&#xff0c;且满足X(1:p-1,1:p-1)&#61;R’<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         ?
+        
+       
+       
+        \cdot
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.44445em; vertical-align: 0em;"></span><span class="mord">?</span></span></span></span></span>R<br /> <mark>R&#61;cholinc(X,‘inf’)</mark>&#xff1a;采用Cholesky-Infinity分解。此种分解是基于Cholesky分解的&#xff0c;但它可以处理实半正定矩阵</p> 
+</blockquote> 
+<p>在MATLABR2018a中函数cholinc已经被删除&#xff0c;用ichol()函数替换<br /> <img src="20210308124622167.png" alt="" /><br /> <mark>稀疏矩阵Cholesky分解示例&#xff1a;</mark></p> 
+<p><img src="2021030813003234.png" alt="" /></p> 
+<h3><a id="121_LU_135"></a>1.2.1 一般方阵的高斯消去法分解&#xff08;LU分解&#xff09;</h3> 
+<p>LU分解可将任意一个方阵A分解为一个下三角矩阵L和一个上三角矩阵U的乘积&#xff0c;即<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        A
+       
+       
+        &#61;
+       
+       
+        L
+       
+       
+        U
+       
+      
+      
+       A&#61;LU
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">L</span><span style="margin-right: 0.10903em;" class="mord mathdefault">U</span></span></span></span></span> (Lower Matrix&#xff0c;Upper Matrix)</p> 
+<blockquote> 
+ <p><mark>[L,U]&#61;lu(X)</mark>&#xff1a;<br /> X是一个方阵,L是一个&#34;心理&#34;下三角矩阵,U为上三角矩阵,满足<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         X
+        
+        
+         &#61;
+        
+        
+         L
+        
+        
+         ?
+        
+        
+         U
+        
+       
+       
+        X&#61;L\cdot U
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">X</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.10903em;" class="mord mathdefault">U</span></span></span></span></span><br /> <mark>[L,U,P]&#61;lu(X)</mark>&#xff1a;<br /> X是一个方阵,L是一个下三角矩阵,U为上三角矩阵,P为置换矩阵,满足<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         P
+        
+        
+         ?
+        
+        
+         X
+        
+        
+         &#61;
+        
+        
+         L
+        
+        
+         ?
+        
+        
+         U
+        
+       
+       
+        P\cdot X&#61;L\cdot U
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.13889em;" class="mord mathdefault">P</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">X</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.10903em;" class="mord mathdefault">U</span></span></span></span></span><br /> <mark>Y&#61;lu(X)</mark>&#xff1a;<br /> X是一个方阵,把上三角矩阵和下三角矩阵合并在矩阵Y中&#xff0c;矩阵Y的对角元素为上三角矩阵的对角元素&#xff0c;即<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         Y
+        
+        
+         &#61;
+        
+        
+         L
+        
+        
+         &#43;
+        
+        
+         U
+        
+        
+         ?
+        
+        
+         I
+        
+       
+       
+        Y&#61;L&#43;U-I
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.22222em;" class="mord mathdefault">Y</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.76666em; vertical-align: -0.08333em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">&#43;</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.76666em; vertical-align: -0.08333em;"></span><span style="margin-right: 0.10903em;" class="mord mathdefault">U</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">I</span></span></span></span></span>&#xff0c;置换矩阵P的信息丢失</p> 
+</blockquote> 
+<p>考虑线性方程组<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        A
+       
+       
+        x
+       
+       
+        &#61;
+       
+       
+        b
+       
+      
+      
+       Ax&#61;b
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault">b</span></span></span></span></span>其中对矩阵A可以做LU分解&#xff0c;使得<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        A
+       
+       
+        &#61;
+       
+       
+        L
+       
+       
+        ?
+       
+       
+        U
+       
+      
+      
+       A&#61;L\cdot U
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.10903em;" class="mord mathdefault">U</span></span></span></span></span>这样的线性方程组可以写成<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        L
+       
+       
+        ?
+       
+       
+        U
+       
+       
+        ?
+       
+       
+        x
+       
+       
+        &#61;
+       
+       
+        b
+       
+      
+      
+       L\cdot U\cdot x&#61;b
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.10903em;" class="mord mathdefault">U</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault">b</span></span></span></span></span>&#xff0c;由于左除算符( \ )可以快速处理三角矩阵&#xff0c;因此可快速解出&#xff1a;<span class="katex--display"><span class="katex-display"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         x
+        
+        
+         &#61;
+        
+        
+         U
+        
+        
+         \
+        
+        
+         (
+        
+        
+         L
+        
+        
+         \
+        
+        
+         b
+        
+        
+         )
+        
+       
+       
+        x&#61;U\backslash (L\backslash b)
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span style="margin-right: 0.10903em;" class="mord mathdefault">U</span><span class="mord">\</span><span class="mopen">(</span><span class="mord mathdefault">L</span><span class="mord">\</span><span class="mord mathdefault">b</span><span class="mclose">)</span></span></span></span></span></span></p> 
+<p>利用LU分解来计算行列式的值和矩阵的逆</p> 
+<blockquote> 
+ <p><mark>det(A)&#61;det(L)*det(U)</mark><br /> <mark>inv(A)&#61;inv(U)*inv(L)</mark></p> 
+</blockquote> 
+<p><mark>进行LU分解示例&#xff1a;</mark><br /> <img src="20210308140456652.png" alt="" /><img src="20210308140519161.png" alt="" /><br /> <img src="20210308140616670.png" alt="" /><br /> <img src="20210308140632796.png" alt="" /></p> 
+<p><img src="20210308140644469.png" alt="" /><br /> 对于稀疏矩阵&#xff0c;函数luinc( )来做不完全LU分解<br /> (Incomplete LU decomposition)</p> 
+<blockquote> 
+ <p><mark>[L,U]&#61;luinc(X,DROPTPL)</mark>&#xff1a;<br /> 其中X、L、U的含义与函数lu()中的变量相同&#xff0c;DROPTPL为不完全LU分解的丢失容限。当DROPTPL设为0时&#xff0c;退化为完全LU分解<br /> <mark>[L,U]&#61;luinc(X,OPTS)</mark>&#xff1a;<br /> 其中OPTS为结构体有4个属性&#xff0c;即DROPTOL、MICHOL、RDIAG、THRESH<br /> 1.DROPTOL为不完全Cholesky分解的丢失容限<br /> 2.MICHOL为1时采用改进算法的不完全Cholesky分解&#xff0c;否则不采用改进算法<br /> 3.RDIAG为1时R的对角元素中的零值替换成为DROPTPL的平方根&#xff0c;R&#61;0时不做此替换<br /> 4.THRESH是绕对角线旋转因子&#xff0c;其取值范围是[0,1]&#xff0c;当THRESH为0时强制绕对角线旋转&#xff0c;THRESH默认值是1<br /> <mark>[L,U,P]&#61;luinc(X,‘0’)</mark>&#xff1a;0级不完全LU分解<br /> <mark>[L,U]&#61;luinc(X,‘0’)</mark>&#xff1a;0级不完全LU分解<br /> <mark>Y&#61;luinc(X,‘0’)</mark>&#xff1a;0级完全LU分解</p> 
+</blockquote> 
+<h3><a id="122_QR_173"></a>1.2.2 矩形矩阵的正交分解&#xff08;QR分解&#xff09;</h3> 
+<p>QR分解把一个<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        m
+       
+       
+        ×
+       
+       
+        n
+       
+      
+      
+       m×n
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.66666em; vertical-align: -0.08333em;"></span><span class="mord mathdefault">m</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">n</span></span></span></span></span>的矩阵A分解为一个正交矩阵Q和一个上三角矩阵R的乘积&#xff0c;即<span class="katex--display"><span class="katex-display"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         A
+        
+        
+         &#61;
+        
+        
+         Q
+        
+        
+         ?
+        
+        
+         R
+        
+       
+       
+        A&#61;Q\cdot R
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.87777em; vertical-align: -0.19444em;"></span><span class="mord mathdefault">Q</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span></span></span></span></span></span></p> 
+<blockquote> 
+ <p><mark>[Q,R]&#61;qr(A)</mark>&#xff1a;其中矩阵R为与矩阵A具有相同大小的上三角矩阵&#xff0c;Q为正交矩阵&#xff0c;它们满足<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         A
+        
+        
+         &#61;
+        
+        
+         Q
+        
+        
+         ?
+        
+        
+         R
+        
+       
+       
+        A&#61;Q\cdot R
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.87777em; vertical-align: -0.19444em;"></span><span class="mord mathdefault">Q</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span></span></span></span></span>。该调用方式适用于满矩阵和稀疏矩阵<br /> <mark>[Q,R]&#61;qr(A,0)</mark>&#xff1a;为&#34;经济&#34;方式的QR分解<br /> 设矩阵A是一个<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         m
+        
+        
+         ×
+        
+        
+         n
+        
+       
+       
+        m×n
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.66666em; vertical-align: -0.08333em;"></span><span class="mord mathdefault">m</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">n</span></span></span></span></span>的矩阵<br /> 若<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         m
+        
+        
+         &#xff1e;
+        
+        
+         n
+        
+       
+       
+        m&#xff1e;n
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">m</span><span class="mord cjk_fallback">&#xff1e;</span><span class="mord mathdefault">n</span></span></span></span></span>&#xff0c;则只计算矩阵Q的前n列元素,R为<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         n
+        
+        
+         ×
+        
+        
+         n
+        
+       
+       
+        n×n
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.66666em; vertical-align: -0.08333em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">n</span></span></span></span></span>矩阵<br /> 若<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         m
+        
+        
+         ≤
+        
+        
+         n
+        
+       
+       
+        m≤n
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.77194em; vertical-align: -0.13597em;"></span><span class="mord mathdefault">m</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">n</span></span></span></span></span>&#xff0c;则与[Q,R]&#61;qr(A)效果一致。该调用方式适用于满矩阵和稀疏矩阵<br /> <mark>[Q,R,E]&#61;qr(A)</mark>&#xff1a;R是上三角矩阵&#xff0c;Q为正交矩阵&#xff0c;E为置换矩阵<br /> 三者满足的关系&#xff1a;<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         A
+        
+        
+         ?
+        
+        
+         E
+        
+        
+         &#61;
+        
+        
+         Q
+        
+        
+         ?
+        
+        
+         R
+        
+       
+       
+        A\cdot E&#61;Q\cdot R
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.05764em;" class="mord mathdefault">E</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.87777em; vertical-align: -0.19444em;"></span><span class="mord mathdefault">Q</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span></span></span></span></span><br /> 程序选择一个合适的矩阵E使得abs(diag( R ))是降序排列的。该调用方式适用于满矩阵<br /> <mark>[Q,R,E]&#61;qr(A,0)</mark>&#xff1a;&#34;经济&#34;方式的QR分解&#xff0c;其中E是一个置换矢量。<br /> 它们满足A(:,E)&#61;<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         Q
+        
+        
+         ?
+        
+        
+         R
+        
+       
+       
+        Q\cdot R
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.87777em; vertical-align: -0.19444em;"></span><span class="mord mathdefault">Q</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.00773em;" class="mord mathdefault">R</span></span></span></span></span>&#xff0c;该调用方式适用于满矩阵<br /> <mark>R&#61;qr(A)</mark>&#xff1a;返回上三角矩阵R&#xff0c;这里R&#61;chol(<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         
+          A
+         
+         
+          ′
+         
+        
+        
+         ?
+        
+        
+         A
+        
+       
+       
+        A&#39; \cdot A
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.751892em; vertical-align: 0em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.751892em;"><span class="" style="top: -3.063em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span></span></span></span></span>)。该调用方式适用于稀疏矩阵<br /> <mark>R&#61;qr(A,0)</mark>&#xff1a;以&#34;经济&#34;方式返回上三角矩阵R<br /> <mark>[C,R]&#61;qr(A,B)</mark>&#xff1a;<br /> 其中矩阵B必须与矩阵A具有相同的行数&#xff0c;矩阵R是上三角矩阵,<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         C
+        
+        
+         &#61;
+        
+        
+         
+          Q
+         
+         
+          ′
+         
+        
+        
+         ?
+        
+        
+         B
+        
+       
+       
+        C&#61;Q&#39;\cdot B
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07153em;" class="mord mathdefault">C</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.946332em; vertical-align: -0.19444em;"></span><span class="mord"><span class="mord mathdefault">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.751892em;"><span class="" style="top: -3.063em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.05017em;" class="mord mathdefault">B</span></span></span></span></span></p> 
+</blockquote> 
+<p><mark>通过QR分解分析矩阵的秩示例&#xff1a;</mark><br /> <img src="20210308161551305.png" alt="" /><img src="20210308161617383.png" alt="" /><img src="20210308161631678.png" alt="" /></p> 
+<h3><a id="123__194"></a>1.2.3 舒尔分解</h3> 
+<p>舒尔分解定义式<span class="katex--display"><span class="katex-display"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         A
+        
+        
+         &#61;
+        
+        
+         U
+        
+        
+         ?
+        
+        
+         S
+        
+        
+         ?
+        
+        
+         
+          U
+         
+         
+          ′
+         
+        
+       
+       
+        A&#61;U\cdot S\cdot U&#39;
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.10903em;" class="mord mathdefault">U</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.05764em;" class="mord mathdefault">S</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.801892em; vertical-align: 0em;"></span><span class="mord"><span style="margin-right: 0.10903em;" class="mord mathdefault">U</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.801892em;"><span class="" style="top: -3.113em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span>其中A必须是一个方阵(Square Matrix)&#xff0c;<br /> U是一个<mark>酉矩阵</mark>&#xff08;或幺正矩阵)&#xff08;图中<mark>共轭转置符号</mark><span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        ?
+       
+      
+      
+       \dagger
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.88888em; vertical-align: -0.19444em;"></span><span class="mord">?</span></span></span></span></span> <mark>dagger</mark>,匕首&#xff09;<br /> S是一个<mark>块对角化矩阵</mark>,由对角线上的1×1和2×2块组成<br /> 特征值(eigenvalue)可以由矩阵S的对角块给出&#xff0c;而矩阵U给出比特征向量更多的数值特征。<br /> 此外&#xff0c;对缺陷矩阵也可以进行舒尔分解<br /> <img src="20210308162714350.png" alt="" /></p> 
+<blockquote> 
+ <p><mark>[U,S]&#61;schur(A)</mark>&#xff1a;返回酉矩阵U和块对角矩阵S<br /> <mark>S&#61;schur(A)</mark>&#xff1a;仅返回块对角矩阵<br /> <mark>schur(A,‘real’)</mark>&#xff1a;返回的实特征值放在对角线上&#xff0c;而把复特征值放在对角线上的2×2块中<br /> <mark>schur(A,‘complex’)</mark>&#xff1a;返回的矩阵S是上三角矩阵&#xff0c;并且如果矩阵A有复特征值&#xff0c;则矩阵S是复矩阵&#xff08;指的是元素中含有复数的矩阵&#xff09;<br /> <mark>rsf2csf( )</mark>&#xff1a;把实数形式的舒尔矩阵转换成复数形式的舒尔矩阵</p> 
+</blockquote> 
+<p><img src="20210308164739704.png" alt="" /></p> 
+<h2><a id="13__208"></a>1.3 特征值和特征向量</h2> 
+<h3><a id="130__209"></a>1.3.0 特征值和特征向量的定义</h3> 
+<p>假设A是一个<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        n
+       
+       
+        ×
+       
+       
+        n
+       
+      
+      
+       n×n
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.66666em; vertical-align: -0.08333em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">n</span></span></span></span></span>的矩阵&#xff0c;A的特征值问题就是找到下面方程组的解&#xff1a;<br /> <span class="katex--display"><span class="katex-display"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         A
+        
+        
+         ?
+        
+        
+         V
+        
+        
+         &#61;
+        
+        
+         λ
+        
+        
+         ?
+        
+        
+         V
+        
+       
+       
+        A\cdot V&#61;\lambda\cdot V
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.22222em;" class="mord mathdefault">V</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault">λ</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.22222em;" class="mord mathdefault">V</span></span></span></span></span></span>其中&#xff0c;<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        λ
+       
+      
+      
+       \lambda
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault">λ</span></span></span></span></span>为标量&#xff0c;<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        V
+       
+      
+      
+       V
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.22222em;" class="mord mathdefault">V</span></span></span></span></span>为矢量</p> 
+<p>若把矩阵A的n个特征值放在矩阵P的对角线上&#xff0c;相应的特征向量按照特征值对应的顺序排列&#xff0c;作为矩阵V的列&#xff0c;特征值问题可改写为&#xff1a;<span class="katex--display"><span class="katex-display"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         A
+        
+        
+         ?
+        
+        
+         V
+        
+        
+         &#61;
+        
+        
+         V
+        
+        
+         ?
+        
+        
+         D
+        
+       
+       
+        A\cdot V&#61;V\cdot D
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.22222em;" class="mord mathdefault">V</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.22222em;" class="mord mathdefault">V</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.02778em;" class="mord mathdefault">D</span></span></span></span></span></span>如果<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        V
+       
+      
+      
+       V
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.22222em;" class="mord mathdefault">V</span></span></span></span></span>是非奇异的&#xff0c;该问题可认为是一个特征值分解问题&#xff0c;关系式如下&#xff1a;<span class="katex--display"><span class="katex-display"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         A
+        
+        
+         &#61;
+        
+        
+         V
+        
+        
+         ?
+        
+        
+         D
+        
+        
+         ?
+        
+        
+         
+          V
+         
+         
+          
+           ?
+          
+          
+           1
+          
+         
+        
+       
+       
+        A&#61;V\cdot D\cdot V^{-1}
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.22222em;" class="mord mathdefault">V</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.02778em;" class="mord mathdefault">D</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.864108em; vertical-align: 0em;"></span><span class="mord"><span style="margin-right: 0.22222em;" class="mord mathdefault">V</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.864108em;"><span class="" style="top: -3.113em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">?</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span></span></span></p> 
+<p><mark>广义特征值问题</mark>是指方程<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        A
+       
+       
+        ?
+       
+       
+        X
+       
+       
+        &#61;
+       
+       
+        λ
+       
+       
+        ?
+       
+       
+        B
+       
+       
+        ?
+       
+       
+        x
+       
+      
+      
+       A\cdot X&#61;\lambda\cdot B\cdot x
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">X</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault">λ</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.05017em;" class="mord mathdefault">B</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">x</span></span></span></span></span>的非平凡解问题&#xff0c;其中A、B都是<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        n
+       
+       
+        ×
+       
+       
+        n
+       
+      
+      
+       n×n
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.66666em; vertical-align: -0.08333em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">n</span></span></span></span></span>的矩阵&#xff0c;<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        λ
+       
+      
+      
+       \lambda
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault">λ</span></span></span></span></span>是标量。满足此方程的<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        λ
+       
+      
+      
+       \lambda
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault">λ</span></span></span></span></span>为<mark>广义特征值</mark>&#xff0c;对应的向量<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        x
+       
+      
+      
+       x
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">x</span></span></span></span></span>为<mark>广义特征向量</mark><br /> 如果<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        X
+       
+      
+      
+       X
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">X</span></span></span></span></span>是一个列向量 <span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        
+         a
+        
+        
+         ?
+        
+       
+      
+      
+       \vec{a}
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.714em; vertical-align: 0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.714em;"><span class="" style="top: -3em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord mathdefault">a</span></span></span><span class="" style="top: -3em;"><span class="pstrut" style="height: 3em;"></span><span class="accent-body" style="left: -0.2355em;"><span class="overlay" style="height: 0.714em; width: 0.471em;">
+            <svg width="0.471em" height="0.714em" style="width:0.471em" viewbox="0 0 471 714" preserveaspectratio="xMinYMin">
+             <path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"></path>
+            </svg></span></span></span></span></span></span></span></span></span></span></span> 的特征向量的矩阵&#xff0c;并且它的秩为n,那么特征向量线性相关。<br /> 如果不是这样&#xff0c;则称矩阵为<mark>缺陷阵</mark><br /> 如果<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+    
+     
+      
+       
+        
+         X
+        
+        
+         ′
+        
+       
+       
+        ?
+       
+       
+        X
+       
+       
+        &#61;
+       
+       
+        I
+       
+      
+      
+       X&#39;\cdot X&#61;I
+      
+     
+    </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.751892em; vertical-align: 0em;"></span><span class="mord"><span style="margin-right: 0.07847em;" class="mord mathdefault">X</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.751892em;"><span class="" style="top: -3.063em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">X</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">I</span></span></span></span></span>&#xff0c;则特征向量正交&#xff0c;这对于对称矩阵是成立的</p> 
+<h3><a id="131__221"></a>1.3.1 特征值和特征向量的相关函数</h3> 
+<blockquote> 
+ <p><mark>eig(A)</mark>&#xff1a;求包含矩阵A的特征值的向量<br /> <mark>[X,D]&#61;eig(A)</mark>&#xff1a;产生一个矩阵A的特征值在对角线上的对角矩阵D和矩阵X&#xff0c;它们的列是相应的特征向量&#xff0c;满足<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         A
+        
+        
+         ?
+        
+        
+         X
+        
+        
+         &#61;
+        
+        
+         X
+        
+        
+         ?
+        
+        
+         D
+        
+       
+       
+        A\cdot X&#61;X\cdot D
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">X</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.07847em;" class="mord mathdefault">X</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.02778em;" class="mord mathdefault">D</span></span></span></span></span>&#xff0c;为了得到有更好条件特征值的矩阵&#xff0c;要进行相似变换<br /> <mark>[T,B]&#61;balance(A)</mark>&#xff1a;找到一个相似变换矩阵T和矩阵B,使得它们满足<span class="katex--inline"><span class="katex"><span class="katex-mathml">
+     
+      
+       
+        
+         B
+        
+        
+         &#61;
+        
+        
+         T
+        
+        
+         ?
+        
+        
+         A
+        
+        
+         ?
+        
+        
+         T
+        
+       
+       
+        B&#61;T-A\cdot T
+       
+      
+     </span><span class="katex-html"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.05017em;" class="mord mathdefault">B</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">&#61;</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.76666em; vertical-align: -0.08333em;"></span><span style="margin-right: 0.13889em;" class="mord mathdefault">T</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault">A</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">?</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span style="margin-right: 0.13889em;" class="mord mathdefault">T</span></span></span></span></span>&#xff0c;B是用balance命令求得的平衡矩阵<br /> <mark>eig(A,‘nobalance’)</mark>&#xff1a;不经过平衡处理求得矩阵A的特征值和特征向量&#xff0c;也就是不进行平衡相似变换<br /> <mark>eigs(A)</mark>&#xff1a;返回一个由矩阵A的部分特征值组成的向量&#xff0c;和eig命令一样&#xff0c;但不返回全部的特征值。如果不带有参量&#xff0c;则计算出最大的特征值&#xff0c;当计算所有特征值时&#xff0c;如果矩阵A的秩不小于6&#xff0c;则计算出6个特征值<br /> <mark>eigs(f,n)</mark>&#xff1a;求出矩阵A的部分特征值。在使用一个矩阵列的线性运算符时&#xff0c;字符串f中包含的是M文件的文件名&#xff0c;n指定问题的阶次。用这种方法来求特征值比开始就用运算符来求要快<br /> <mark>eigs(A,B,k,sigma)</mark><br /> 求矩阵A的部分特征值,矩阵B的大小和A相同&#xff1b;<br /> 如果没有给出B&#61;eye(size(A)),那么k就是要计算的特征值的个数&#xff1b;<br /> 如果k没有给出&#xff0c;就用小于6的数或者A的秩<br /> sigma是一个实数或复数的移位参数&#xff0c;或下列文本字符串中的一个<br /> 文本字符串指明的是特征值的属性&#xff1a;<br /> lm&#xff1a;为最大的特征值<br /> sm&#xff1a;为最小的特征值<br /> lr&#xff1a;为最大的实数部分<br /> sr&#xff1a;最小的实数部分<br /> be&#xff1a;为同时求的最大和最小的实数部分<br /> <mark>condeig(A)</mark>&#xff1a;返回一个由矩阵A的特征值条件数组成的向量<br /> <mark>[V,D,s]&#61;condeig(A)</mark>&#xff1a;返回[V,D]&#61;eig(A)和s&#61;condeig(A)</p> 
+</blockquote> 
+<h3><a id="132__242"></a>1.3.2 特征值和特征向量的计算</h3> 
+<p><img src="20210308174057672.png" alt="" /><br /> <img src="20210308174125216.png" alt="" /></p>
+
+</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+          <footer id="colophon" role="contentinfo">
+	<div id="site-generator">孙悟空 sunwukong@sangkeji.com   Copyright 2021-2022</div>
+	<script src="../../footer.js"></script>
+          </footer>
+        </div>
+    </body>
+</html>
