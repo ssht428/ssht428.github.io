@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>欢迎来到我的博客</title>
+        <link rel="stylesheet" type="text/css" media="all" href="style.css">
+        
+    </head>
+    <body class="post-template-default single single-post postid-0 single-format-standard logged-in admin-bar single-author singular two-column left-sidebar customize-support">
+        <div id="page" class="hfeed">
+            <div id="main">
+                <div id="primary">
+                    <div id="content" role="main">        
+                        <article id="post-0" class="post-0 post type-post status-publish format-standard hentry category-0">
+                            <header class="entry-header">
+                                <h1 class="entry-title">欢迎来到我的博客</h1>
+                            </header>
+                            <div class="entry-content">
+<br><a href="http://www.sangkeji.com"> 主页 </a>  &emsp;&emsp;&emsp;&emsp;   <a href="#welcome0">  工业  </a>&emsp;&emsp;&emsp;&emsp;<a href="#welcome1">  机器人  </a>&emsp;&emsp;&emsp;&emsp; <a href="#welcome2">  视觉  </a>&emsp;&emsp;&emsp;&emsp; <a href="#welcome3">  嵌入式 </a>&emsp;&emsp;&emsp;&emsp; <a href="#welcome4">  杂七杂八  </a>&emsp;&emsp;&emsp;&emsp;
+<br>
+<br>
+<p>
+  <br> 本博客主要是记录过去做过的一些项目，好多都已经忘记。
+  <br> 其次如有“钱多活少环境好”的工作也可以联系我^_^，可加wechat:&emsp;&emsp;
+  <img class="img_zoom" src="wechat_qrcode.png" width="60px" height="60px"/> 
+  <br> 2011年就在万网注册域名，当时因为国内服务器要各种审查，并且随时会关掉，所以就没买。后来2016年在midphase买了服务器(赠送域名)，当时就简单下载了个主题玩了几天然后又是放在一边不更新了。
+<br> 最近想着还是记录一下过去做过的各个项目，还有顺便整理下学习收集的各种资料，所以找个最简单的方式先记录一下。虽然目前我也有专门网站，或者使用其他网站提供的blog功能，但是鉴于各种不确定性，还是找个自己能把控的并且还简单的。
+对比了一圈，就先用github pages功能，因为还要存储对应的代码，所以正好就放一起算了。
+
+<br> 下面是所有文章的目录(原创+转载)：
+
+<br>=============================================================================
+<div id="welcome1"><strong>机器人</strong></div>
+<br>目前编写过程序的机器人有库卡(KUKA)，三菱(Mitsubishi)，优傲(UR)，李群(QKM)，达野(DAYE)，越疆(DOBOT)等等，大多数都是简单测试，没有实际项目。主要是为了配合机器视觉(Machine Vision)进行通信测试，远程控制。
+<br>
+<br><a href="blog/robot/dobot/index.html"> 越疆DOBOT机器人 </a> 
+<br><a href="blog/robot/mitsubishi/index.html"> 三菱机器人MITSUBISHI SCARA </a> 
+<br><a href="blog/robot/qkm/index.html"> 李群机器人QKM SCARA </a> 
+<br><a href="blog/robot/kuka/index.html"> 库卡KUKA机器人 </a> 
+<br><a href="blog/robot/ur/index.html"> 优傲UR机器人 </a> 
+<br><a href="blog/robot/force-torque-sensor/index.html"> 六维力矩传感器(Matlab仿真/滤波/主动打磨应用) </a> 
+<br><a href="blog/robot/vrep/index.html"> [转载]v-rep机器人仿真 </a> 
+<br><a href="#"> reserve </a> 
+
+
+<br>=============================================================================
+<div id="welcome2"><strong>视觉</strong></div>
+<br>首先要感谢公司给了机会和时间让我学习视觉检测方面的知识，并且提供了很多硬件供测试。#STRONG Thanks #-STRONG
+<br>工业视觉是从20年4月份才开始学习的，当初为成本低选择了opencv，公司一开始只有个大恒的相机，先期仅做一个简单连接测试，但是经常会断开相机通信，并且导致电脑上的相机驱动也损坏，需要重新安装相机软件才可以。然后找大恒的销售，一开始还给些资料，并且给了个新式的“智能相机”试用，里面集成了Merlic软件，软件有点简单，无法实现项目要求，所以还是得自己写。后来再联系，就直接让一个客服接了，给了些N年前的代码，所以只好放弃了。
+<br>后来公司收了两个Basler相机，于是就干脆试试Basler的，并且网上和github有很多案例和使用说明。前期用VS2015调试连接、采集图像都顺利。
+<br>OpenCV一开始使用，按照各入门教程还算顺利，只是有时修改参数不方便，需要修改程序然后重新编译。或者使用opencv自带的createTrackbar，但是也是比较麻烦，所以要做界面才可以。找了下，好像有个cvUI可以，经过几天的试用，发现集成很简单，并且简单的界面还可以，但是稍微要加点功能，都无能为力了。
+<br>过去只使用过VisualBasic 6.0做PC端的软件，但是OpenCV不能与那么老的VB6结合，只好找个新的编程语言了。 因为过去经常使用的是C编写后台和MCU之类的底层，所以首先想到的是有没有可以用C进行编程的界面，想起来GTK+，找了好多天，都没有很好的教程。
+<br>看来只好新学一门语言了，由于我一直在windows上编程，所以首先看看windows上有什么好的速度快的，都说C#是最简单的，所以就先试试。试了几天发现，即使做最简单的界面，默认添加的杂代码太多，并且和OpenCV结合也不方便，所以再换。。。
+<br>找来找去，还是选Qt试试，一开始不选Qt的原因是据说“Qt界面运行速度慢，程序体积有点大”，但是转来转去，只好硬着头皮学了，并且其中好多C++用法和标准的C++有差别。
+<br>过程中还有很多其他的涉及，下面仅对其中有点用的进行转载，部分代码可能在文章中当成附件，如果是个大项目，有可能放在github单独一个project。
+<br><a href="#note-tests">  学习记录及实验  </a>&emsp;&emsp;&emsp;&emsp; <a href="#projects">  实际工程项目  </a>&emsp;&emsp;&emsp;&emsp;
+<div id="note-tests"><strong>学习记录及实验</strong>
+<br>|--<a href="blog/vision/opencv-learning/index.html ">  OpenCV相关学习书籍 </a>
+<br>|--<a href="blog/vision/opencv-stepbystep/test0/index.html ">  VS2015-OpenCV-Qt-Pylon 安装及配置  </a> 
+<br>|--<a href="blog/vision/opencv-stepbystep/test1/index.html ">  OpenCV函数-imread()  </a> 
+<br>|--<a href="blog/vision/opencv-stepbystep/test2/index.html ">  OpenCV函数-waitkey() </a>  
+<br>|--<a href="blog/vision/opencv-stepbystep/test3/index.html ">  OpenCV函数-dilate/erode() </a>  
+<br>|--<a href="blog/vision/hand-eye-calib2d/index.html ">  手眼标定2D  </a>  
+<br>|--<a href="blog/vision/qt-install/index.html ">  Qt的安装及配置OpenCV   </a>  
+<br>|--<a href="blog/vision/camera-calib-matlab/index.html"> Matlab中相机标定 </a> 
+<br>|--<a href="blog/vision/camera-calib-opencv/index.html"> OpenCV中相机标定 </a> 
+<br>|--<a href="blog/vision/camera-calib-opencv/ref-links.html"> 相机标定-参考链接 </a> 
+<br>|--<a href="blog/vision/nine-points-calib/index.html ">  九点手眼标定   </a>  
+<br>|--<a href="blog/vision/mnist-opencv-svm/index.html ">  opencv3.0中的SVM训练 mnist 手写字体识别   </a>  
+
+</div>
+<br>
+<br>
+<div id="projects"><strong>实际工程项目</strong>
+<br>|--<a href="blog/vision/merlic-try/index.html ">  Merlic视觉软件介绍   </a>  
+<br>|--<a href="blog/vision/keyence-debug/index.html ">  基恩士Keyence视觉软硬件介绍及调试   </a> 
+<br>|--<a href="blog/vision/basler-sw-hw/index.html ">  Basler软硬件介绍及驱动安装配置  </a> 
+<br>|--<a href="blog/vision/qrcode-calib/index.html ">  UR机器人使用二维码QrCode校准   </a>  
+<br>|--<a href="blog/vision/qkm-scara-handeye/index.html ">  李群QKM机器人SCARA手眼标定   </a>  
+<br>|--<a href="blog/vision/trackshoes-dimension/index.html ">  推土机履带板尺寸检测   </a>  
+<br>|--<a href="blog/vision/glucose-direction/index.html ">  医疗软袋制剂自动装盘   </a>  
+<br>|--<a href="blog/vision/glucose-missout/index.html ">  医疗葡萄糖注射液袋漏取检测   </a>  
+</div>
+
+<br>=============================================================================
+<div id="welcome3"><strong>嵌入式</strong></div>
+<br>目前主要使用STM32,过去51、BBB、Raspberry Pi、等等也玩过，但是基本上现在都忘干净啦。
+<br>也做过小表DMM、LCR、WFG、OSC等，基本上也是做个半成品，没卖掉一个。下面主要写下做的勉强能说出来的项目，仅仅记录下结果，部分code会单独放在github上，没什么参考价值滴。
+<br>
+<br><a href="blog/embedded/big-dog/index.html"> 大型机械狗 </a> 
+<br><a href="blog/embedded/four-wheels/index.html"> 四轮农业车 </a> 
+<br><a href="blog/embedded/stm32/index.html"> stm32 </a> 
+
+
+<br>=============================================================================
+<div id="welcome0"><strong>工业</strong></div>
+<br><a href="#"> <del> 汽车接插件电阻焊 </del></a> 
+<br><a href="#"> <del> 各类非标设备 </del></a> 
+<br><a href="#"> <del> 印包设备 </del></a> 
+<br><a href="#"> <del> 化纤经编机 </del></a> 
+<br><a href="#"> <del> 真空镀膜机 </del></a> 
+<br><a href="#"> <del> 多轴向经编机 </del></a> 
+<br><a href="#"> <del> 两翼平开安全旋转门 </del></a> 
+<br><a href="#"> <del> 现代电机控制实验室 </del></a> 
+<br><a href="#"> <del> 产品管理系统 </del></a> 
+<br><a href="#"> <del> 组建产品管理部 </del></a> 
+
+<br>=============================================================================
+<div id="welcome4"><strong>杂七杂八</strong></div>
+<br><a href="blog/matlab/file-path/index.html"> Matlab文件目录测试(FilePath)相对路径 </a> 
+<br><a href="blog/pid/index.html"> [转载]PID原理算法及整定 </a> 
+<br><a href="blog/algebra/index.html"> [转载]线性代数学习记录 </a> 
+<br><a href="blog/lua/index.html"> [转载]Lua学习记录 </a> 
+<br><a href="blog/opencv/index.html"> [转载]OpenCV学习记录 </a> 
+<br><a href="blog/ompl/index.html"> [转载]开源运动规划库(OMPL)学习记录 </a> 
+<br><a href="blog/DeepLearning-500-questions/index.html"> [转载]深度学习500问 </a> 
+<br><a href="blog/misc/book-song-movie/index.html"> 书藉/歌曲/电影类推荐 </a> 
+<br><a href="blog/misc/xianyansuiyu/index.html"> 闲言碎语 </a> 
+
+<br>=============================================================================
+
+</p>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            <footer id="colophon" role="contentinfo">
+                <div id="site-generator">孙悟空  sunwukong@sangkeji.com  Copyright 2021-2022</div>
+                <script src="footer.js"></script>
+            </footer>
+        </div>
+        <!-- <div class="to_top_button"> <a href="#">^</a> </div>  -->
+         <div class="to_top_button"> <a href="#">
+        <svg width="50" height="50" viewBox="0 0 25 25" fill="currentColor">
+        <path d="M13.204 3.107a1.75 1.75 0 00-2.408 0L3.806 9.73c-1.148 1.088-.378 3.02 1.204 3.02h2.24V20c0 .966.784 1.75 1.75 1.75h6A1.75 1.75 0 0016.75 20v-7.25h2.24c1.582 0 2.353-1.932 1.204-3.02l-6.99-6.623z" fill-rule="evenodd" clip-rule="evenodd">
+        </path>
+        </svg>
+        
+        </a> </div>
+    </body>
+</html>

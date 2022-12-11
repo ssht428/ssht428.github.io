@@ -1,99 +1,15 @@
-function format_content(raw)
-{
-    var items = raw.split("\n");
-    var formated = "";
-    var in_code = false;
-    var replace_map = [[/&/g, "&amp;"], [/</g, "&lt;"], [/>/g, "&gt;"],
-        [/#RED/g, "<font color='red'>"], [/#-RED/g, "</font>"],
-        [/#STRONG/g, "<strong>"], [/#-STRONG/g, "</strong>"],
-        [/#HREF/g, "<a href="], [/#-HREF1/g, ">"], [/#-HREF2/g, "</a>"],
-        [/#TABLE/g, "<table>"], [/#-TABLE/g, "</table>"],
-        [/#TBODY/g, "<tbody>"], [/#-TBODY/g, "</tbody>"],
-        [/#BR/g, "<br>"],
-        [/#P/g, "<p>"], [/#-P/g, "</p>"],
-        [/#TH/g, "<th>"], [/#-TH/g, "</th>"],
-        [/#TR/g, "<tr>"], [/#-TR/g, "</tr>"],
-        [/#TD/g, "<td>"], [/#-TD/g, "</td>"],
-        [/#UL/g, "<ul>"], [/#-UL/g, "</ul>"],
-        [/#OL/g, "<ol>"], [/#-OL/g, "</ol>"],
-        [/#LI/g, "<li>"], [/#-LI/g, "</li>"],
-        [/#EM/g, "<em>"], [/#-EM/g, "</em>"],
-        [/#SUP/g, "<sup>"], [/#-SUP/g, "</sup>"],
-        [/#SUB/g, "<sub>"], [/#-SUB/g, "</sub>"]];
-    for(var i = 0; i < items.length; i++)
-    {
-        item = items[i];
-        for(var j = 0; j < replace_map.length; j++)
-            item = item.replace(replace_map[j][0], replace_map[j][1]);
-        if(in_code)
-        {
-            if(item == "---code")
-            {
-                formated += "</pre>";
-                in_code = false;
-            }
-            else
-                formated += item + "\n";
-        }
-        else
-        {
-            if(item.length == 0)
-                continue;
-            if(item.endsWith(".png") || item.endsWith(".jpg") || item.endsWith(".gif"))
-            {
-                formated += "<p><img src = '" + item + "'></p>";
-                
-            }
-            else if(item == "+++code")
-            {
-                formated += "<pre>";
-                in_code = true;
-            }
-            else
-            {
-                if(item.startsWith("<"))
-                    formated += item;
-                else
-                    formated += "<p>" + item + "</p>";
-            }
-        }
-    }
-    return formated;
-}
-
+﻿
 window.onload = function()
 {
-    var title = document.getElementById("title").innerText;
-    var content = document.getElementById("content").innerText;
-    var footer = "孙悟空 from 吉林大学自动化 @ sunwukong@sangkeji.com";
-    document.write('                                                                                \
-        <html>                                                                                      \
-            <head>                                                                                  \
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">                 \
-                <title>' + title + '</title>                                                        \
-                <link rel="stylesheet" type="text/css" media="all" href="../../../style.css">       \
-            </head>                                                                                 \
-            <body class="post-template-default single single-post postid-14                         \
-                single-format-standard logged-in admin-bar single-author singular two-column        \
-                left-sidebar customize-support">                                                    \
-                <div id="page" class="hfeed">                                                       \
-                    <div id="main">                                                                 \
-                        <div id="primary">                                                          \
-                            <div id="content" role="main">                                          \
-                                <article id="post-14" class="post-14 post type-post status-publish  \
-                                    format-standard hentry category-18">                            \
-                                    <header class="entry-header">                                   \
-                                        <h1 class="entry-title">' + title + '</h1>                  \
-                                    </header>                                                       \
-                                    <div class="entry-content">' + format_content(content) + '</div>\
-                                </article>                                                          \
-                            </div>                                                                  \
-                        </div>                                                                      \
-                    </div>                                                                          \
-                    <footer id="colophon" role="contentinfo">                                       \
-                        <div id="site-generator">' + footer + '</div>                               \
-                    </footer>                                                                       \
-                </div>                                                                              \
-            </body>                                                                                 \
-        </html>');
+    var oTop = document.getElementById("to_top");
+    var screenh = document.documentElement.clientHeight || document.body.clientHeight;
+    oTop.style.right = "0px";
+    oTop.style.top = screenh - oTop.offsetHeight + "px";
+    window.onscroll = function(){
+        var scrolltop = document.documentElement.scrollTop || document.body.scrollTop;
+        oTop.style.top = screenh - oTop.offsetHeight + scrolltop +"px";
+    }
+     oTop.onclick = function(){
+        document.documentElement.scrollTop = document.body.scrollTop =0;
+    }
 }
